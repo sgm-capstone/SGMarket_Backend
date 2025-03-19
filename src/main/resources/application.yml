@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: SGMarket-Backend
+  profiles:
+    group:
+      test: "test"
+      local: "local, datasource"
+      dev: "dev, datasource"
+      prod: "prod, datasource"
