@@ -1,4 +1,4 @@
-# Java 17 환경 제공
+# Java 21 환경 제공
 FROM amazoncorretto:21
 
 # 빌드 과정에서 사용할 JAR 파일 경로를 ARG로 설정 (기본값: build/libs/*.jar)
