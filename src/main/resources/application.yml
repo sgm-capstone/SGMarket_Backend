@@ -7,3 +7,6 @@ spring:
       local: "local, datasource"
       dev: "dev, datasource"
       prod: "prod, datasource"
+
+swagger:
+  url: ${SERVER_URL:http://localhost:8080}
