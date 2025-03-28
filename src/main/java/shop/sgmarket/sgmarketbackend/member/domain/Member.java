@@ -7,6 +7,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -33,6 +34,8 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private Status status;
 
+    private LocalDateTime lastLoginAt;
+
     @Builder(access = AccessLevel.PRIVATE)
     private Member(OauthInfo oauthInfo, MemberRole memberRole, String address, Status status) {
         this.oauthInfo = oauthInfo;
@@ -45,14 +48,17 @@ public class Member {
                                       String oauthId,
                                       String email,
                                       String nickname,
-                                      String profileImageUrl,
-                                      String address) {
+                                      String profileImageUrl
+    ) {
         OauthInfo oauthInfo = OauthInfo.createOauthInfo(oauthId, oAuthProvider.getValue(), email, nickname, profileImageUrl);
         return Member.builder()
                 .oauthInfo(oauthInfo)
                 .memberRole(MemberRole.USER)
-                .address(address)
                 .status(Status.ACTIVE)
                 .build();
+    }
+
+    public void updateLastLoginAt() {
+        this.lastLoginAt = LocalDateTime.now();
     }
 }
