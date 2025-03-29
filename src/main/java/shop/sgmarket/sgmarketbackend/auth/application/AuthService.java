@@ -7,8 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shop.sgmarket.sgmarketbackend.auth.domain.OAuthProvider;
-import shop.sgmarket.sgmarketbackend.auth.dto.RefreshTokenDto;
-import shop.sgmarket.sgmarketbackend.auth.dto.request.RefreshTokenRequest;
 import shop.sgmarket.sgmarketbackend.auth.dto.response.AuthTokenResponse;
 import shop.sgmarket.sgmarketbackend.auth.dto.response.OAuthTokenResponse;
 import shop.sgmarket.sgmarketbackend.auth.dto.response.SocialClientResponse;
@@ -67,19 +65,6 @@ public class AuthService {
 
         return AuthTokenResponse.of(tokenPair);
 
-    }
-
-    @Transactional(readOnly = true)
-    public AuthTokenResponse reissueTokenPair(RefreshTokenRequest request, HttpServletResponse response) {
-        RefreshTokenDto refreshTokenDto =
-                jwtTokenProvider.retrieveRefreshToken(request.refreshToken());
-        RefreshTokenDto refreshToken =
-                jwtTokenProvider.createRefreshTokenDto(refreshTokenDto.memberId());
-
-        Member member = memberUtil.getMemberByMemberId(refreshToken.memberId());
-
-        TokenPairResponse tokenPair = getLoginResponse(member, response);
-        return AuthTokenResponse.of(tokenPair);
     }
 
     private TokenPairResponse getLoginResponse(Member member, HttpServletResponse response) {
