@@ -1,6 +1,5 @@
 package shop.sgmarket.sgmarketbackend.auth.api;
 
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,10 +17,9 @@ import shop.sgmarket.sgmarketbackend.auth.dto.response.OAuthTokenResponse;
 import shop.sgmarket.sgmarketbackend.auth.dto.response.SocialClientResponse;
 import shop.sgmarket.sgmarketbackend.global.response.ApiResponseTemplate;
 
-@Tag(name = "[인증 API]", description = "인증 관련 API")
 @RestController
-@RequestMapping("/auth")
 @RequiredArgsConstructor
+@RequestMapping("/auth")
 public class AuthController implements AuthDocs {
 
     private final AuthService authService;
