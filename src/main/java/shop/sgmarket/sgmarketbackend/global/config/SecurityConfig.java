@@ -41,9 +41,9 @@ public class SecurityConfig {
                                                 "/v3/api-docs/**",
                                                 "/swagger-resources/**",
                                                 "/webjars/**"
-                                        ).permitAll() // 인증 없이 접근 가능
+                                        ).permitAll()
                                         .requestMatchers("/auth/**")
-                                        .permitAll() // Auth endpoints
+                                        .permitAll()
                                         .anyRequest()
                                         .authenticated())
                 .exceptionHandling(

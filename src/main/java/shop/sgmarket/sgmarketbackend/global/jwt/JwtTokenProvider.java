@@ -53,12 +53,6 @@ public class JwtTokenProvider {
         return token;
     }
 
-    public RefreshTokenDto createRefreshTokenDto(Long memberId) {
-        RefreshTokenDto refreshTokenDto = jwtUtil.generateRefreshTokenDto(memberId);
-        saveRefreshTokenToRedis(memberId, refreshTokenDto.tokenValue(), refreshTokenDto.ttl());
-        return refreshTokenDto;
-    }
-
     private void saveRefreshTokenToRedis(Long memberId, String refreshTokenDto, Long ttl) {
         RefreshToken refreshToken =
                 RefreshToken.builder()
@@ -116,9 +110,5 @@ public class JwtTokenProvider {
                     MemberRole.valueOf(e.getClaims().get(TOKEN_ROLE_NAME, String.class));
             return createAccessTokenDto(memberId, memberRole);
         }
-    }
-
-    public void deleteRefreshToken(Long memberId) {
-        refreshTokenRepository.deleteById(memberId);
     }
 }
