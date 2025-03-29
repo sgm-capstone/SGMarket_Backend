@@ -55,7 +55,7 @@ public class AuthService {
         Member member = memberRepository
                 .findByOauthInfoOauthProviderAndOauthInfoOauthId(oAuthProvider.getValue(), oauthId)
                 .orElseGet(() -> {
-                    Member newMember = Member.createMember(oAuthProvider, oauthId, email, nickname, profileImage);
+                    Member newMember = Member.createOauthMember(oAuthProvider, oauthId, email, nickname, profileImage);
                     memberRepository.save(newMember);
                     log.info("회원가입 진행: {}", newMember.getId());
                     return newMember;

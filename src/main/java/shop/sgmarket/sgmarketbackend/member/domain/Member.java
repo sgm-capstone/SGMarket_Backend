@@ -44,11 +44,11 @@ public class Member {
         this.status = status;
     }
 
-    public static Member createMember(OAuthProvider oAuthProvider,
-                                      String oauthId,
-                                      String email,
-                                      String nickname,
-                                      String profileImageUrl
+    public static Member createOauthMember(OAuthProvider oAuthProvider,
+                                           String oauthId,
+                                           String email,
+                                           String nickname,
+                                           String profileImageUrl
     ) {
         OauthInfo oauthInfo = OauthInfo.createOauthInfo(oauthId, oAuthProvider.getValue(), email, nickname, profileImageUrl);
         return Member.builder()
