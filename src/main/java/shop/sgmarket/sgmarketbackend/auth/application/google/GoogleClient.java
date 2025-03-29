@@ -15,7 +15,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
 import shop.sgmarket.sgmarketbackend.auth.application.OAuthClient;
 import shop.sgmarket.sgmarketbackend.auth.dto.response.SocialClientResponse;
-import shop.sgmarket.sgmarketbackend.auth.dto.response.goggle.GoogleAuthResponse;
+import shop.sgmarket.sgmarketbackend.auth.dto.response.google.GoogleAuthResponse;
 import shop.sgmarket.sgmarketbackend.auth.dto.response.OAuthTokenResponse;
 import shop.sgmarket.sgmarketbackend.global.error.ErrorCode;
 import shop.sgmarket.sgmarketbackend.global.error.exception.CustomException;

@@ -1,4 +1,4 @@
-package shop.sgmarket.sgmarketbackend.auth.dto.response.goggle;
+package shop.sgmarket.sgmarketbackend.auth.dto.response.google;
 
 public record GoogleAuthResponse(
         String sub,
