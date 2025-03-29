@@ -61,4 +61,8 @@ public class Member {
     public void updateLastLoginAt() {
         this.lastLoginAt = LocalDateTime.now();
     }
+
+    public void updateAddress(String address) {
+        this.address = address;
+    }
 }
