@@ -71,11 +71,7 @@ public class Member {
         this.lastLoginAt = LocalDateTime.now();
     }
 
-    public void updateAddress(String address) {
-        this.address = address;
-    }
-
-    public void registerMember(String address, String nickname) {
+    public void register(String address, String nickname) {
         this.address = address;
         this.nickname = nickname;
     }
