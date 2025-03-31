@@ -12,7 +12,6 @@ import shop.sgmarket.sgmarketbackend.auth.dto.response.OAuthTokenResponse;
 import shop.sgmarket.sgmarketbackend.auth.dto.response.SocialClientResponse;
 import shop.sgmarket.sgmarketbackend.auth.dto.response.TokenPairResponse;
 import shop.sgmarket.sgmarketbackend.global.jwt.JwtTokenProvider;
-import shop.sgmarket.sgmarketbackend.global.util.MemberUtil;
 import shop.sgmarket.sgmarketbackend.member.domain.Member;
 import shop.sgmarket.sgmarketbackend.member.domain.MemberRole;
 import shop.sgmarket.sgmarketbackend.member.repository.MemberRepository;
@@ -24,7 +23,6 @@ public class AuthService {
 
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
-    private final MemberUtil memberUtil;
     private final Map<OAuthProvider, OAuthClient> oAuthClients;
 
     @Transactional(readOnly = true)
