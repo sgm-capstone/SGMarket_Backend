@@ -19,21 +19,21 @@ public class OauthInfo {
     private String oauthProvider;
 
     @Column(name = "email")
-    private String email;
+    private String oauthEmail;
 
-    @Column(name = "nickname")
-    private String nickname;
+    @Column(name = "oauth_nickname")
+    private String oauthNickname;
 
     @Column(name = "profile_image_url")
-    private String profileImageUrl;
+    private String oauthProfileImageUrl;
 
     @Builder(access = AccessLevel.PRIVATE)
-    private OauthInfo(String oauthId, String oauthProvider, String email, String nickname, String profileImageUrl) {
+    private OauthInfo(String oauthId, String oauthProvider, String oauthEmail, String oauthNickname, String oauthProfileImageUrl) {
         this.oauthId = oauthId;
         this.oauthProvider = oauthProvider;
-        this.email = email;
-        this.nickname = nickname;
-        this.profileImageUrl = profileImageUrl;
+        this.oauthEmail = oauthEmail;
+        this.oauthNickname = oauthNickname;
+        this.oauthProfileImageUrl = oauthProfileImageUrl;
     }
 
     public static OauthInfo createOauthInfo(String oauthId,
@@ -44,9 +44,9 @@ public class OauthInfo {
         return OauthInfo.builder()
                 .oauthId(oauthId)
                 .oauthProvider(oauthProvider)
-                .email(email)
-                .nickname(nickname)
-                .profileImageUrl(profileImageUrl)
+                .oauthEmail(email)
+                .oauthNickname(nickname)
+                .oauthProfileImageUrl(profileImageUrl)
                 .build();
     }
 }

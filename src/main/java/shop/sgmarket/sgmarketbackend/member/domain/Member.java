@@ -31,6 +31,8 @@ public class Member {
 
     private String address;
 
+    private String nickname;
+
     @Enumerated(EnumType.STRING)
     private Status status;
 
@@ -46,11 +48,18 @@ public class Member {
 
     public static Member createOauthMember(OAuthProvider oAuthProvider,
                                            String oauthId,
-                                           String email,
-                                           String nickname,
-                                           String profileImageUrl
+                                           String oauthEmail,
+                                           String oauthNickname,
+                                           String oauthProfileImageUrl
     ) {
-        OauthInfo oauthInfo = OauthInfo.createOauthInfo(oauthId, oAuthProvider.getValue(), email, nickname, profileImageUrl);
+        OauthInfo oauthInfo = OauthInfo.createOauthInfo(
+                oauthId,
+                oAuthProvider.getValue(),
+                oauthEmail,
+                oauthNickname,
+                oauthProfileImageUrl
+        );
+
         return Member.builder()
                 .oauthInfo(oauthInfo)
                 .memberRole(MemberRole.USER)
@@ -64,5 +73,10 @@ public class Member {
 
     public void updateAddress(String address) {
         this.address = address;
+    }
+
+    public void registerMember(String address, String nickname) {
+        this.address = address;
+        this.nickname = nickname;
     }
 }

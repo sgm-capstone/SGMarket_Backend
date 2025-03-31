@@ -15,9 +15,9 @@ public record UpdateAddressResponse(
     public static UpdateAddressResponse from(Member member) {
         return UpdateAddressResponse.builder()
                 .memberId(member.getId())
-                .email(member.getOauthInfo().getEmail())
-                .nickname(member.getOauthInfo().getEmail())
-                .profileImageUrl(member.getOauthInfo().getProfileImageUrl())
+                .email(member.getOauthInfo().getOauthEmail())
+                .nickname(member.getOauthInfo().getOauthNickname())
+                .profileImageUrl(member.getOauthInfo().getOauthProfileImageUrl())
                 .memberRole(member.getMemberRole().getValue())
                 .address(member.getAddress())
                 .build();
