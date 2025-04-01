@@ -27,7 +27,7 @@ public class Member {
     private OauthInfo oauthInfo;
 
     @Enumerated(EnumType.STRING)
-    private MemberRole memberRole;
+    private MemberRole role;
 
     private String address;
 
@@ -39,9 +39,9 @@ public class Member {
     private LocalDateTime lastLoginAt;
 
     @Builder(access = AccessLevel.PRIVATE)
-    private Member(OauthInfo oauthInfo, MemberRole memberRole, String address, String nickname ,Status status) {
+    private Member(OauthInfo oauthInfo, MemberRole role, String address, String nickname , Status status) {
         this.oauthInfo = oauthInfo;
-        this.memberRole = memberRole;
+        this.role = role;
         this.address = address;
         this.nickname = nickname;
         this.status = status;
@@ -63,7 +63,7 @@ public class Member {
 
         return Member.builder()
                 .oauthInfo(oauthInfo)
-                .memberRole(MemberRole.USER)
+                .role(MemberRole.USER)
                 .status(Status.ACTIVE)
                 .build();
     }

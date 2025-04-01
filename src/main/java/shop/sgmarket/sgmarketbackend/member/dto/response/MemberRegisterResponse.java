@@ -18,7 +18,7 @@ public record MemberRegisterResponse(
                 .email(member.getOauthInfo().getOauthEmail())
                 .nickname(member.getOauthInfo().getOauthNickname())
                 .profileImageUrl(member.getOauthInfo().getOauthProfileImageUrl())
-                .memberRole(member.getMemberRole().getValue())
+                .memberRole(member.getRole().getValue())
                 .address(member.getAddress())
                 .build();
     }
