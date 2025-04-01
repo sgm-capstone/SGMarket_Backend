@@ -9,6 +9,7 @@ spring:
       prod: "prod, datasource"
     include:
       - security
+      - redis
 
 swagger:
   url: ${SERVER_URL:http://localhost:8080}
