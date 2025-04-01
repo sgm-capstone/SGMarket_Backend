@@ -11,6 +11,7 @@ public enum ErrorCode {
     // 400 BAD REQUEST
     INVALID_INPUT(HttpStatus.BAD_REQUEST, "COMMON_4001", "입력 값이 올바르지 않습니다."),
     MISSING_REQUEST_PARAMETER(HttpStatus.BAD_REQUEST, "COMMON_4002", "필수 요청 파라미터가 누락되었습니다."),
+    UNSUPPORTED_OAUTH_PROVIDER(HttpStatus.BAD_REQUEST, "COMMON_4003", "지원하지 않는 소셜 로그인 제공자입니다."),
 
 
     // 401 UNAUTHORIZED

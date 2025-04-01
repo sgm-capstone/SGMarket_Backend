@@ -11,6 +11,8 @@ import shop.sgmarket.sgmarketbackend.auth.dto.response.AuthTokenResponse;
 import shop.sgmarket.sgmarketbackend.auth.dto.response.OAuthTokenResponse;
 import shop.sgmarket.sgmarketbackend.auth.dto.response.SocialClientResponse;
 import shop.sgmarket.sgmarketbackend.auth.dto.response.TokenPairResponse;
+import shop.sgmarket.sgmarketbackend.global.error.ErrorCode;
+import shop.sgmarket.sgmarketbackend.global.error.exception.CustomException;
 import shop.sgmarket.sgmarketbackend.global.jwt.JwtTokenProvider;
 import shop.sgmarket.sgmarketbackend.member.domain.Member;
 import shop.sgmarket.sgmarketbackend.member.domain.MemberRole;
@@ -33,11 +35,11 @@ public class AuthService {
 
     @Transactional(readOnly = true)
     public SocialClientResponse authenticateFromProvider(OAuthProvider provider, String token) {
-        OAuthClient client = oAuthClients.get(provider);
-        if (client == null) {
-            throw new IllegalArgumentException(provider + " 는 지원하지 않는 소셜 로그인입니다.");
+        OAuthClient oAuthClient = oAuthClients.get(provider);
+        if (oAuthClient == null) {
+            throw new CustomException(ErrorCode.UNSUPPORTED_OAUTH_PROVIDER, provider);
         }
-        return client.authenticate(token);
+        return oAuthClient.authenticate(token);
     }
 
     @Transactional

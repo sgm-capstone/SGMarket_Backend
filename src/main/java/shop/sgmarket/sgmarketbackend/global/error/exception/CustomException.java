@@ -12,4 +12,9 @@ public class CustomException extends RuntimeException {
         super(errorCode.getMessage());
         this.errorCode = errorCode;
     }
+
+    public CustomException(ErrorCode errorCode, Object additionalMessage) {
+        super(errorCode.getMessage() + " - " + additionalMessage);
+        this.errorCode = errorCode;
+    }
 }
