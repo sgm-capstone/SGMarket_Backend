@@ -49,15 +49,6 @@ public class JwtUtil {
         return buildRefreshToken(memberId, issuedAt, expiredAt);
     }
 
-    public RefreshTokenDto generateRefreshTokenDto(Long memberId) {
-        Date issuedAt = new Date();
-        Date expiredAt =
-                new Date(issuedAt.getTime() + jwtProperties.refreshTokenExpirationMilliTime());
-        String tokenValue = buildRefreshToken(memberId, issuedAt, expiredAt);
-        return new RefreshTokenDto(
-                memberId, tokenValue, jwtProperties.refreshTokenExpirationTime());
-    }
-
     public AccessTokenDto parseAccessToken(String token) throws ExpiredJwtException {
         try {
             Jws<Claims> claims = getClaims(token, getAccessTokenKey());
