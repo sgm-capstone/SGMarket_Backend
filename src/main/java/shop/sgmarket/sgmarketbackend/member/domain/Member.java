@@ -1,5 +1,6 @@
 package shop.sgmarket.sgmarketbackend.member.domain;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -36,6 +37,7 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private Status status;
 
+    @Column(name = "last_login_at")
     private LocalDateTime lastLoginAt;
 
     @Builder(access = AccessLevel.PRIVATE)
