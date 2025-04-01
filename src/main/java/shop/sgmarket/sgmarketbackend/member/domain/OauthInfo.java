@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 public class OauthInfo {
 
     @Column(name = "oauth_id")
-    public String oauthId;
+    private String oauthId;
 
     @Column(name = "oauth_provider")
     private String oauthProvider;
