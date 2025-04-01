@@ -7,10 +7,13 @@ import org.springframework.boot.web.server.Cookie;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
+import shop.sgmarket.sgmarketbackend.global.properties.JwtProperties;
 
 @Component
 @RequiredArgsConstructor
 public class CookieUtil {
+
+    private final JwtProperties jwtProperties;
 
     public HttpHeaders generateTokenCookies(String refreshToken) {
         String sameSite = determineSameSitePolicy();
@@ -21,7 +24,7 @@ public class CookieUtil {
                         .secure(true)
                         .sameSite(sameSite)
                         .httpOnly(true)
-                        .maxAge(1000 * 60 * 30)
+                        .maxAge(jwtProperties.refreshTokenExpirationTime())
                         .build();
 
         HttpHeaders headers = new HttpHeaders();
