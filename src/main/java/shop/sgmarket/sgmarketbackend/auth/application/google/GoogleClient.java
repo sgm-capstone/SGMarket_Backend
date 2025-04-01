@@ -68,7 +68,7 @@ public class GoogleClient implements OAuthClient {
                             return Objects.requireNonNull(response.bodyTo(GoogleAuthResponse.class));
                         });
 
-        return new SocialClientResponse(
+        return SocialClientResponse.of(
                 googleAuthResponse.email(),
                 googleAuthResponse.sub(),
                 googleAuthResponse.name(),

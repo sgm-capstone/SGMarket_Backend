@@ -72,7 +72,7 @@ public class KakaoClient implements OAuthClient {
                                             response.bodyTo(KakaoAuthResponse.class));
                                 });
 
-        return new SocialClientResponse(
+        return SocialClientResponse.of(
                 kakaoAuthResponse.kakaoAccount().email(),
                 kakaoAuthResponse.id().toString(),
                 kakaoAuthResponse.properties().nickname(),
