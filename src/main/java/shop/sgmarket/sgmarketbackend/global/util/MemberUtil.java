@@ -8,7 +8,6 @@ import shop.sgmarket.sgmarketbackend.global.error.exception.CustomException;
 import shop.sgmarket.sgmarketbackend.member.domain.Member;
 import shop.sgmarket.sgmarketbackend.member.repository.MemberRepository;
 
-
 @Component
 @RequiredArgsConstructor
 public class MemberUtil {
