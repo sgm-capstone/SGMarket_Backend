@@ -48,12 +48,12 @@ public class KakaoClient implements OAuthClient {
     }
 
     private MultiValueMap<String, String> createParams(String code) {
-        return new LinkedMultiValueMap<>() {{
-            add("grant_type", "authorization_code");
-            add("client_id", kakaoProperties.clientId());
-            add("redirect_uri", kakaoProperties.redirectUri());
-            add("code", code);
-        }};
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("grant_type", "authorization_code");
+        params.add("client_id", kakaoProperties.clientId());
+        params.add("redirect_uri", kakaoProperties.redirectUri());
+        params.add("code", code);
+        return params;
     }
 
     @Override

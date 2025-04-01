@@ -46,13 +46,13 @@ public class GoogleClient implements OAuthClient {
     }
 
     private MultiValueMap<String, String> createParams(final String code) {
-        return new LinkedMultiValueMap<>() {{
-            add("grant_type", "authorization_code");
-            add("client_id", googleProperties.clientId());
-            add("client_secret", googleProperties.clientSecret());
-            add("redirect_uri", googleProperties.redirectUri());
-            add("code", code);
-        }};
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("grant_type", "authorization_code");
+        params.add("client_id", googleProperties.clientId());
+        params.add("client_secret", googleProperties.clientSecret());
+        params.add("redirect_uri", googleProperties.redirectUri());
+        params.add("code", code);
+        return params;
     }
 
     @Override
