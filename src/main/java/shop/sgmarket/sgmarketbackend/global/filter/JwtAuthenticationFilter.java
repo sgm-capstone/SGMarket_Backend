@@ -22,7 +22,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.WebUtils;
 import shop.sgmarket.sgmarketbackend.auth.dto.AccessTokenDto;
 import shop.sgmarket.sgmarketbackend.auth.dto.RefreshTokenDto;
-import shop.sgmarket.sgmarketbackend.global.jwt.JwtTokenProvider;
+import shop.sgmarket.sgmarketbackend.global.security.JwtTokenProvider;
+import shop.sgmarket.sgmarketbackend.global.security.PrincipalDetails;
 import shop.sgmarket.sgmarketbackend.member.domain.MemberRole;
 
 @Slf4j

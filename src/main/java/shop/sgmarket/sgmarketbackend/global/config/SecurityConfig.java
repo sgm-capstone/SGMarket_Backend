@@ -20,7 +20,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import shop.sgmarket.sgmarketbackend.global.filter.JwtAuthenticationFilter;
-import shop.sgmarket.sgmarketbackend.global.jwt.JwtTokenProvider;
+import shop.sgmarket.sgmarketbackend.global.security.JwtTokenProvider;
 
 @Configuration
 @EnableWebSecurity

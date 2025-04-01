@@ -13,7 +13,7 @@ import shop.sgmarket.sgmarketbackend.auth.dto.response.SocialClientResponse;
 import shop.sgmarket.sgmarketbackend.auth.dto.response.TokenPairResponse;
 import shop.sgmarket.sgmarketbackend.global.error.ErrorCode;
 import shop.sgmarket.sgmarketbackend.global.error.exception.CustomException;
-import shop.sgmarket.sgmarketbackend.global.jwt.JwtTokenProvider;
+import shop.sgmarket.sgmarketbackend.global.security.JwtTokenProvider;
 import shop.sgmarket.sgmarketbackend.member.domain.Member;
 import shop.sgmarket.sgmarketbackend.member.domain.MemberRole;
 import shop.sgmarket.sgmarketbackend.member.repository.MemberRepository;

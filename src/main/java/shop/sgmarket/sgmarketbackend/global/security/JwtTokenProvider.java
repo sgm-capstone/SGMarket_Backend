@@ -1,4 +1,4 @@
-package shop.sgmarket.sgmarketbackend.global.jwt;
+package shop.sgmarket.sgmarketbackend.global.security;
 
 import static shop.sgmarket.sgmarketbackend.global.constant.SecurityConstant.TOKEN_ROLE_NAME;
 

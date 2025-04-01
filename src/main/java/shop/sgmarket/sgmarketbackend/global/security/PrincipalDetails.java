@@ -1,4 +1,4 @@
-package shop.sgmarket.sgmarketbackend.global.filter;
+package shop.sgmarket.sgmarketbackend.global.security;
 
 import java.util.Collection;
 import java.util.Collections;
