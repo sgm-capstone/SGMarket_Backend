@@ -52,19 +52,24 @@ public class AuthService {
 
         Member member = memberRepository
                 .findByOauthInfoOauthProviderAndOauthInfoOauthId(oAuthProvider.getValue(), oauthId)
-                .orElseGet(() -> {
-                    Member newMember = Member.createOauthMember(oAuthProvider, oauthId, email, nickname, profileImage);
-                    memberRepository.save(newMember);
-                    log.info("회원가입 진행: {}", newMember.getId());
-                    return newMember;
-                });
+                .orElseGet(() -> createOauthMember(oAuthProvider, oauthId, email, nickname, profileImage));
 
         TokenPairResponse tokenPair = getLoginResponse(member, response);
         member.updateLastLoginAt();
         log.info("소셜 로그인 진행: {}", member.getId());
 
         return AuthTokenResponse.of(tokenPair);
+    }
 
+    private Member createOauthMember(OAuthProvider oAuthProvider,
+                                     String oauthId,
+                                     String email,
+                                     String nickname,
+                                     String profileImage) {
+        Member oauthMember = Member.createOauthMember(oAuthProvider, oauthId, email, nickname, profileImage);
+        memberRepository.save(oauthMember);
+        log.info("회원가입 진행: {}", oauthMember.getId());
+        return oauthMember;
     }
 
     private TokenPairResponse getLoginResponse(Member member, HttpServletResponse response) {
