@@ -39,10 +39,11 @@ public class Member {
     private LocalDateTime lastLoginAt;
 
     @Builder(access = AccessLevel.PRIVATE)
-    private Member(OauthInfo oauthInfo, MemberRole memberRole, String address, Status status) {
+    private Member(OauthInfo oauthInfo, MemberRole memberRole, String address, String nickname ,Status status) {
         this.oauthInfo = oauthInfo;
         this.memberRole = memberRole;
         this.address = address;
+        this.nickname = nickname;
         this.status = status;
     }
 
