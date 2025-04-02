@@ -8,12 +8,12 @@ public class CustomException extends RuntimeException {
 
     private final ErrorCode errorCode;
 
-    public CustomException(ErrorCode errorCode) {
+    public CustomException(final ErrorCode errorCode) {
         super(errorCode.getMessage());
         this.errorCode = errorCode;
     }
 
-    public CustomException(ErrorCode errorCode, Object additionalMessage) {
+    public CustomException(final ErrorCode errorCode, final Object additionalMessage) {
         super(errorCode.getMessage() + " : " + additionalMessage);
         this.errorCode = errorCode;
     }

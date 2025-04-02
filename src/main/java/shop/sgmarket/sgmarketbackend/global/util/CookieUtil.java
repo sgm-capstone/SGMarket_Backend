@@ -15,7 +15,7 @@ public class CookieUtil {
 
     private final JwtProperties jwtProperties;
 
-    public HttpHeaders generateTokenCookies(String refreshToken) {
+    public HttpHeaders generateTokenCookies(final String refreshToken) {
         String sameSite = determineSameSitePolicy();
 
         ResponseCookie refreshTokenCookie =

@@ -14,7 +14,7 @@ public class MemberService {
     private final MemberUtil memberUtil;
 
     @Transactional
-    public MemberRegisterResponse updateAddress(MemberRegisterRequest memberRegisterRequest) {
+    public MemberRegisterResponse updateAddress(final MemberRegisterRequest memberRegisterRequest) {
         Member member = memberUtil.getCurrentMember();
         member.register(memberRegisterRequest.address(), memberRegisterRequest.nickname());
 

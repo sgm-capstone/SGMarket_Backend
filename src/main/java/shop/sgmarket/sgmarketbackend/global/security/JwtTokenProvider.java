@@ -27,33 +27,34 @@ public class JwtTokenProvider {
     private final CookieUtil cookieUtil;
     private final RefreshTokenRepository refreshTokenRepository;
 
-    public TokenPairResponse generateTokenPair(Long memberId, MemberRole memberRole, HttpServletResponse response) {
+    public TokenPairResponse generateTokenPair(final Long memberId,
+                                               final MemberRole memberRole,
+                                               HttpServletResponse response) {
         String accessToken = createAccessToken(memberId, memberRole);
         String refreshToken = createRefreshToken(memberId);
 
         HttpHeaders cookieHeaders = cookieUtil.generateTokenCookies(refreshToken);
         response.addHeader(HttpHeaders.SET_COOKIE, cookieHeaders.getFirst(HttpHeaders.SET_COOKIE));
 
-
         return TokenPairResponse.of(accessToken, refreshToken);
     }
 
 
-    private String createAccessToken(Long memberId, MemberRole memberRole) {
+    private String createAccessToken(final Long memberId,final MemberRole memberRole) {
         return jwtUtil.generateAccessToken(memberId, memberRole);
     }
 
-    public AccessTokenDto createAccessTokenDto(Long memberId, MemberRole memberRole) {
+    public AccessTokenDto createAccessTokenDto(final Long memberId, final MemberRole memberRole) {
         return jwtUtil.generateAccessTokenDto(memberId, memberRole);
     }
 
-    private String createRefreshToken(Long memberId) {
+    private String createRefreshToken(final Long memberId) {
         String token = jwtUtil.generateRefreshToken(memberId);
         saveRefreshTokenToRedis(memberId, token, jwtUtil.getRefreshTokenExpirationTime());
         return token;
     }
 
-    private void saveRefreshTokenToRedis(Long memberId, String refreshTokenDto, Long ttl) {
+    private void saveRefreshTokenToRedis(final Long memberId, final String refreshTokenDto, final Long ttl) {
         RefreshToken refreshToken =
                 RefreshToken.builder()
                         .memberId(memberId)
@@ -63,7 +64,7 @@ public class JwtTokenProvider {
         refreshTokenRepository.save(refreshToken);
     }
 
-    public AccessTokenDto retrieveAccessToken(String accessTokenValue) {
+    public AccessTokenDto retrieveAccessToken(final String accessTokenValue) {
         try {
             return jwtUtil.parseAccessToken(accessTokenValue);
         } catch (Exception e) {
@@ -71,7 +72,7 @@ public class JwtTokenProvider {
         }
     }
 
-    public RefreshTokenDto retrieveRefreshToken(String refreshTokenValue) {
+    public RefreshTokenDto retrieveRefreshToken(final String refreshTokenValue) {
         RefreshTokenDto refreshTokenDto = parseRefreshToken(refreshTokenValue);
 
         if (refreshTokenDto == null) {
@@ -87,11 +88,11 @@ public class JwtTokenProvider {
         return null;
     }
 
-    private Optional<RefreshToken> getRefreshTokenFromRedis(Long memberId) {
+    private Optional<RefreshToken> getRefreshTokenFromRedis(final Long memberId) {
         return refreshTokenRepository.findById(memberId);
     }
 
-    private RefreshTokenDto parseRefreshToken(String refreshTokenValue) {
+    private RefreshTokenDto parseRefreshToken(final String refreshTokenValue) {
         try {
             return jwtUtil.parseRefreshToken(refreshTokenValue);
         } catch (Exception e) {
@@ -99,7 +100,7 @@ public class JwtTokenProvider {
         }
     }
 
-    public AccessTokenDto reissueAccessTokenIfExpired(String accessTokenValue) {
+    public AccessTokenDto reissueAccessTokenIfExpired(final String accessTokenValue) {
         // AT가 만료된 경우 AT 재발급, 만료되지 않은 경우 null 반환
         try {
             jwtUtil.parseAccessToken(accessTokenValue);

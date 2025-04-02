@@ -36,11 +36,11 @@ public class OauthInfo {
         this.oauthProfileImageUrl = oauthProfileImageUrl;
     }
 
-    public static OauthInfo createOauthInfo(String oauthId,
-                                            String oauthProvider,
-                                            String email,
-                                            String nickname,
-                                            String profileImageUrl) {
+    public static OauthInfo createOauthInfo(final String oauthId,
+                                            final String oauthProvider,
+                                            final String email,
+                                            final String nickname,
+                                            final String profileImageUrl) {
         return OauthInfo.builder()
                 .oauthId(oauthId)
                 .oauthProvider(oauthProvider)

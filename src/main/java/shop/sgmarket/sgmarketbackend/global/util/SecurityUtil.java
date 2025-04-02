@@ -21,7 +21,12 @@ public class SecurityUtil {
     public String getCurrentMemberRole() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         try {
-            return authentication.getAuthorities().stream().findFirst().get().getAuthority();
+            return authentication.getAuthorities()
+                    .stream()
+                    .findFirst()
+                    .get()
+                    .getAuthority();
+
         } catch (Exception e) {
             throw new CustomException(ErrorCode.UNAUTHORIZED_ACCESS);
         }

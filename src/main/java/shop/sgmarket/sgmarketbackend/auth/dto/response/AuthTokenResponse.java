@@ -4,7 +4,7 @@ public record AuthTokenResponse(
         String accessToken
 ) {
     public static AuthTokenResponse of(
-            TokenPairResponse tokenPairResponse) {
+            final TokenPairResponse tokenPairResponse) {
         return new AuthTokenResponse(
                 tokenPairResponse.accessToken()
         );

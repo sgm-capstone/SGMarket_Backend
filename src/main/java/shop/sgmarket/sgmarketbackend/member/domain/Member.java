@@ -41,7 +41,7 @@ public class Member {
     private LocalDateTime lastLoginAt;
 
     @Builder(access = AccessLevel.PRIVATE)
-    private Member(OauthInfo oauthInfo, MemberRole role, String address, String nickname , Status status) {
+    private Member(OauthInfo oauthInfo, MemberRole role, String address, String nickname, Status status) {
         this.oauthInfo = oauthInfo;
         this.role = role;
         this.address = address;
@@ -49,11 +49,11 @@ public class Member {
         this.status = status;
     }
 
-    public static Member createOauthMember(OAuthProvider oAuthProvider,
-                                           String oauthId,
-                                           String oauthEmail,
-                                           String oauthNickname,
-                                           String oauthProfileImageUrl
+    public static Member createOauthMember(final OAuthProvider oAuthProvider,
+                                           final String oauthId,
+                                           final String oauthEmail,
+                                           final String oauthNickname,
+                                           final String oauthProfileImageUrl
     ) {
         OauthInfo oauthInfo = OauthInfo.createOauthInfo(
                 oauthId,
@@ -74,7 +74,7 @@ public class Member {
         this.lastLoginAt = LocalDateTime.now();
     }
 
-    public void register(String address, String nickname) {
+    public void register(final String address, final String nickname) {
         this.address = address;
         this.nickname = nickname;
     }

@@ -2,6 +2,7 @@ package shop.sgmarket.sgmarketbackend.member.api;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import shop.sgmarket.sgmarketbackend.global.response.ApiResponseTemplate;
@@ -16,7 +17,7 @@ public class MemberController {
     private final MemberService memberService;
 
     @PostMapping("/register")
-    public ApiResponseTemplate<MemberRegisterResponse> updateAddress(MemberRegisterRequest memberRegisterRequest) {
+    public ApiResponseTemplate<MemberRegisterResponse> updateAddress(@RequestBody final MemberRegisterRequest memberRegisterRequest) {
         return ApiResponseTemplate.ok(memberService.updateAddress(memberRegisterRequest))
                 .message("주소 변경 완료");
     }

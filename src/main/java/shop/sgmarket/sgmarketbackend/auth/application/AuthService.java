@@ -28,13 +28,13 @@ public class AuthService {
     private final Map<OAuthProvider, OAuthClient> oAuthClients;
 
     @Transactional(readOnly = true)
-    public OAuthTokenResponse getToken(OAuthProvider provider, String code) {
+    public OAuthTokenResponse getToken(final OAuthProvider provider, final String code) {
         OAuthClient client = oAuthClients.get(provider);
         return client.getToken(code);
     }
 
     @Transactional(readOnly = true)
-    public SocialClientResponse authenticateFromProvider(OAuthProvider provider, String token) {
+    public SocialClientResponse authenticateFromProvider(final OAuthProvider provider, final String token) {
         OAuthClient oAuthClient = oAuthClients.get(provider);
         if (oAuthClient == null) {
             throw new CustomException(ErrorCode.UNSUPPORTED_OAUTH_PROVIDER, provider);
@@ -43,11 +43,11 @@ public class AuthService {
     }
 
     @Transactional
-    public AuthTokenResponse socialLogin(OAuthProvider oAuthProvider,
-                                         String oauthId,
-                                         String email,
-                                         String nickname,
-                                         String profileImage,
+    public AuthTokenResponse socialLogin(final OAuthProvider oAuthProvider,
+                                         final String oauthId,
+                                         final String email,
+                                         final String nickname,
+                                         final String profileImage,
                                          HttpServletResponse response) {
 
         Member member = memberRepository
@@ -61,11 +61,11 @@ public class AuthService {
         return AuthTokenResponse.of(tokenPair);
     }
 
-    private Member createOauthMember(OAuthProvider oAuthProvider,
-                                     String oauthId,
-                                     String email,
-                                     String nickname,
-                                     String profileImage) {
+    private Member createOauthMember(final OAuthProvider oAuthProvider,
+                                     final String oauthId,
+                                     final String email,
+                                     final String nickname,
+                                     final String profileImage) {
         Member oauthMember = Member.createOauthMember(oAuthProvider, oauthId, email, nickname, profileImage);
         memberRepository.save(oauthMember);
         log.info("회원가입 진행: {}", oauthMember.getId());

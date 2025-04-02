@@ -32,7 +32,7 @@ public class KakaoClient implements OAuthClient {
     private final RestClient restClient;
 
     @Override
-    public OAuthTokenResponse getToken(String code) {
+    public OAuthTokenResponse getToken(final String code) {
         MultiValueMap<String, String> params = createParams(code);
 
         return restClient.post()
@@ -47,7 +47,7 @@ public class KakaoClient implements OAuthClient {
                 });
     }
 
-    private MultiValueMap<String, String> createParams(String code) {
+    private MultiValueMap<String, String> createParams(final String code) {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("grant_type", "authorization_code");
         params.add("client_id", kakaoProperties.clientId());
@@ -57,7 +57,7 @@ public class KakaoClient implements OAuthClient {
     }
 
     @Override
-    public SocialClientResponse authenticate(String token) {
+    public SocialClientResponse authenticate(final String token) {
         KakaoAuthResponse kakaoAuthResponse =
                 restClient
                         .get()

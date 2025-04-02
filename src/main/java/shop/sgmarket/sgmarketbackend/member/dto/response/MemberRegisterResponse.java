@@ -12,7 +12,7 @@ public record MemberRegisterResponse(
         String memberRole,
         String address
 ) {
-    public static MemberRegisterResponse from(Member member) {
+    public static MemberRegisterResponse from(final Member member) {
         return MemberRegisterResponse.builder()
                 .memberId(member.getId())
                 .email(member.getOauthInfo().getOauthEmail())

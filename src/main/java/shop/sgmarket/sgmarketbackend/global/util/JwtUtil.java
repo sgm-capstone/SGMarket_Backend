@@ -27,29 +27,30 @@ public class JwtUtil {
     private final JwtProperties jwtProperties;
     private static final String TOKEN_TYPE_KEY_NAME = "type";
 
-    public String generateAccessToken(Long memberId, MemberRole memberRole) {
+    public String generateAccessToken(final Long memberId, final MemberRole memberRole) {
         Date issuedAt = new Date();
         Date expiredAt =
                 new Date(issuedAt.getTime() + jwtProperties.accessTokenExpirationMilliTime());
+
         return buildAccessToken(memberId, memberRole, issuedAt, expiredAt);
     }
 
-    public AccessTokenDto generateAccessTokenDto(Long memberId, MemberRole memberRole) {
+    public AccessTokenDto generateAccessTokenDto(final Long memberId, final MemberRole memberRole) {
         Date issuedAt = new Date();
         Date expiredAt =
                 new Date(issuedAt.getTime() + jwtProperties.accessTokenExpirationMilliTime());
         String tokenValue = buildAccessToken(memberId, memberRole, issuedAt, expiredAt);
-        return new AccessTokenDto(memberId, memberRole, tokenValue);
+
+        return AccessTokenDto.of(memberId, memberRole, tokenValue);
     }
 
-    public String generateRefreshToken(Long memberId) {
+    public String generateRefreshToken(final Long memberId) {
         Date issuedAt = new Date();
-        Date expiredAt =
-                new Date(issuedAt.getTime() + jwtProperties.refreshTokenExpirationMilliTime());
+        Date expiredAt = new Date(issuedAt.getTime() + jwtProperties.refreshTokenExpirationMilliTime());
         return buildRefreshToken(memberId, issuedAt, expiredAt);
     }
 
-    public AccessTokenDto parseAccessToken(String token) throws ExpiredJwtException {
+    public AccessTokenDto parseAccessToken(final String token) throws ExpiredJwtException {
         try {
             Jws<Claims> claims = getClaims(token, getAccessTokenKey());
 
@@ -64,14 +65,15 @@ public class JwtUtil {
         }
     }
 
-    public RefreshTokenDto parseRefreshToken(String token) throws ExpiredJwtException {
+    public RefreshTokenDto parseRefreshToken(final String token) throws ExpiredJwtException {
         try {
             Jws<Claims> claims = getClaims(token, getRefreshTokenKey());
 
             return new RefreshTokenDto(
                     Long.parseLong(claims.getBody().getSubject()),
                     token,
-                    jwtProperties.refreshTokenExpirationTime());
+                    jwtProperties.refreshTokenExpirationTime()
+            );
         } catch (ExpiredJwtException e) {
             throw e;
         } catch (Exception e) {
@@ -91,8 +93,11 @@ public class JwtUtil {
         return Keys.hmacShaKeyFor(jwtProperties.accessTokenSecret().getBytes());
     }
 
-    private Jws<Claims> getClaims(String token, Key key) {
-        return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+    private Jws<Claims> getClaims(final String token, final Key key) {
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token);
     }
 
     private String buildAccessToken(
@@ -108,7 +113,7 @@ public class JwtUtil {
                 .compact();
     }
 
-    private String buildRefreshToken(Long memberId, Date issuedAt, Date expiredAt) {
+    private String buildRefreshToken(final Long memberId, final Date issuedAt, final Date expiredAt) {
         return Jwts.builder()
                 .setHeader(createTokenHeader(TokenType.REFRESH))
                 .setSubject(memberId.toString())
@@ -118,7 +123,7 @@ public class JwtUtil {
                 .compact();
     }
 
-    private Map<String, Object> createTokenHeader(TokenType tokenType) {
+    private Map<String, Object> createTokenHeader(final TokenType tokenType) {
         return Map.of(
                 "typ",
                 "JWT",
@@ -127,6 +132,7 @@ public class JwtUtil {
                 "regDate",
                 System.currentTimeMillis(),
                 TOKEN_TYPE_KEY_NAME,
-                tokenType.getValue());
+                tokenType.getValue()
+        );
     }
 }

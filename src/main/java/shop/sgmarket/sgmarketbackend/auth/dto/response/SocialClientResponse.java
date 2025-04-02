@@ -10,10 +10,10 @@ public record SocialClientResponse(
         String profileImage
 ) {
     public static SocialClientResponse of(
-            String email,
-            String oauthId,
-            String nickname,
-            String profileImage
+            final String email,
+            final String oauthId,
+            final String nickname,
+            final String profileImage
     ) {
         return new SocialClientResponse(
                 email,
