@@ -1,12 +1,14 @@
 package shop.sgmarket.sgmarketbackend.auth.domain;
 
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.TimeToLive;
 
 @Getter
+@EqualsAndHashCode(of = "memberId")
 @RedisHash(value = "refreshToken")
 public class RefreshToken {
 
