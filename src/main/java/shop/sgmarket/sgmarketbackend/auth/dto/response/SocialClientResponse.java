@@ -15,11 +15,11 @@ public record SocialClientResponse(
             final String nickname,
             final String profileImage
     ) {
-        return new SocialClientResponse(
-                email,
-                oauthId,
-                nickname,
-                profileImage
-        );
+        return SocialClientResponse.builder()
+                .email(email)
+                .oauthId(oauthId)
+                .nickname(nickname)
+                .profileImage(profileImage)
+                .build();
     }
 }
