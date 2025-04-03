@@ -14,15 +14,9 @@ public enum ErrorCode {
     UNSUPPORTED_OAUTH_PROVIDER(HttpStatus.BAD_REQUEST, "COMMON_4003", "지원하지 않는 소셜 로그인 제공자입니다."),
     INVALID_KAKAO_TOKEN(HttpStatus.BAD_REQUEST, "KAKAO_4001", "카카오 토큰이 유효하지 않거나 비어 있습니다."),
     INVALID_GOOGLE_TOKEN(HttpStatus.BAD_REQUEST, "GOOGLE_4001", "구글 토큰이 유효하지 않거나 비어 있습니다."),
-    INVALID_OAUTH_PROVIDER(HttpStatus.NOT_FOUND, "AUTH_4041", "OAuth 제공자가 비어있습니다."),
-    INVALID_OAUTH_ID(HttpStatus.BAD_REQUEST, "COMMON_4004", "소셜 로그인 ID가 비어있습니다."),
-    INVALID_EMAIL(HttpStatus.BAD_REQUEST, "COMMON_4005", "소셜 로그인 이메일이 비어있습니다."),
-    INVALID_OAUTH_NICKNAME(HttpStatus.BAD_REQUEST, "COMMON_4006", "소셜 로그인 닉네임이 비어있습니다."),
-    INVALID_PROFILE_IMAGE(HttpStatus.BAD_REQUEST, "COMMON_4007", "소셜 로그인 프로필 이미지가 비어있습니다."),
 
     // 401 UNAUTHORIZED
     UNAUTHORIZED_ACCESS(HttpStatus.UNAUTHORIZED, "AUTH_4011", "인증이 필요합니다."),
-    INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "AUTH_4012", "아이디 또는 비밀번호가 올바르지 않습니다."),
 
     // 403 FORBIDDEN
     FORBIDDEN_ACCESS(HttpStatus.FORBIDDEN, "AUTH_4031", "접근 권한이 없습니다."),
