@@ -1,7 +1,6 @@
 package shop.sgmarket.sgmarketbackend.global.util;
 
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import shop.sgmarket.sgmarketbackend.global.error.ErrorCode;
@@ -25,8 +24,9 @@ public class SecurityUtil {
             return authentication.getAuthorities()
                     .stream()
                     .findFirst()
-                    .map(GrantedAuthority::getAuthority)
-                    .orElse("UNKNOWN");
+                    .orElseThrow(() -> new CustomException(ErrorCode.UNAUTHORIZED_ACCESS))
+                    .getAuthority();
+
         } catch (Exception e) {
             throw new CustomException(ErrorCode.UNAUTHORIZED_ACCESS);
         }
