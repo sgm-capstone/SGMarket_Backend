@@ -1,8 +1,9 @@
 package shop.sgmarket.sgmarketbackend.auth.domain;
 
-import java.security.InvalidParameterException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import shop.sgmarket.sgmarketbackend.global.error.ErrorCode;
+import shop.sgmarket.sgmarketbackend.global.error.exception.CustomException;
 
 @Getter
 @RequiredArgsConstructor
@@ -16,7 +17,7 @@ public enum OAuthProvider {
         return switch (provider.toUpperCase()) {
             case "KAKAO" -> KAKAO;
             case "GOOGLE" -> GOOGLE;
-            default -> throw new InvalidParameterException("[ERROR]: 지원하지 않는 제공자입니다: " + provider);
+            default -> throw new CustomException(ErrorCode.UNSUPPORTED_OAUTH_PROVIDER, ": " + provider);
         };
     }
 }
