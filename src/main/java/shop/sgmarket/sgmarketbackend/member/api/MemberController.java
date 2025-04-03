@@ -17,11 +17,11 @@ import shop.sgmarket.sgmarketbackend.member.dto.response.MemberUpdateResponse;
 public class MemberController {
     private final MemberService memberService;
 
-    @PostMapping("/register")
+    @PostMapping("/profile")
     public ApiResponseTemplate<MemberUpdateResponse> updateProfile(
             @RequestBody @Valid final MemberUpdateRequest memberUpdateRequest) {
 
         return ApiResponseTemplate.ok(memberService.updateProfile(memberUpdateRequest))
-                .message("주소 변경 완료");
+                .message("프로필 업데이트 완료");
     }
 }
