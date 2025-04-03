@@ -15,17 +15,19 @@ public class MemberUtil {
     private final SecurityUtil securityUtil;
     private final MemberRepository memberRepository;
 
+
     @Transactional(readOnly = true)
     public Member getCurrentMember() {
-        return memberRepository
-                .findById(securityUtil.getCurrentMemberId())
-                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+        return findMemberOrThrow(securityUtil.getCurrentMemberId());
     }
 
     @Transactional(readOnly = true)
     public Member getMemberByMemberId(final Long memberId) {
-        return memberRepository
-                .findById(memberId)
+        return findMemberOrThrow(memberId);
+    }
+
+    private Member findMemberOrThrow(final Long id) {
+        return memberRepository.findById(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
     }
 

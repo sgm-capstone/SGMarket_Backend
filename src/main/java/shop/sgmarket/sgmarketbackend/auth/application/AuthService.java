@@ -49,6 +49,7 @@ public class AuthService {
                                          final String nickname,
                                          final String profileImage,
                                          HttpServletResponse response) {
+        validateOauthInfo(oAuthProvider, oauthId, email, nickname, profileImage);
 
         Member member = memberRepository
                 .findByOauthInfoOauthProviderAndOauthInfoOauthId(oAuthProvider.getValue(), oauthId)
@@ -61,6 +62,33 @@ public class AuthService {
         return AuthTokenResponse.of(tokenPair);
     }
 
+    private void validateOauthInfo(final OAuthProvider oAuthProvider,
+                                   final String oauthId,
+                                   final String email,
+                                   final String nickname,
+                                   final String profileImage) {
+
+        if (oAuthProvider == null || oAuthProvider.getValue() == null) {
+            throw new CustomException(ErrorCode.UNSUPPORTED_OAUTH_PROVIDER);
+        }
+
+        if (oauthId == null || oauthId.isEmpty()) {
+            throw new CustomException(ErrorCode.INVALID_OAUTH_ID);
+        }
+
+        if (email == null || email.isEmpty()) {
+            throw new CustomException(ErrorCode.INVALID_EMAIL);
+        }
+
+        if (nickname == null || nickname.isEmpty()) {
+            throw new CustomException(ErrorCode.INVALID_OAUTH_NICKNAME);
+        }
+
+        if (profileImage == null || profileImage.isEmpty()) {
+            throw new CustomException(ErrorCode.INVALID_PROFILE_IMAGE);
+        }
+    }
+
     private Member createOauthMember(final OAuthProvider oAuthProvider,
                                      final String oauthId,
                                      final String email,
@@ -69,6 +97,7 @@ public class AuthService {
         Member oauthMember = Member.createOauthMember(oAuthProvider, oauthId, email, nickname, profileImage);
         memberRepository.save(oauthMember);
         log.info("회원가입 진행: {}", oauthMember.getId());
+
         return oauthMember;
     }
 

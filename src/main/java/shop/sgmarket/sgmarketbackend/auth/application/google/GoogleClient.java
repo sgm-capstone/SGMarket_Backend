@@ -6,6 +6,7 @@ import static shop.sgmarket.sgmarketbackend.global.constant.SecurityConstant.TOK
 
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -14,13 +15,14 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
 import shop.sgmarket.sgmarketbackend.auth.application.OAuthClient;
+import shop.sgmarket.sgmarketbackend.auth.dto.response.OAuthTokenResponse;
 import shop.sgmarket.sgmarketbackend.auth.dto.response.SocialClientResponse;
 import shop.sgmarket.sgmarketbackend.auth.dto.response.google.GoogleAuthResponse;
-import shop.sgmarket.sgmarketbackend.auth.dto.response.OAuthTokenResponse;
 import shop.sgmarket.sgmarketbackend.global.error.ErrorCode;
 import shop.sgmarket.sgmarketbackend.global.error.exception.CustomException;
 import shop.sgmarket.sgmarketbackend.global.properties.GoogleProperties;
 
+@Slf4j
 @Component("GOOGLE")
 @RequiredArgsConstructor
 @EnableConfigurationProperties(GoogleProperties.class)
@@ -39,6 +41,7 @@ public class GoogleClient implements OAuthClient {
                 .body(params)
                 .exchange((request, response) -> {
                     if (!response.getStatusCode().is2xxSuccessful()) {
+                        log.error("구글 토큰 조회 실패, 상태 코드: {}", response.getStatusCode());
                         throw new CustomException(ErrorCode.GOOGLE_COMMUNICATION_ERROR);
                     }
                     return Objects.requireNonNull(response.bodyTo(OAuthTokenResponse.class));
@@ -57,6 +60,9 @@ public class GoogleClient implements OAuthClient {
 
     @Override
     public SocialClientResponse authenticate(final String token) {
+        if (token == null || token.trim().isEmpty()) {
+            throw new CustomException(ErrorCode.INVALID_GOOGLE_TOKEN);
+        }
         GoogleAuthResponse googleAuthResponse =
                 restClient.get()
                         .uri(GOOGLE_USER_INFO_URL)

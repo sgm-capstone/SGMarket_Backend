@@ -12,7 +12,13 @@ public enum ErrorCode {
     INVALID_INPUT(HttpStatus.BAD_REQUEST, "COMMON_4001", "입력 값이 올바르지 않습니다."),
     MISSING_REQUEST_PARAMETER(HttpStatus.BAD_REQUEST, "COMMON_4002", "필수 요청 파라미터가 누락되었습니다."),
     UNSUPPORTED_OAUTH_PROVIDER(HttpStatus.BAD_REQUEST, "COMMON_4003", "지원하지 않는 소셜 로그인 제공자입니다."),
-
+    INVALID_KAKAO_TOKEN(HttpStatus.BAD_REQUEST, "KAKAO_4001", "카카오 토큰이 유효하지 않거나 비어 있습니다."),
+    INVALID_GOOGLE_TOKEN(HttpStatus.BAD_REQUEST, "GOOGLE_4001", "구글 토큰이 유효하지 않거나 비어 있습니다."),
+    INVALID_OAUTH_PROVIDER(HttpStatus.NOT_FOUND, "AUTH_4041", "OAuth 제공자가 비어있습니다."),
+    INVALID_OAUTH_ID(HttpStatus.BAD_REQUEST, "COMMON_4004", "소셜 로그인 ID가 비어있습니다."),
+    INVALID_EMAIL(HttpStatus.BAD_REQUEST, "COMMON_4005", "소셜 로그인 이메일이 비어있습니다."),
+    INVALID_OAUTH_NICKNAME(HttpStatus.BAD_REQUEST, "COMMON_4006", "소셜 로그인 닉네임이 비어있습니다."),
+    INVALID_PROFILE_IMAGE(HttpStatus.BAD_REQUEST, "COMMON_4007", "소셜 로그인 프로필 이미지가 비어있습니다."),
 
     // 401 UNAUTHORIZED
     UNAUTHORIZED_ACCESS(HttpStatus.UNAUTHORIZED, "AUTH_4011", "인증이 필요합니다."),
@@ -23,7 +29,6 @@ public enum ErrorCode {
 
     // 404 NOT FOUND
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER_4041", "회원을 찾을 수 없습니다."),
-    INVALID_OAUTH_PROVIDER(HttpStatus.NOT_FOUND, "AUTH_4041", "지원하지 않는 소셜 로그인 제공자입니다."),
 
     // 500 INTERNAL SERVER ERROR
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "SYSTEM_5001", "서버 내부 오류가 발생했습니다."),

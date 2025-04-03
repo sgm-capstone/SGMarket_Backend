@@ -41,6 +41,7 @@ public class KakaoClient implements OAuthClient {
                 .body(params)
                 .exchange((request, response) -> {
                     if (!response.getStatusCode().is2xxSuccessful()) {
+                        log.error("카카오 토큰 조회 실패, 상태 코드: {}", response.getStatusCode());
                         throw new CustomException(ErrorCode.KAKAO_COMMUNICATION_ERROR);
                     }
                     return Objects.requireNonNull(response.bodyTo(OAuthTokenResponse.class));
@@ -58,6 +59,9 @@ public class KakaoClient implements OAuthClient {
 
     @Override
     public SocialClientResponse authenticate(final String token) {
+        if (token == null || token.trim().isEmpty()) {
+            throw new CustomException(ErrorCode.INVALID_KAKAO_TOKEN);
+        }
         KakaoAuthResponse kakaoAuthResponse =
                 restClient
                         .get()

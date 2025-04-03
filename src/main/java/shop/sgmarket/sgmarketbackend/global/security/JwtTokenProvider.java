@@ -49,9 +49,9 @@ public class JwtTokenProvider {
     }
 
     private String createRefreshToken(final Long memberId) {
-        String token = jwtUtil.generateRefreshToken(memberId);
-        saveRefreshTokenToRedis(memberId, token, jwtUtil.getRefreshTokenExpirationTime());
-        return token;
+        String refreshTokenValue = jwtUtil.generateRefreshToken(memberId);
+        saveRefreshTokenToRedis(memberId, refreshTokenValue, jwtUtil.getRefreshTokenExpirationTime());
+        return refreshTokenValue;
     }
 
     private void saveRefreshTokenToRedis(final Long memberId, final String refreshTokenDto, final Long ttl) {
@@ -68,6 +68,7 @@ public class JwtTokenProvider {
         try {
             return jwtUtil.parseAccessToken(accessTokenValue);
         } catch (Exception e) {
+            log.info("Access Token 파싱 실패");
             return null;
         }
     }
