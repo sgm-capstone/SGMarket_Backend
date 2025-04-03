@@ -15,7 +15,7 @@ public record KakaoAuthResponse(
     }
 
     public static record PropertiesResponse(
-            String nickname, String profile_image
+            String nickname, String profileImage
     ) {
     }
 }

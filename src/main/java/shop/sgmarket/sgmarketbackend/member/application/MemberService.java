@@ -5,8 +5,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shop.sgmarket.sgmarketbackend.global.util.MemberUtil;
 import shop.sgmarket.sgmarketbackend.member.domain.Member;
-import shop.sgmarket.sgmarketbackend.member.dto.request.MemberRegisterRequest;
-import shop.sgmarket.sgmarketbackend.member.dto.response.MemberRegisterResponse;
+import shop.sgmarket.sgmarketbackend.member.dto.request.MemberUpdateRequest;
+import shop.sgmarket.sgmarketbackend.member.dto.response.MemberUpdateResponse;
 
 @Service
 @RequiredArgsConstructor
@@ -14,10 +14,10 @@ public class MemberService {
     private final MemberUtil memberUtil;
 
     @Transactional
-    public MemberRegisterResponse updateAddress(final MemberRegisterRequest memberRegisterRequest) {
+    public MemberUpdateResponse updateProfile(final MemberUpdateRequest memberUpdateRequest) {
         Member member = memberUtil.getCurrentMember();
-        member.register(memberRegisterRequest.address(), memberRegisterRequest.nickname());
+        member.updateProfile(memberUpdateRequest.address(), memberUpdateRequest.nickname());
 
-        return MemberRegisterResponse.from(member);
+        return MemberUpdateResponse.from(member);
     }
 }

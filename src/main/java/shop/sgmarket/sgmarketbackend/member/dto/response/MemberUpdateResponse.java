@@ -4,7 +4,7 @@ import lombok.Builder;
 import shop.sgmarket.sgmarketbackend.member.domain.Member;
 
 @Builder
-public record MemberRegisterResponse(
+public record MemberUpdateResponse(
         Long memberId,
         String email,
         String nickname,
@@ -12,8 +12,8 @@ public record MemberRegisterResponse(
         String memberRole,
         String address
 ) {
-    public static MemberRegisterResponse from(final Member member) {
-        return MemberRegisterResponse.builder()
+    public static MemberUpdateResponse from(final Member member) {
+        return MemberUpdateResponse.builder()
                 .memberId(member.getId())
                 .email(member.getOauthInfo().getOauthEmail())
                 .nickname(member.getOauthInfo().getOauthNickname())

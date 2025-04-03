@@ -80,7 +80,7 @@ public class KakaoClient implements OAuthClient {
                 kakaoAuthResponse.kakaoAccount().email(),
                 kakaoAuthResponse.id().toString(),
                 kakaoAuthResponse.properties().nickname(),
-                kakaoAuthResponse.properties().profile_image()
+                kakaoAuthResponse.properties().profileImage()
         );
     }
 }

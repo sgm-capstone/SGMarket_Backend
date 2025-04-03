@@ -76,7 +76,7 @@ public class Member {
         this.lastLoginAt = LocalDateTime.now();
     }
 
-    public void register(final String address, final String nickname) {
+    public void updateProfile(final String address, final String nickname) {
         this.address = address;
         this.nickname = nickname;
     }
