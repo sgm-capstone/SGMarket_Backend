@@ -1,5 +1,6 @@
 package shop.sgmarket.sgmarketbackend.member.api;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,7 +18,9 @@ public class MemberController {
     private final MemberService memberService;
 
     @PostMapping("/register")
-    public ApiResponseTemplate<MemberRegisterResponse> updateAddress(@RequestBody final MemberRegisterRequest memberRegisterRequest) {
+    public ApiResponseTemplate<MemberRegisterResponse> updateAddress(
+            @RequestBody @Valid final MemberRegisterRequest memberRegisterRequest) {
+
         return ApiResponseTemplate.ok(memberService.updateAddress(memberRegisterRequest))
                 .message("주소 변경 완료");
     }
