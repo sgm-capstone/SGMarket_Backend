@@ -7,7 +7,6 @@ import static shop.sgmarket.sgmarketbackend.global.constant.SecurityConstant.TOK
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -25,7 +24,6 @@ import shop.sgmarket.sgmarketbackend.global.properties.GoogleProperties;
 @Slf4j
 @Component("GOOGLE")
 @RequiredArgsConstructor
-@EnableConfigurationProperties(GoogleProperties.class)
 public class GoogleClient implements OAuthClient {
 
     private final GoogleProperties googleProperties;

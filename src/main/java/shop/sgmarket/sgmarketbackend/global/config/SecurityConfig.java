@@ -4,8 +4,6 @@ import static org.springframework.http.HttpHeaders.SET_COOKIE;
 import static org.springframework.security.config.Customizer.withDefaults;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.autoconfigure.security.SecurityProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -25,7 +23,6 @@ import shop.sgmarket.sgmarketbackend.global.security.JwtTokenProvider;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-@EnableConfigurationProperties(SecurityProperties.class)
 public class SecurityConfig {
 
     private final JwtTokenProvider jwtTokenProvider;

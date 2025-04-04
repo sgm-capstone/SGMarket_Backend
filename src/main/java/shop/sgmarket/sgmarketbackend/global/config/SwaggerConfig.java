@@ -8,13 +8,11 @@ import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import shop.sgmarket.sgmarketbackend.global.properties.SwaggerProperties;
 
 @Configuration
-@EnableConfigurationProperties(SwaggerProperties.class)
 @RequiredArgsConstructor
 public class SwaggerConfig {
 

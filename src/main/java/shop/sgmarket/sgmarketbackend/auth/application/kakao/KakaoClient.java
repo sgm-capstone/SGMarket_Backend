@@ -7,7 +7,6 @@ import static shop.sgmarket.sgmarketbackend.global.constant.SecurityConstant.TOK
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -15,9 +14,9 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
 import shop.sgmarket.sgmarketbackend.auth.application.OAuthClient;
+import shop.sgmarket.sgmarketbackend.auth.dto.response.OAuthTokenResponse;
 import shop.sgmarket.sgmarketbackend.auth.dto.response.SocialClientResponse;
 import shop.sgmarket.sgmarketbackend.auth.dto.response.kakao.KakaoAuthResponse;
-import shop.sgmarket.sgmarketbackend.auth.dto.response.OAuthTokenResponse;
 import shop.sgmarket.sgmarketbackend.global.error.ErrorCode;
 import shop.sgmarket.sgmarketbackend.global.error.exception.CustomException;
 import shop.sgmarket.sgmarketbackend.global.properties.KakaoProperties;
@@ -25,7 +24,6 @@ import shop.sgmarket.sgmarketbackend.global.properties.KakaoProperties;
 @Slf4j
 @Component("KAKAO")
 @RequiredArgsConstructor
-@EnableConfigurationProperties(KakaoProperties.class)
 public class KakaoClient implements OAuthClient {
 
     private final KakaoProperties kakaoProperties;

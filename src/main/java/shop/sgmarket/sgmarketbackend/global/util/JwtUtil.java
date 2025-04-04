@@ -11,7 +11,6 @@ import java.security.Key;
 import java.util.Date;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Component;
 import shop.sgmarket.sgmarketbackend.auth.domain.TokenType;
 import shop.sgmarket.sgmarketbackend.auth.dto.AccessTokenDto;
@@ -21,7 +20,6 @@ import shop.sgmarket.sgmarketbackend.member.domain.MemberRole;
 
 @Component
 @RequiredArgsConstructor
-@EnableConfigurationProperties(JwtProperties.class)
 public class JwtUtil {
 
     private final JwtProperties jwtProperties;
