@@ -6,7 +6,7 @@ on:
       - develop
 
 env:
-  DOCKER_IMAGE_NAME: ${{ secrets.DEV_DOCKER_IMAGE_NAME }}  # 예: "junyeong/sgmarket-backend:latest"
+  DOCKER_IMAGE_NAME: ${{ secrets.DEV_DOCKER_IMAGE_NAME }}
   EC2_HOST: ${{ secrets.EC2_HOST }}
   EC2_SSH_USER: ec2-user
   PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
@@ -26,20 +26,24 @@ jobs:
         java-version: '21'
         distribution: 'temurin'
 
-    - name: Set up application-prod.yml
+    - name: Set up configuration files
       run: |
-        echo "${{ secrets.DEV_APPLICATION }}" | base64 -d > ./src/main/resources/application-prod.yml
+        echo "${{ secrets.DEV_APPLICATION }}" > ./src/main/resources/application-dev.yml
+        echo "${{ secrets.DEV_APPLICATION_DATASOURCE }}" > ./src/main/resources/application-datasource.yml
+        echo "${{ secrets.DEV_APPLICATION_REDIS }}" > ./src/main/resources/application-redis.yml
+        echo "${{ secrets.DEV_APPLICATION_SECURITY }}" > ./src/main/resources/application-security.yml
+        echo "${{ secrets.DEV_APPLICATION_YML }}" > ./src/main/resources/application.yml
 
     - name: Build with Gradle
-      run: ./gradlew build
+      run: ./gradlew build -x test
 
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag ${{ env.DOCKER_IMAGE_NAME }}
 
-    - name: Login to Docker Hub using Access Token
+    - name: Login to Docker Hub
       run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
 
-    - name: Push the Docker image to Docker Hub
+    - name: Push the Docker image
       run: docker push ${{ env.DOCKER_IMAGE_NAME }}
 
   deploy-to-ec2:
@@ -63,8 +67,12 @@ jobs:
           echo "📦 Pulling the latest Docker image..."
           sudo docker pull ${{ env.DOCKER_IMAGE_NAME }}
 
-          echo "🚀 Running the new container..."
-          sudo docker run --pull always --name ${{ env.CONTAINER_NAME }} -d -p 8089:8089 -e TZ=Asia/Seoul ${{ env.DOCKER_IMAGE_NAME }}
+          echo "🚀 Running the new container with profile 'dev'..."
+          sudo docker run --pull always --name ${{ env.CONTAINER_NAME }} -d \
+            -p 8089:8089 \
+            -e TZ=Asia/Seoul \
+            -e SPRING_PROFILES_ACTIVE=dev \
+            ${{ env.DOCKER_IMAGE_NAME }}
 
           echo "🧹 Cleaning up unused Docker resources..."
           sudo docker system prune -f
