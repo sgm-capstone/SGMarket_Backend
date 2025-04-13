@@ -54,7 +54,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // 2. 쿠키에서 Refresh Token 가져오기
         String refreshToken = extractRefreshTokenFromCookie(request);
         if (refreshToken == null) {
-            log.info("Refresh Token이 없음");
             filterChain.doFilter(request, response);
             return;
         }
@@ -62,7 +61,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // 3. Refresh Token 감증
         RefreshTokenDto refreshTokenDto = jwtTokenProvider.retrieveRefreshToken(refreshToken);
         if (refreshTokenDto == null) {
-            log.info("Refresh Token 검증 실패");
             filterChain.doFilter(request, response);
             return;
         }
@@ -71,7 +69,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         AccessTokenDto newAccessToken = jwtTokenProvider.reissueAccessTokenIfExpired(accessToken);
         if (newAccessToken != null) {
             response.setHeader(HttpHeaders.AUTHORIZATION, TOKEN_PREFIX + newAccessToken.tokenValue());
-            log.info("Access Token 재발급 완료");
             setAuthenticationToContext(newAccessToken.memberId(), newAccessToken.memberRole());
         }
 
