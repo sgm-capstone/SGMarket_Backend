@@ -4,6 +4,7 @@ import static shop.sgmarket.sgmarketbackend.global.constant.SecurityConstant.TOK
 
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,7 +13,6 @@ import org.springframework.stereotype.Service;
 import shop.sgmarket.sgmarketbackend.auth.domain.RefreshToken;
 import shop.sgmarket.sgmarketbackend.auth.dto.AccessTokenDto;
 import shop.sgmarket.sgmarketbackend.auth.dto.RefreshTokenDto;
-import shop.sgmarket.sgmarketbackend.auth.dto.response.TokenPairResponse;
 import shop.sgmarket.sgmarketbackend.auth.repository.RefreshTokenRepository;
 import shop.sgmarket.sgmarketbackend.global.util.CookieUtil;
 import shop.sgmarket.sgmarketbackend.global.util.JwtUtil;
@@ -27,17 +27,18 @@ public class JwtTokenProvider {
     private final CookieUtil cookieUtil;
     private final RefreshTokenRepository refreshTokenRepository;
 
-    public TokenPairResponse generateTokenPair(final Long memberId,
+    public void generateTokenPair(final Long memberId,
                                                final MemberRole memberRole,
                                                HttpServletResponse response) {
         String accessToken = createAccessToken(memberId, memberRole);
         String refreshToken = createRefreshToken(memberId);
 
-        HttpHeaders cookieHeaders = cookieUtil.generateTokenCookies(refreshToken);
-        response.addHeader(HttpHeaders.SET_COOKIE, cookieHeaders.getFirst(HttpHeaders.SET_COOKIE));
-
-        return TokenPairResponse.of(accessToken, refreshToken);
+        HttpHeaders cookieHeaders = cookieUtil.generateTokenCookies(accessToken, refreshToken);
+        for (String cookie : Objects.requireNonNull(cookieHeaders.get(HttpHeaders.SET_COOKIE))) {
+            response.addHeader(HttpHeaders.SET_COOKIE, cookie);
+        }
     }
+
 
 
     private String createAccessToken(final Long memberId,final MemberRole memberRole) {

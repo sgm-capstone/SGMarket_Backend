@@ -20,7 +20,7 @@ public interface AuthDocs {
                     @ApiResponse(responseCode = "400", description = "잘못된 요청"),
                     @ApiResponse(responseCode = "500", description = "서버 오류")
             })
-    ApiResponseTemplate<AuthTokenResponse> socialLogin(
+    ApiResponseTemplate<Void> socialLogin(
             @Parameter(description = "소셜 제공자", required = true) String provider,
             @Parameter(description = "인증 코드", required = true) String code,
             HttpServletResponse response
