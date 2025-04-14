@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import shop.sgmarket.sgmarketbackend.auth.application.AuthService;
 import shop.sgmarket.sgmarketbackend.auth.domain.OAuthProvider;
-import shop.sgmarket.sgmarketbackend.auth.dto.response.AuthTokenResponse;
 import shop.sgmarket.sgmarketbackend.auth.dto.response.OAuthTokenResponse;
 import shop.sgmarket.sgmarketbackend.auth.dto.response.SocialClientResponse;
 import shop.sgmarket.sgmarketbackend.global.response.ApiResponseTemplate;
@@ -22,7 +21,7 @@ public class AuthController implements AuthDocs {
 
     @Override
     @GetMapping("/login")
-    public ApiResponseTemplate<AuthTokenResponse> socialLogin(
+    public ApiResponseTemplate<Void> socialLogin(
             @RequestParam final String provider,
             @RequestParam final String code,
             HttpServletResponse response
@@ -32,16 +31,15 @@ public class AuthController implements AuthDocs {
         SocialClientResponse socialClientResponse = authService.authenticateFromProvider(oauthProvider,
                 oAuthTokenResponse.accessToken());
 
-        return ApiResponseTemplate.ok(
-                authService.socialLogin(
-                        oauthProvider,
-                        socialClientResponse.oauthId(),
-                        socialClientResponse.email(),
-                        socialClientResponse.nickname(),
-                        socialClientResponse.profileImage(),
-                        response
-                )
-        ).message(provider + " 소셜 로그인 완료");
+        authService.socialLogin(
+                oauthProvider,
+                socialClientResponse.oauthId(),
+                socialClientResponse.email(),
+                socialClientResponse.nickname(),
+                socialClientResponse.profileImage(),
+                response
+        );
+        return ApiResponseTemplate.ok();
     }
 
     // TODO: 로그아웃 API 구현

@@ -1,5 +1,6 @@
 package shop.sgmarket.sgmarketbackend.global.filter;
 
+import static shop.sgmarket.sgmarketbackend.global.constant.SecurityConstant.ACCESS_TOKEN_COOKIE_NAME;
 import static shop.sgmarket.sgmarketbackend.global.constant.SecurityConstant.REFRESH_TOKEN_COOKIE_NAME;
 import static shop.sgmarket.sgmarketbackend.global.constant.SecurityConstant.TOKEN_PREFIX;
 
@@ -39,8 +40,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain)
             throws ServletException, IOException {
 
-        // 1. 헤더에서 Access Token 가져오기
-        String accessToken = extractAccessTokenFromHeader(request);
+        // 1. 쿠키 Access Token 가져오기
+        String accessToken = extractAccessTokenFromCookie(request);
 
         if (accessToken != null) {
             AccessTokenDto accessTokenDto = jwtTokenProvider.retrieveAccessToken(accessToken);
@@ -75,18 +76,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private static String extractAccessTokenFromHeader(HttpServletRequest request) {
-        return Optional.ofNullable(request.getHeader(HttpHeaders.AUTHORIZATION))
-                .filter(header -> header.startsWith(TOKEN_PREFIX))
-                .map(header -> header.replace(TOKEN_PREFIX, ""))
-                .orElse(null);
-    }
-
     private void setAuthenticationToContext(Long memberId, MemberRole memberRole) {
         UserDetails userDetails = new PrincipalDetails(memberId, memberRole);
         Authentication authentication =
                 new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authentication);
+    }
+
+    private String extractAccessTokenFromCookie(HttpServletRequest request) {
+        return Optional.ofNullable(WebUtils.getCookie(request, ACCESS_TOKEN_COOKIE_NAME))
+                .map(Cookie::getValue)
+                .orElse(null);
     }
 
     private String extractRefreshTokenFromCookie(HttpServletRequest request) {

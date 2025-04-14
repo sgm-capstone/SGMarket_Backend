@@ -7,10 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shop.sgmarket.sgmarketbackend.auth.domain.OAuthProvider;
-import shop.sgmarket.sgmarketbackend.auth.dto.response.AuthTokenResponse;
 import shop.sgmarket.sgmarketbackend.auth.dto.response.OAuthTokenResponse;
 import shop.sgmarket.sgmarketbackend.auth.dto.response.SocialClientResponse;
-import shop.sgmarket.sgmarketbackend.auth.dto.response.TokenPairResponse;
 import shop.sgmarket.sgmarketbackend.global.error.ErrorCode;
 import shop.sgmarket.sgmarketbackend.global.error.exception.CustomException;
 import shop.sgmarket.sgmarketbackend.global.security.JwtTokenProvider;
@@ -43,7 +41,7 @@ public class AuthService {
     }
 
     @Transactional
-    public AuthTokenResponse socialLogin(final OAuthProvider oAuthProvider,
+    public void socialLogin(final OAuthProvider oAuthProvider,
                                          final String oauthId,
                                          final String email,
                                          final String nickname,
@@ -54,11 +52,9 @@ public class AuthService {
                 .findByOauthInfoOauthProviderAndOauthInfoOauthId(oAuthProvider.getValue(), oauthId)
                 .orElseGet(() -> createOauthMember(oAuthProvider, oauthId, email, nickname, profileImage));
 
-        TokenPairResponse tokenPair = getLoginResponse(member, response);
+        getLoginResponse(member, response);
         member.updateLastLoginAt();
         log.info("소셜 로그인 진행: {}", member.getId());
-
-        return AuthTokenResponse.of(tokenPair);
     }
 
     private Member createOauthMember(final OAuthProvider oAuthProvider,
@@ -73,7 +69,7 @@ public class AuthService {
         return oauthMember;
     }
 
-    private TokenPairResponse getLoginResponse(Member member, HttpServletResponse response) {
-        return jwtTokenProvider.generateTokenPair(member.getId(), MemberRole.USER, response);
+    private void getLoginResponse(Member member, HttpServletResponse response) {
+        jwtTokenProvider.generateTokenPair(member.getId(), MemberRole.USER, response);
     }
 }
