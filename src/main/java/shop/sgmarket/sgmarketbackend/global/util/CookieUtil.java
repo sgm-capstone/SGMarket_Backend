@@ -1,13 +1,14 @@
 package shop.sgmarket.sgmarketbackend.global.util;
 
-import static shop.sgmarket.sgmarketbackend.global.constant.SecurityConstant.REFRESH_TOKEN_COOKIE_NAME;
 import static shop.sgmarket.sgmarketbackend.global.constant.SecurityConstant.ACCESS_TOKEN_COOKIE_NAME;
+import static shop.sgmarket.sgmarketbackend.global.constant.SecurityConstant.REFRESH_TOKEN_COOKIE_NAME;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.web.server.Cookie;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
+import shop.sgmarket.sgmarketbackend.global.properties.CookieProperties;
 import shop.sgmarket.sgmarketbackend.global.properties.JwtProperties;
 
 @Component
@@ -15,6 +16,7 @@ import shop.sgmarket.sgmarketbackend.global.properties.JwtProperties;
 public class CookieUtil {
 
     private final JwtProperties jwtProperties;
+    private final CookieProperties cookieProperties;
 
     public HttpHeaders generateTokenCookies(final String accessToken, final String refreshToken) {
         String sameSite = determineSameSitePolicy();
@@ -22,7 +24,7 @@ public class CookieUtil {
         ResponseCookie accessTokenCookie =
                 ResponseCookie.from(ACCESS_TOKEN_COOKIE_NAME, accessToken)
                         .path("/")
-                        .secure(true)
+                        .secure(cookieProperties.isSecure())
                         .sameSite(sameSite)
                         .httpOnly(true)
                         .maxAge(jwtProperties.accessTokenExpirationTime())
@@ -31,7 +33,7 @@ public class CookieUtil {
         ResponseCookie refreshTokenCookie =
                 ResponseCookie.from(REFRESH_TOKEN_COOKIE_NAME, refreshToken)
                         .path("/")
-                        .secure(true)
+                        .secure(cookieProperties.isSecure())
                         .sameSite(sameSite)
                         .httpOnly(true)
                         .maxAge(jwtProperties.refreshTokenExpirationTime())
