@@ -17,6 +17,5 @@ logging:
     org.hibernate.SQL: debug
     org.hibernate.type: trace
 
-jwt:
-  cookie:
-    is-secure: false
+frontend:
+  redirect-uri: http://localhost:8080/swagger-ui/index.html#/
