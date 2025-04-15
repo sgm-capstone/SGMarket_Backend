@@ -17,6 +17,5 @@ logging:
     org.hibernate.SQL: info
     org.hibernate.type: warn
 
-jwt:
-  cookie:
-    is-secure: true
+frontend:
+  redirect-uri: ${REDIRECT_URI}

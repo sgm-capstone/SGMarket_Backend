@@ -8,7 +8,6 @@ import org.springframework.boot.web.server.Cookie.SameSite;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
-import shop.sgmarket.sgmarketbackend.global.properties.CookieProperties;
 import shop.sgmarket.sgmarketbackend.global.properties.JwtProperties;
 
 @Component
@@ -16,7 +15,6 @@ import shop.sgmarket.sgmarketbackend.global.properties.JwtProperties;
 public class CookieUtil {
 
     private final JwtProperties jwtProperties;
-    private final CookieProperties cookieProperties;
 
     public HttpHeaders generateTokenCookies(final String accessToken, final String refreshToken) {
         String sameSite = determineSameSitePolicy();

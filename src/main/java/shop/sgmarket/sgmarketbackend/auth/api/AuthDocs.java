@@ -7,8 +7,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import shop.sgmarket.sgmarketbackend.auth.dto.response.AuthTokenResponse;
-import shop.sgmarket.sgmarketbackend.global.response.ApiResponseTemplate;
 
 @Tag(name = "[인증 API]", description = "인증 관련 API")
 public interface AuthDocs {
@@ -20,9 +20,9 @@ public interface AuthDocs {
                     @ApiResponse(responseCode = "400", description = "잘못된 요청"),
                     @ApiResponse(responseCode = "500", description = "서버 오류")
             })
-    ApiResponseTemplate<Void> socialLogin(
+    void socialLogin (
             @Parameter(description = "소셜 제공자", required = true) String provider,
             @Parameter(description = "인증 코드", required = true) String code,
             HttpServletResponse response
-    );
+    ) throws IOException;
 }
