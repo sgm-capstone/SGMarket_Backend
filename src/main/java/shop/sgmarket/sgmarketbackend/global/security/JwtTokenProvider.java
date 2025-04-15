@@ -28,8 +28,8 @@ public class JwtTokenProvider {
     private final RefreshTokenRepository refreshTokenRepository;
 
     public void generateTokenPair(final Long memberId,
-                                               final MemberRole memberRole,
-                                               HttpServletResponse response) {
+                                  final MemberRole memberRole,
+                                  HttpServletResponse response) {
         String accessToken = createAccessToken(memberId, memberRole);
         String refreshToken = createRefreshToken(memberId);
 
@@ -40,8 +40,7 @@ public class JwtTokenProvider {
     }
 
 
-
-    private String createAccessToken(final Long memberId,final MemberRole memberRole) {
+    private String createAccessToken(final Long memberId, final MemberRole memberRole) {
         return jwtUtil.generateAccessToken(memberId, memberRole);
     }
 

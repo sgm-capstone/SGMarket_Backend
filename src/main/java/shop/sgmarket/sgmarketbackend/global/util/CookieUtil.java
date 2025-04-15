@@ -4,7 +4,7 @@ import static shop.sgmarket.sgmarketbackend.global.constant.SecurityConstant.ACC
 import static shop.sgmarket.sgmarketbackend.global.constant.SecurityConstant.REFRESH_TOKEN_COOKIE_NAME;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.web.server.Cookie;
+import org.springframework.boot.web.server.Cookie.SameSite;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
@@ -47,6 +47,10 @@ public class CookieUtil {
     }
 
     private String determineSameSitePolicy() {
-        return Cookie.SameSite.NONE.attributeValue();  // 일단 임시 설정
+        if (cookieProperties.isSecure()) {
+            return SameSite.NONE.attributeValue();
+
+        }
+        return SameSite.LAX.attributeValue();
     }
 }
