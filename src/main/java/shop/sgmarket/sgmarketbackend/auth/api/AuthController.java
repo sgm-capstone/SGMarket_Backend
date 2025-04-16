@@ -11,16 +11,15 @@ import shop.sgmarket.sgmarketbackend.auth.application.AuthService;
 import shop.sgmarket.sgmarketbackend.auth.domain.OAuthProvider;
 import shop.sgmarket.sgmarketbackend.auth.dto.response.OAuthTokenResponse;
 import shop.sgmarket.sgmarketbackend.auth.dto.response.SocialClientResponse;
-import shop.sgmarket.sgmarketbackend.global.properties.RedirectUriProperties;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/auth")
 public class AuthController implements AuthDocs {
 
-    private final RedirectUriProperties redirectUriProperties;
     private final AuthService authService;
 
+    @Override
     @GetMapping("/login")
     public void socialLogin(
             @RequestParam final String provider,
@@ -40,10 +39,7 @@ public class AuthController implements AuthDocs {
                 socialClientResponse.profileImage(),
                 response
         );
-
-        response.sendRedirect(redirectUriProperties.redirectUri());
     }
-
 
     // TODO: 로그아웃 API 구현
 }

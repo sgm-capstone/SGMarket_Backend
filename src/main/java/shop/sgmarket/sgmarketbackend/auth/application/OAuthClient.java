@@ -11,7 +11,7 @@ public interface OAuthClient {
      * @param token 인증 토큰
      * @return 소셜 로그인 사용자 정보
      */
-    SocialClientResponse authenticate(String token);
+    SocialClientResponse getUserInfo(String token);
 
     /**
      * 소셜 로그인 인증
