@@ -57,7 +57,7 @@ public class GoogleClient implements OAuthClient {
     }
 
     @Override
-    public SocialClientResponse authenticate(final String token) {
+    public SocialClientResponse getUserInfo(final String token) {
         if (token == null || token.trim().isEmpty()) {
             throw new CustomException(ErrorCode.INVALID_GOOGLE_TOKEN);
         }
