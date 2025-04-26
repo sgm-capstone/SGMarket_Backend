@@ -14,8 +14,10 @@ public record KakaoAuthResponse(
     ) {
     }
 
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static record PropertiesResponse(
-            String nickname, String profileImage
+            String nickname,
+            String profileImage
     ) {
     }
 }

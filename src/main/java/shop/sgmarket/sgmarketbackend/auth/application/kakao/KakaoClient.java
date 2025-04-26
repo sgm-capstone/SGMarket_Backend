@@ -74,6 +74,7 @@ public class KakaoClient implements OAuthClient {
                                             response.bodyTo(KakaoAuthResponse.class));
                                 });
 
+        System.out.println("profileImage = " + kakaoAuthResponse.properties().profileImage());
         return SocialClientResponse.of(
                 kakaoAuthResponse.kakaoAccount().email(),
                 kakaoAuthResponse.id().toString(),
