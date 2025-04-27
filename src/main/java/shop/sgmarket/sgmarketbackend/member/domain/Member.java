@@ -15,12 +15,14 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import shop.sgmarket.sgmarketbackend.auth.domain.OAuthProvider;
+import shop.sgmarket.sgmarketbackend.global.domain.BaseTimeEntity;
+import shop.sgmarket.sgmarketbackend.global.domain.Status;
 
 @Entity
 @Getter
-@EqualsAndHashCode(of = "id")
+@EqualsAndHashCode(callSuper = false, of = "id")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Member {
+public class Member extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
