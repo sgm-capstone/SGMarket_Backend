@@ -15,6 +15,8 @@ import shop.sgmarket.sgmarketbackend.auction.repository.AuctionCategoryRepositor
 import shop.sgmarket.sgmarketbackend.auction.repository.AuctionRepository;
 import shop.sgmarket.sgmarketbackend.auction.repository.ItemRepository;
 import shop.sgmarket.sgmarketbackend.global.dto.PageResponse;
+import shop.sgmarket.sgmarketbackend.global.error.ErrorCode;
+import shop.sgmarket.sgmarketbackend.global.error.exception.CustomException;
 import shop.sgmarket.sgmarketbackend.global.util.MemberUtil;
 import shop.sgmarket.sgmarketbackend.member.domain.Member;
 
@@ -34,7 +36,7 @@ public class AuctionService {
         Item item = Item.createItem(request.itemRegisterRequest().itemName(), member);
 
         AuctionCategory auctionCategory = auctionCategoryRepository.findByName(request.auctionCategory())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리입니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.AUCTION_CATEGORY_NOT_FOUND));
 
         Auction auction = Auction.create(
                 request.title(),
@@ -57,7 +59,7 @@ public class AuctionService {
     @Transactional(readOnly = true)
     public AuctionInfoResponse getAuction(Long auctionId) {
         Auction auction = auctionRepository.findById(auctionId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 경매가 존재하지 않습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.AUCTION_NOT_FOUND));
 
         return AuctionInfoResponse.of(auction, auction.getItem(), auction.getItem().getMember());
     }
@@ -80,10 +82,10 @@ public class AuctionService {
     @Transactional
     public AuctionInfoResponse updateAuction(Long auctionId, AuctionUpdateRequest request) {
         Auction auction = auctionRepository.findById(auctionId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 경매가 존재하지 않습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.AUCTION_NOT_FOUND));
 
         AuctionCategory auctionCategory = auctionCategoryRepository.findByName(request.auctionCategory())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리입니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.AUCTION_CATEGORY_NOT_FOUND));
 
         auction.update(
                 request.title(),
@@ -99,7 +101,7 @@ public class AuctionService {
     @Transactional
     public void deleteAuction(Long auctionId) {
         Auction auction = auctionRepository.findById(auctionId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 경매가 존재하지 않습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.AUCTION_NOT_FOUND));
         auction.delete();
     }
 }
