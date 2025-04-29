@@ -109,8 +109,11 @@ public class AuctionService {
 
     @Transactional
     public void deleteAuction(Long auctionId) {
+        Member member = memberUtil.getCurrentMember();
         Auction auction = auctionRepository.findById(auctionId)
                 .orElseThrow(() -> new CustomException(ErrorCode.AUCTION_NOT_FOUND));
+
+        validateAuthority(member, auction);
         auction.delete();
     }
 
