@@ -1,8 +1,8 @@
 package shop.sgmarket.sgmarketbackend.auction.application;
 
-import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shop.sgmarket.sgmarketbackend.auction.domain.Auction;
@@ -11,10 +11,10 @@ import shop.sgmarket.sgmarketbackend.auction.domain.Item;
 import shop.sgmarket.sgmarketbackend.auction.dto.request.AuctionRegisterRequest;
 import shop.sgmarket.sgmarketbackend.auction.dto.request.AuctionUpdateRequest;
 import shop.sgmarket.sgmarketbackend.auction.dto.response.AuctionInfoResponse;
-import shop.sgmarket.sgmarketbackend.auction.dto.response.AuctionsResponse;
 import shop.sgmarket.sgmarketbackend.auction.repository.AuctionCategoryRepository;
 import shop.sgmarket.sgmarketbackend.auction.repository.AuctionRepository;
 import shop.sgmarket.sgmarketbackend.auction.repository.ItemRepository;
+import shop.sgmarket.sgmarketbackend.global.dto.PageResponse;
 import shop.sgmarket.sgmarketbackend.global.util.MemberUtil;
 import shop.sgmarket.sgmarketbackend.member.domain.Member;
 
@@ -63,14 +63,19 @@ public class AuctionService {
     }
 
     @Transactional(readOnly = true)
-    public AuctionsResponse getAllAuctions() {
-        List<AuctionInfoResponse> responses = auctionRepository.findAll().stream()
-                .map(auction -> AuctionInfoResponse.of(auction, auction.getItem(), auction.getItem().getMember()))
-                .collect(Collectors.toList());
+    public PageResponse<AuctionInfoResponse> getAllAuctions(Pageable pageable) {
+        Page<Auction> auctions = auctionRepository.findAll(pageable);
 
-        return AuctionsResponse.from(responses);
+        Page<AuctionInfoResponse> auctionInfoResponses = auctions.map(auction ->
+                AuctionInfoResponse.of(
+                        auction,
+                        auction.getItem(),
+                        auction.getItem().getMember()
+                )
+        );
+
+        return PageResponse.from(auctionInfoResponses);
     }
-
 
     @Transactional
     public AuctionInfoResponse updateAuction(Long auctionId, AuctionUpdateRequest request) {

@@ -15,11 +15,11 @@ public record AuctionInfoResponse(
         long auctionStartPrice,
         long auctionCurrentPrice,
         long auctionEndPrice,
-        String auctionStatus,
         String auctionImageUrl,
         String auctionCategory,
         ItemInfo auctionItem,
-        MemberInfo auctionMember
+        MemberInfo auctionMember,
+        String status
 ) {
     public static AuctionInfoResponse of(Auction auction, Item item, Member member) {
         return AuctionInfoResponse.builder()
@@ -35,6 +35,7 @@ public record AuctionInfoResponse(
                 .auctionCategory(auction.getCategory().getName())
                 .auctionItem(ItemInfo.from(item))
                 .auctionMember(MemberInfo.from(member))
+                .status(auction.getStatus().name())
                 .build();
     }
 
@@ -52,7 +53,8 @@ public record AuctionInfoResponse(
             String memberProfileImageUrl
     ) {
         public static MemberInfo from(Member member) {
-            return new MemberInfo(member.getId(), member.getNickname(), member.getOauthInfo().getOauthProfileImageUrl());
+            return new MemberInfo(member.getId(), member.getNickname(),
+                    member.getOauthInfo().getOauthProfileImageUrl());
         }
     }
 }
