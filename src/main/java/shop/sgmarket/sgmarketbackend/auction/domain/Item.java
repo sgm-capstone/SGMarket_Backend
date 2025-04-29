@@ -52,4 +52,9 @@ public class Item extends BaseTimeEntity {
                 .member(member)
                 .build();
     }
+
+    public void update(String name, String imageUrl) {
+        this.name = name;
+        this.imageUrl = imageUrl;
+    }
 }

@@ -1,7 +1,6 @@
 package shop.sgmarket.sgmarketbackend.auction.api;
 
 import jakarta.validation.Valid;
-import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
@@ -10,8 +9,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,13 +29,13 @@ public class AuctionController implements AuctionDocs {
     private final AuctionService auctionService;
 
     @Override
-    @PatchMapping(
+    @PostMapping(
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ApiResponseTemplate<AuctionInfoResponse> registerAuction(
-            @Valid @RequestPart("request") AuctionRegisterRequest request,
-            @RequestPart(value = "itemImage", required = false) MultipartFile itemImage
-    ) throws IOException {
+            @Valid @RequestPart AuctionRegisterRequest request,
+            @RequestPart MultipartFile itemImage
+    ) {
         AuctionInfoResponse response = auctionService.register(request, itemImage);
         return ApiResponseTemplate.created("경매 등록에 성공했습니다.", response);
     }
@@ -56,11 +54,17 @@ public class AuctionController implements AuctionDocs {
     }
 
     @Override
-    @PutMapping("/{auctionId}")
+    @PatchMapping(
+            value = "/{auctionId}", // ★ 여기에 추가해야 함
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
     public ApiResponseTemplate<AuctionInfoResponse> updateAuction(
             @PathVariable Long auctionId,
-            @Valid @RequestBody AuctionUpdateRequest request) {
-        AuctionInfoResponse response = auctionService.updateAuction(auctionId, request);
+            @Valid @RequestPart AuctionUpdateRequest request,
+            @RequestPart(value = "itemImage", required = false) MultipartFile itemImage
+    ) {
+        AuctionInfoResponse response = auctionService.updateAuction(auctionId, request, itemImage);
         return ApiResponseTemplate.ok("경매 수정에 성공했습니다.", response);
     }
 

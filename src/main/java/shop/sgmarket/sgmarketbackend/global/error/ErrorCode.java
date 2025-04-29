@@ -17,6 +17,7 @@ public enum ErrorCode {
 
     // 401 UNAUTHORIZED
     UNAUTHORIZED_ACCESS(HttpStatus.UNAUTHORIZED, "AUTH_4011", "인증이 필요합니다."),
+    UNAUTHORIZED_MEMBER(HttpStatus.UNAUTHORIZED, "AUTH_4012", "작성자가 아닙니다"),
 
     // 403 FORBIDDEN
     FORBIDDEN_ACCESS(HttpStatus.FORBIDDEN, "AUTH_4031", "접근 권한이 없습니다."),
@@ -31,6 +32,7 @@ public enum ErrorCode {
     DATABASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "SYSTEM_5002", "데이터베이스 오류가 발생했습니다."),
     KAKAO_COMMUNICATION_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "KAKAO_5001", "카카오 통신에 실패하였습니다."),
     GOOGLE_COMMUNICATION_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "GOOGLE_5001", "구글 통신에 실패하였습니다."),
+    IMAGE_UPLOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "IMAGE_5001", "이미지 업로드에 실패했습니다."),
     ;
 
     private final HttpStatus httpStatus;

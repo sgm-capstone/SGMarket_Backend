@@ -34,11 +34,11 @@ public class AuctionService {
     private final S3UploadService s3UploadService;
 
     @Transactional
-    public AuctionInfoResponse register(AuctionRegisterRequest request, MultipartFile itemImage) throws IOException {
+    public AuctionInfoResponse register(AuctionRegisterRequest request, MultipartFile itemImage) {
         Member member = memberUtil.getCurrentMember();
 
-        String imageUrl = s3UploadService.uploadImage(itemImage, "auction/" + member.getId());
-        Item item = Item.createItem(request.itemRegisterRequest().itemName(), imageUrl ,member);
+        String imageUrl = getImageUrl(member, itemImage);
+        Item item = Item.createItem(request.itemRegisterRequest().itemName(), imageUrl, member);
 
         AuctionCategory auctionCategory = auctionCategoryRepository.findByName(request.auctionCategory())
                 .orElseThrow(() -> new CustomException(ErrorCode.AUCTION_CATEGORY_NOT_FOUND));
@@ -84,10 +84,13 @@ public class AuctionService {
     }
 
     @Transactional
-    public AuctionInfoResponse updateAuction(Long auctionId, AuctionUpdateRequest request) {
+    public AuctionInfoResponse updateAuction(Long auctionId, AuctionUpdateRequest request, MultipartFile itemImage) {
+        Member member = memberUtil.getCurrentMember();
+
         Auction auction = auctionRepository.findById(auctionId)
                 .orElseThrow(() -> new CustomException(ErrorCode.AUCTION_NOT_FOUND));
 
+        validateAuthority(member, auction);
         AuctionCategory auctionCategory = auctionCategoryRepository.findByName(request.auctionCategory())
                 .orElseThrow(() -> new CustomException(ErrorCode.AUCTION_CATEGORY_NOT_FOUND));
 
@@ -98,6 +101,9 @@ public class AuctionService {
                 auctionCategory
         );
 
+        String image = getImageUrl(member, itemImage);
+        auction.getItem().update(request.itemName(), image);
+
         return AuctionInfoResponse.of(auction, auction.getItem(), auction.getItem().getMember());
     }
 
@@ -106,5 +112,19 @@ public class AuctionService {
         Auction auction = auctionRepository.findById(auctionId)
                 .orElseThrow(() -> new CustomException(ErrorCode.AUCTION_NOT_FOUND));
         auction.delete();
+    }
+
+    private String getImageUrl(Member member, MultipartFile itemImage) {
+        try {
+            return s3UploadService.uploadImage(itemImage, "auction/" + member.getId());
+        } catch (IOException e) {
+            throw new CustomException(ErrorCode.IMAGE_UPLOAD_FAILED);
+        }
+    }
+
+    private void validateAuthority(Member member, Auction auction) {
+        if (!member.getId().equals(auction.getItem().getMember().getId())) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED_MEMBER);
+        }
     }
 }

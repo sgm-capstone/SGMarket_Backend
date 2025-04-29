@@ -2,6 +2,7 @@ package shop.sgmarket.sgmarketbackend.auction.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
@@ -24,12 +25,15 @@ public record AuctionRegisterRequest(
         LocalDateTime endDate,
 
         @NotNull
+        @Min(1)
         @Schema(example = "1200000", description = "경매 시작 가격")
         int startPrice,
 
+        @Min(1)
         @Schema(example = "1300000", description = "현재 가격")
         int currentPrice,
 
+        @Min(1)
         @Schema(example = "1500000", description = "경매 종료 가격")
         int endPrice,
 
