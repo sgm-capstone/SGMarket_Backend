@@ -46,11 +46,7 @@ public record AuctionRegisterRequest(
     public record ItemRegisterRequest(
             @NotNull
             @Schema(example = "아이폰 15 프로", description = "아이템 이름")
-            String itemName,
-
-            @NotNull
-            @Schema(example = "애플", description = "경매 아이템의 브랜드 또는 제조사")
-            String auction
+            String itemName
     ) {
     }
 }
