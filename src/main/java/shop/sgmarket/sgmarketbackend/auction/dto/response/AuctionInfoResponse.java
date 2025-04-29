@@ -31,7 +31,7 @@ public record AuctionInfoResponse(
                 .auctionStartPrice(auction.getStartPrice())
                 .auctionCurrentPrice(auction.getCurrentPrice())
                 .auctionEndPrice(auction.getEndPrice())
-                .auctionImageUrl(auction.getImageUrl())
+                .auctionImageUrl(item.getImageUrl())
                 .auctionCategory(auction.getCategory().getName())
                 .auctionItem(ItemInfo.from(item))
                 .auctionMember(MemberInfo.from(member))

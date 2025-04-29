@@ -38,7 +38,7 @@ public class AuctionService {
         Member member = memberUtil.getCurrentMember();
 
         String imageUrl = s3UploadService.uploadImage(itemImage, "auction/" + member.getId());
-        Item item = Item.createItem(request.itemRegisterRequest().itemName(), member);
+        Item item = Item.createItem(request.itemRegisterRequest().itemName(), imageUrl ,member);
 
         AuctionCategory auctionCategory = auctionCategoryRepository.findByName(request.auctionCategory())
                 .orElseThrow(() -> new CustomException(ErrorCode.AUCTION_CATEGORY_NOT_FOUND));
@@ -46,7 +46,6 @@ public class AuctionService {
         Auction auction = Auction.create(
                 request.title(),
                 request.description(),
-                imageUrl,
                 request.endDate(),
                 request.startPrice(),
                 request.currentPrice(),
@@ -95,7 +94,6 @@ public class AuctionService {
         auction.update(
                 request.title(),
                 request.description(),
-                request.imageUrl(),
                 request.endDate(),
                 auctionCategory
         );

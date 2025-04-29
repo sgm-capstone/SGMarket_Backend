@@ -1,5 +1,6 @@
 package shop.sgmarket.sgmarketbackend.auction.domain;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -27,6 +28,9 @@ public class Item extends BaseTimeEntity {
 
     private String name;
 
+    @Column(name = "image_url")
+    private String imageUrl;
+
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 
@@ -34,15 +38,17 @@ public class Item extends BaseTimeEntity {
     private Status status;
 
     @Builder(access = AccessLevel.PRIVATE)
-    private Item(String name, Member member) {
+    private Item(String name, String imageUrl, Member member) {
         this.name = name;
+        this.imageUrl = imageUrl;
         this.member = member;
         this.status = Status.ACTIVE;
     }
 
-    public static Item createItem(String name, Member member) {
+    public static Item createItem(String name, String imageUrl, Member member) {
         return Item.builder()
                 .name(name)
+                .imageUrl(imageUrl)
                 .member(member)
                 .build();
     }

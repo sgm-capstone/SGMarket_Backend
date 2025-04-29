@@ -32,9 +32,6 @@ public class Auction extends BaseTimeEntity {
 
     private String description;
 
-    @Column(name = "image_url")
-    private String imageUrl;
-
     @Column(name = "start_date")
     private LocalDateTime startDate;
 
@@ -62,11 +59,10 @@ public class Auction extends BaseTimeEntity {
     private Status status;
 
     @Builder(access = AccessLevel.PRIVATE)
-    private Auction(String title, String description, String imageUrl, LocalDateTime startDate, LocalDateTime endDate,
+    private Auction(String title, String description, LocalDateTime startDate, LocalDateTime endDate,
                     long startPrice, long currentPrice, long endPrice, AuctionCategory category, Item item, Status status) {
         this.title = title;
         this.description = description;
-        this.imageUrl = imageUrl;
         this.startDate = startDate;
         this.endDate = endDate;
         this.startPrice = startPrice;
@@ -77,13 +73,12 @@ public class Auction extends BaseTimeEntity {
         this.status = status;
     }
 
-    public static Auction create(String title, String description, String imageUrl, LocalDateTime endDate,
+    public static Auction create(String title, String description, LocalDateTime endDate,
                                  long startPrice, long currentPrice, long endPrice, AuctionCategory category,
                                  Item item) {
         return Auction.builder()
                 .title(title)
                 .description(description)
-                .imageUrl(imageUrl)
                 .startDate(LocalDateTime.now())
                 .endDate(endDate)
                 .startPrice(startPrice)
@@ -95,11 +90,10 @@ public class Auction extends BaseTimeEntity {
                 .build();
     }
 
-    public void update(String title, String description, String imageUrl, LocalDateTime endDate,
+    public void update(String title, String description, LocalDateTime endDate,
                        AuctionCategory category) {
         this.title = title;
         this.description = description;
-        this.imageUrl = imageUrl;
         this.endDate = endDate;
         this.category = category;
     }
