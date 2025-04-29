@@ -33,9 +33,6 @@ public record AuctionRegisterRequest(
         @Schema(example = "1500000", description = "경매 종료 가격")
         int endPrice,
 
-        @Schema(example = "https://example.com/iphone15pro.jpg", description = "경매 아이템 이미지 URL")
-        String imageUrl,
-
         @NotNull
         @Schema(example = "디지털기기", description = "경매 카테고리")
         String auctionCategory

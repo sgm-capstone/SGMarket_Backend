@@ -2,27 +2,40 @@ package shop.sgmarket.sgmarketbackend.auction.api;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.io.IOException;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.multipart.MultipartFile;
 import shop.sgmarket.sgmarketbackend.auction.dto.request.AuctionRegisterRequest;
 import shop.sgmarket.sgmarketbackend.auction.dto.request.AuctionUpdateRequest;
 import shop.sgmarket.sgmarketbackend.auction.dto.response.AuctionInfoResponse;
 import shop.sgmarket.sgmarketbackend.global.dto.PageResponse;
 import shop.sgmarket.sgmarketbackend.global.response.ApiResponseTemplate;
 
-@Tag(name = "Auction", description = "경매 API")
+@Tag(name = "경매 API", description = "경매 관련 API입니다.")
 public interface AuctionDocs {
 
     @Operation(summary = "경매 등록", description = "새로운 경매를 등록합니다.")
     ApiResponseTemplate<AuctionInfoResponse> registerAuction(
-            @Valid @RequestBody AuctionRegisterRequest request
-    );
+            @Parameter(
+                    description = "경매 등록 정보 JSON",
+                    required = true,
+                    content = @Content(schema = @Schema(implementation = AuctionRegisterRequest.class))
+            )
+            @RequestPart("request") AuctionRegisterRequest request,
+
+            @Parameter(description = "상품 이미지", required = true)
+            @RequestPart("representImage") MultipartFile itemImage
+    ) throws IOException;
 
     @Operation(summary = "경매 조회", description = "경매 ID로 경매를 조회합니다.")
     ApiResponseTemplate<AuctionInfoResponse> getAuction(
