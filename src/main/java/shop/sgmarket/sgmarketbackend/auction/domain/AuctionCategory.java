@@ -25,7 +25,7 @@ public class AuctionCategory {
         this.name = name;
     }
 
-    public static AuctionCategory createItemCategory(String name) {
+    public static AuctionCategory createAuctionCategory(String name) {
         return AuctionCategory.builder()
                 .name(name)
                 .build();

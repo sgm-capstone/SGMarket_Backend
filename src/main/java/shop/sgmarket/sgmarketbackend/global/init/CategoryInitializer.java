@@ -34,7 +34,7 @@ public class CategoryInitializer implements CommandLineRunner {
 
         for (String name : categories) {
             auctionCategoryRepository.findByName(name)
-                    .orElseGet(() -> auctionCategoryRepository.save(AuctionCategory.createItemCategory(name)));
+                    .orElseGet(() -> auctionCategoryRepository.save(AuctionCategory.createAuctionCategory(name)));
         }
     }
 }
