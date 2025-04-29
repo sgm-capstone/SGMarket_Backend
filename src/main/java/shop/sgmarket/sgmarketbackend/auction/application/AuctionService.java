@@ -1,6 +1,5 @@
 package shop.sgmarket.sgmarketbackend.auction.application;
 
-import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -118,11 +117,7 @@ public class AuctionService {
     }
 
     private String getImageUrl(Member member, MultipartFile itemImage) {
-        try {
-            return s3UploadService.uploadImage(itemImage, "auction/" + member.getId());
-        } catch (IOException e) {
-            throw new CustomException(ErrorCode.IMAGE_UPLOAD_FAILED);
-        }
+        return s3UploadService.uploadImage(itemImage, "auction/" + member.getId());
     }
 
     private void validateAuthority(Member member, Auction auction) {

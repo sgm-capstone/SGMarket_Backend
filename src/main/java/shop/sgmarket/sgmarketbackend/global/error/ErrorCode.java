@@ -14,6 +14,7 @@ public enum ErrorCode {
     UNSUPPORTED_OAUTH_PROVIDER(HttpStatus.BAD_REQUEST, "COMMON_4003", "지원하지 않는 소셜 로그인 제공자입니다."),
     INVALID_KAKAO_TOKEN(HttpStatus.BAD_REQUEST, "KAKAO_4001", "카카오 토큰이 유효하지 않거나 비어 있습니다."),
     INVALID_GOOGLE_TOKEN(HttpStatus.BAD_REQUEST, "GOOGLE_4001", "구글 토큰이 유효하지 않거나 비어 있습니다."),
+    INVALID_FILE_EXTENSION(HttpStatus.BAD_REQUEST, "IMAGE_4001", "파일 이름에 확장자가 없습니다."),
 
     // 401 UNAUTHORIZED
     UNAUTHORIZED_ACCESS(HttpStatus.UNAUTHORIZED, "AUTH_4011", "인증이 필요합니다."),
@@ -33,6 +34,8 @@ public enum ErrorCode {
     KAKAO_COMMUNICATION_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "KAKAO_5001", "카카오 통신에 실패하였습니다."),
     GOOGLE_COMMUNICATION_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "GOOGLE_5001", "구글 통신에 실패하였습니다."),
     IMAGE_UPLOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "IMAGE_5001", "이미지 업로드에 실패했습니다."),
+    MISSING_S3_BUCKET_CONFIG(HttpStatus.INTERNAL_SERVER_ERROR, "IMAGE_5002", "S3 bucket 설정이 비어 있습니다."),
+    MISSING_S3_REGION_CONFIG(HttpStatus.INTERNAL_SERVER_ERROR, "IMAGE_5003", "S3 region 설정이 비어 있습니다."),
     ;
 
     private final HttpStatus httpStatus;
