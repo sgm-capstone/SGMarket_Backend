@@ -6,19 +6,29 @@ import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
+import java.util.ArrayList;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.MediaType;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import shop.sgmarket.sgmarketbackend.global.properties.SwaggerProperties;
 
 @Configuration
-@RequiredArgsConstructor
 public class SwaggerConfig {
 
     private static final String JWT_SCHEME_NAME = "JWT TOKEN";
 
     private final SwaggerProperties swaggerProperties;
+
+    @Autowired
+    public SwaggerConfig(MappingJackson2HttpMessageConverter converter, SwaggerProperties swaggerProperties) {
+        this.swaggerProperties = swaggerProperties;
+        var supportedMediaTypes = new ArrayList<>(converter.getSupportedMediaTypes());
+        supportedMediaTypes.add(new MediaType("application", "octet-stream"));
+        converter.setSupportedMediaTypes(supportedMediaTypes);
+    }
 
     @Bean
     public OpenAPI sgMarketAPI() {
@@ -58,4 +68,5 @@ public class SwaggerConfig {
                                 .scheme("bearer")
                                 .bearerFormat("JWT"));
     }
+
 }

@@ -10,6 +10,7 @@ spring:
     include:
       - security
       - redis
+      - cloud
 
 swagger:
   url: ${SERVER_URL:http://localhost:8080}
