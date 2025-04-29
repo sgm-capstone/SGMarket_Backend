@@ -32,6 +32,7 @@ jobs:
         echo "${{ secrets.DEV_APPLICATION_DATASOURCE }}" > ./src/main/resources/application-datasource.yml
         echo "${{ secrets.DEV_APPLICATION_REDIS }}" > ./src/main/resources/application-redis.yml
         echo "${{ secrets.DEV_APPLICATION_SECURITY }}" > ./src/main/resources/application-security.yml
+        echo "${{ secrets.APPLICATION_CLOUD_YML }}" > ./src/main/resources/application-cloud.yml
         echo "${{ secrets.DEV_APPLICATION_YML }}" > ./src/main/resources/application.yml
 
     - name: Build with Gradle
