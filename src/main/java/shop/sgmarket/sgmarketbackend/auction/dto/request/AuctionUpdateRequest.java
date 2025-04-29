@@ -2,6 +2,7 @@ package shop.sgmarket.sgmarketbackend.auction.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
@@ -19,6 +20,7 @@ public record AuctionUpdateRequest(
         @NotNull
         @Schema(example = "2025-12-31 23:59:59", description = "경매 종료 시간", type = "string")
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+        @Future(message = "경매 종료 시간은 미래 시간이어야 합니다")
         LocalDateTime endDate,
 
         @NotNull
