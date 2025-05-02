@@ -15,6 +15,7 @@ import shop.sgmarket.sgmarketbackend.auction.dto.response.AuctionInfoResponse;
 import shop.sgmarket.sgmarketbackend.auction.repository.AuctionCategoryRepository;
 import shop.sgmarket.sgmarketbackend.auction.repository.AuctionRepository;
 import shop.sgmarket.sgmarketbackend.auction.repository.ItemRepository;
+import shop.sgmarket.sgmarketbackend.global.domain.Status;
 import shop.sgmarket.sgmarketbackend.global.dto.PageResponse;
 import shop.sgmarket.sgmarketbackend.global.error.ErrorCode;
 import shop.sgmarket.sgmarketbackend.global.error.exception.CustomException;
@@ -61,7 +62,7 @@ public class AuctionService {
 
     @Transactional(readOnly = true)
     public AuctionInfoResponse getAuction(Long auctionId) {
-        Auction auction = auctionRepository.findById(auctionId)
+        Auction auction = auctionRepository.findByIdAndStatus(auctionId, Status.ACTIVE)
                 .orElseThrow(() -> new CustomException(ErrorCode.AUCTION_NOT_FOUND));
 
         return AuctionInfoResponse.of(auction, auction.getItem(), auction.getItem().getMember());
@@ -69,7 +70,7 @@ public class AuctionService {
 
     @Transactional(readOnly = true)
     public PageResponse<AuctionInfoResponse> getAllAuctions(Pageable pageable) {
-        Page<Auction> auctions = auctionRepository.findAll(pageable);
+        Page<Auction> auctions = auctionRepository.findAllByStatus(Status.ACTIVE, pageable);
 
         Page<AuctionInfoResponse> auctionInfoResponses = auctions.map(auction ->
                 AuctionInfoResponse.of(
@@ -81,6 +82,7 @@ public class AuctionService {
 
         return PageResponse.from(auctionInfoResponses);
     }
+
 
     @Transactional
     public AuctionInfoResponse updateAuction(Long auctionId, AuctionUpdateRequest request, MultipartFile itemImage) {
