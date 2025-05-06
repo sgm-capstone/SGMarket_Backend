@@ -4,7 +4,6 @@ import static shop.sgmarket.sgmarketbackend.global.constant.SecurityConstant.TOK
 
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.HttpServletResponse;
-import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +12,10 @@ import org.springframework.stereotype.Service;
 import shop.sgmarket.sgmarketbackend.auth.domain.RefreshToken;
 import shop.sgmarket.sgmarketbackend.auth.dto.AccessTokenDto;
 import shop.sgmarket.sgmarketbackend.auth.dto.RefreshTokenDto;
+import shop.sgmarket.sgmarketbackend.auth.dto.response.AccessTokenResponse;
 import shop.sgmarket.sgmarketbackend.auth.repository.RefreshTokenRepository;
+import shop.sgmarket.sgmarketbackend.global.error.ErrorCode;
+import shop.sgmarket.sgmarketbackend.global.error.exception.CustomException;
 import shop.sgmarket.sgmarketbackend.global.util.CookieUtil;
 import shop.sgmarket.sgmarketbackend.global.util.JwtUtil;
 import shop.sgmarket.sgmarketbackend.member.domain.MemberRole;
@@ -27,16 +29,21 @@ public class JwtTokenProvider {
     private final CookieUtil cookieUtil;
     private final RefreshTokenRepository refreshTokenRepository;
 
-    public void generateTokenPair(final Long memberId,
-                                  final MemberRole memberRole,
-                                  HttpServletResponse response) {
-        String accessToken = createAccessToken(memberId, memberRole);
-        String refreshToken = createRefreshToken(memberId);
+    public void generateRefreshToken(final Long memberId,
+                                        final MemberRole memberRole,
+                                     HttpServletResponse response) {
+        String refreshToken = createRefreshToken(memberId, memberRole);
 
-        HttpHeaders cookieHeaders = cookieUtil.generateTokenCookies(accessToken, refreshToken);
-        for (String cookie : Objects.requireNonNull(cookieHeaders.get(HttpHeaders.SET_COOKIE))) {
-            response.addHeader(HttpHeaders.SET_COOKIE, cookie);
-        }
+        HttpHeaders cookieHeaders = cookieUtil.generateTokenCookies(refreshToken);
+        response.addHeader(HttpHeaders.SET_COOKIE, cookieHeaders.getFirst(HttpHeaders.SET_COOKIE));
+
+    }
+
+    public AccessTokenResponse generateAccessToken(final Long memberId,
+                                                   final MemberRole memberRole) {
+        String accessToken = createAccessToken(memberId, memberRole);
+
+        return AccessTokenResponse.of(accessToken);
     }
 
 
@@ -48,8 +55,8 @@ public class JwtTokenProvider {
         return jwtUtil.generateAccessTokenDto(memberId, memberRole);
     }
 
-    private String createRefreshToken(final Long memberId) {
-        String refreshTokenValue = jwtUtil.generateRefreshToken(memberId);
+    private String createRefreshToken(final Long memberId, final MemberRole memberRole) {
+        String refreshTokenValue = jwtUtil.generateRefreshToken(memberId, memberRole);
         saveRefreshTokenToRedis(memberId, refreshTokenValue, jwtUtil.getRefreshTokenExpirationTime());
         return refreshTokenValue;
     }
@@ -75,19 +82,18 @@ public class JwtTokenProvider {
 
     public RefreshTokenDto retrieveRefreshToken(final String refreshTokenValue) {
         RefreshTokenDto refreshTokenDto = parseRefreshToken(refreshTokenValue);
-
         if (refreshTokenDto == null) {
-            return null;
+            throw new CustomException(ErrorCode.INVALID_REFRESH_TOKEN);
         }
 
         Optional<RefreshToken> refreshToken = getRefreshTokenFromRedis(refreshTokenDto.memberId());
-
-        if (refreshToken.isPresent()) {
-            return refreshTokenDto;
+        if (refreshToken.isEmpty()) {
+            throw new CustomException(ErrorCode.INVALID_REFRESH_TOKEN);
         }
 
-        return null;
+        return refreshTokenDto;
     }
+
 
     private Optional<RefreshToken> getRefreshTokenFromRedis(final Long memberId) {
         return refreshTokenRepository.findById(memberId);
