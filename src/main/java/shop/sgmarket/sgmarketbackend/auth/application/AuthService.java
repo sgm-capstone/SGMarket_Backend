@@ -71,7 +71,6 @@ public class AuthService {
     @Transactional
     public AccessTokenResponse getAccessToken(HttpServletRequest request) {
         String refreshToken = CookieUtil.extractRefreshTokenFromCookie(request);
-        System.out.println("refreshToken = " + refreshToken);
         if (refreshToken == null) {
             throw new CustomException(ErrorCode.REFRESH_TOKEN_NOT_FOUND);
         }
