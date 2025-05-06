@@ -80,7 +80,7 @@ public class AuthService {
         return oauthMember;
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public AccessTokenResponse getAccessToken(HttpServletRequest request) {
         String refreshToken = CookieUtil.extractRefreshTokenFromCookie(request);
         RefreshTokenDto refreshTokenDto = jwtTokenProvider.retrieveRefreshToken(refreshToken);
