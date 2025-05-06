@@ -68,21 +68,6 @@ public class AuthService {
         jwtTokenProvider.generateRefreshToken(member.getId(), member.getRole(), response);
     }
 
-    @Transactional
-    public AccessTokenResponse getAccessToken(HttpServletRequest request) {
-        String refreshToken = CookieUtil.extractRefreshTokenFromCookie(request);
-        if (refreshToken == null) {
-            throw new CustomException(ErrorCode.REFRESH_TOKEN_NOT_FOUND);
-        }
-
-        RefreshTokenDto refreshTokenDto = jwtTokenProvider.retrieveRefreshToken(refreshToken);
-        if (refreshTokenDto == null) {
-            throw new CustomException(ErrorCode.INVALID_REFRESH_TOKEN);
-        }
-
-        return jwtTokenProvider.generateAccessToken(refreshTokenDto.memberId(), refreshTokenDto.memberRole());
-    }
-
     private Member createOauthMember(final OAuthProvider oAuthProvider,
                                      final String oauthId,
                                      final String email,
@@ -95,5 +80,11 @@ public class AuthService {
         return oauthMember;
     }
 
+    @Transactional
+    public AccessTokenResponse getAccessToken(HttpServletRequest request) {
+        String refreshToken = CookieUtil.extractRefreshTokenFromCookie(request);
+        RefreshTokenDto refreshTokenDto = jwtTokenProvider.retrieveRefreshToken(refreshToken);
 
+        return jwtTokenProvider.generateAccessToken(refreshTokenDto.memberId(), refreshTokenDto.memberRole());
+    }
 }

@@ -14,6 +14,8 @@ import shop.sgmarket.sgmarketbackend.auth.dto.AccessTokenDto;
 import shop.sgmarket.sgmarketbackend.auth.dto.RefreshTokenDto;
 import shop.sgmarket.sgmarketbackend.auth.dto.response.AccessTokenResponse;
 import shop.sgmarket.sgmarketbackend.auth.repository.RefreshTokenRepository;
+import shop.sgmarket.sgmarketbackend.global.error.ErrorCode;
+import shop.sgmarket.sgmarketbackend.global.error.exception.CustomException;
 import shop.sgmarket.sgmarketbackend.global.util.CookieUtil;
 import shop.sgmarket.sgmarketbackend.global.util.JwtUtil;
 import shop.sgmarket.sgmarketbackend.member.domain.MemberRole;
@@ -80,19 +82,18 @@ public class JwtTokenProvider {
 
     public RefreshTokenDto retrieveRefreshToken(final String refreshTokenValue) {
         RefreshTokenDto refreshTokenDto = parseRefreshToken(refreshTokenValue);
-
         if (refreshTokenDto == null) {
-            return null;
+            throw new CustomException(ErrorCode.INVALID_REFRESH_TOKEN);
         }
 
         Optional<RefreshToken> refreshToken = getRefreshTokenFromRedis(refreshTokenDto.memberId());
-
-        if (refreshToken.isPresent()) {
-            return refreshTokenDto;
+        if (refreshToken.isEmpty()) {
+            throw new CustomException(ErrorCode.INVALID_REFRESH_TOKEN);
         }
 
-        return null;
+        return refreshTokenDto;
     }
+
 
     private Optional<RefreshToken> getRefreshTokenFromRedis(final Long memberId) {
         return refreshTokenRepository.findById(memberId);
