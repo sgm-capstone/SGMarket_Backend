@@ -42,10 +42,10 @@ public class JwtUtil {
         return AccessTokenDto.of(memberId, memberRole, tokenValue);
     }
 
-    public String generateRefreshToken(final Long memberId) {
+    public String generateRefreshToken(final Long memberId, final MemberRole memberRole) {
         Date issuedAt = new Date();
         Date expiredAt = new Date(issuedAt.getTime() + jwtProperties.refreshTokenExpirationMilliTime());
-        return buildRefreshToken(memberId, issuedAt, expiredAt);
+        return buildRefreshToken(memberId, memberRole, issuedAt, expiredAt);
     }
 
     public AccessTokenDto parseAccessToken(final String token) throws ExpiredJwtException {
@@ -69,6 +69,7 @@ public class JwtUtil {
 
             return new RefreshTokenDto(
                     Long.parseLong(claims.getBody().getSubject()),
+                    MemberRole.valueOf(claims.getBody().get("role", String.class)),
                     token,
                     jwtProperties.refreshTokenExpirationTime()
             );
@@ -111,10 +112,12 @@ public class JwtUtil {
                 .compact();
     }
 
-    private String buildRefreshToken(final Long memberId, final Date issuedAt, final Date expiredAt) {
+    private String buildRefreshToken(final Long memberId, MemberRole memberRole, final Date issuedAt,
+                                     final Date expiredAt) {
         return Jwts.builder()
                 .setHeader(createTokenHeader(TokenType.REFRESH))
                 .setSubject(memberId.toString())
+                .claim(TOKEN_ROLE_NAME, memberRole.name())
                 .setIssuedAt(issuedAt)
                 .setExpiration(expiredAt)
                 .signWith(getRefreshTokenKey())

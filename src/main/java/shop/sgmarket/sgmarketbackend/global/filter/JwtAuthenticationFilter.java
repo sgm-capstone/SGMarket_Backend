@@ -1,12 +1,9 @@
 package shop.sgmarket.sgmarketbackend.global.filter;
 
-import static shop.sgmarket.sgmarketbackend.global.constant.SecurityConstant.ACCESS_TOKEN_COOKIE_NAME;
-import static shop.sgmarket.sgmarketbackend.global.constant.SecurityConstant.REFRESH_TOKEN_COOKIE_NAME;
 import static shop.sgmarket.sgmarketbackend.global.constant.SecurityConstant.TOKEN_PREFIX;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -20,11 +17,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.filter.OncePerRequestFilter;
-import org.springframework.web.util.WebUtils;
 import shop.sgmarket.sgmarketbackend.auth.dto.AccessTokenDto;
 import shop.sgmarket.sgmarketbackend.auth.dto.RefreshTokenDto;
 import shop.sgmarket.sgmarketbackend.global.security.JwtTokenProvider;
 import shop.sgmarket.sgmarketbackend.global.security.PrincipalDetails;
+import shop.sgmarket.sgmarketbackend.global.util.CookieUtil;
 import shop.sgmarket.sgmarketbackend.member.domain.MemberRole;
 
 @Slf4j
@@ -40,8 +37,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain)
             throws ServletException, IOException {
 
-        // 1. 쿠키 Access Token 가져오기
-        String accessToken = extractAccessTokenFromCookie(request);
+        // 1. 헤더에서 Access Token 가져오기
+        String accessToken = extractAccessTokenFromHeader(request);
 
         if (accessToken != null) {
             AccessTokenDto accessTokenDto = jwtTokenProvider.retrieveAccessToken(accessToken);
@@ -53,7 +50,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         // 2. 쿠키에서 Refresh Token 가져오기
-        String refreshToken = extractRefreshTokenFromCookie(request);
+        String refreshToken = CookieUtil.extractRefreshTokenFromCookie(request);
         if (refreshToken == null) {
             filterChain.doFilter(request, response);
             return;
@@ -83,15 +80,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
-    private String extractAccessTokenFromCookie(HttpServletRequest request) {
-        return Optional.ofNullable(WebUtils.getCookie(request, ACCESS_TOKEN_COOKIE_NAME))
-                .map(Cookie::getValue)
-                .orElse(null);
-    }
-
-    private String extractRefreshTokenFromCookie(HttpServletRequest request) {
-        return Optional.ofNullable(WebUtils.getCookie(request, REFRESH_TOKEN_COOKIE_NAME))
-                .map(Cookie::getValue)
+    private static String extractAccessTokenFromHeader(HttpServletRequest request) {
+        return Optional.ofNullable(request.getHeader(HttpHeaders.AUTHORIZATION))
+                .filter(header -> header.startsWith(TOKEN_PREFIX))
+                .map(header -> header.replace(TOKEN_PREFIX, ""))
                 .orElse(null);
     }
 }

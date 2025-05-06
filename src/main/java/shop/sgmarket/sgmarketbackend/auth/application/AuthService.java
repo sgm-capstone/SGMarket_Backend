@@ -1,5 +1,6 @@
 package shop.sgmarket.sgmarketbackend.auth.application;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Map;
@@ -8,14 +9,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shop.sgmarket.sgmarketbackend.auth.domain.OAuthProvider;
+import shop.sgmarket.sgmarketbackend.auth.dto.RefreshTokenDto;
+import shop.sgmarket.sgmarketbackend.auth.dto.response.AccessTokenResponse;
 import shop.sgmarket.sgmarketbackend.auth.dto.response.OAuthTokenResponse;
 import shop.sgmarket.sgmarketbackend.auth.dto.response.SocialClientResponse;
 import shop.sgmarket.sgmarketbackend.global.error.ErrorCode;
 import shop.sgmarket.sgmarketbackend.global.error.exception.CustomException;
 import shop.sgmarket.sgmarketbackend.global.properties.RedirectUriProperties;
 import shop.sgmarket.sgmarketbackend.global.security.JwtTokenProvider;
+import shop.sgmarket.sgmarketbackend.global.util.CookieUtil;
 import shop.sgmarket.sgmarketbackend.member.domain.Member;
-import shop.sgmarket.sgmarketbackend.member.domain.MemberRole;
 import shop.sgmarket.sgmarketbackend.member.repository.MemberRepository;
 
 @Slf4j
@@ -61,6 +64,26 @@ public class AuthService {
         response.sendRedirect(redirectUriProperties.redirectUri());
     }
 
+    private void getLoginResponse(final Member member, HttpServletResponse response) {
+        jwtTokenProvider.generateRefreshToken(member.getId(), member.getRole(), response);
+    }
+
+    @Transactional
+    public AccessTokenResponse getAccessToken(HttpServletRequest request) {
+        String refreshToken = CookieUtil.extractRefreshTokenFromCookie(request);
+        System.out.println("refreshToken = " + refreshToken);
+        if (refreshToken == null) {
+            throw new CustomException(ErrorCode.REFRESH_TOKEN_NOT_FOUND);
+        }
+
+        RefreshTokenDto refreshTokenDto = jwtTokenProvider.retrieveRefreshToken(refreshToken);
+        if (refreshTokenDto == null) {
+            throw new CustomException(ErrorCode.INVALID_REFRESH_TOKEN);
+        }
+
+        return jwtTokenProvider.generateAccessToken(refreshTokenDto.memberId(), refreshTokenDto.memberRole());
+    }
+
     private Member createOauthMember(final OAuthProvider oAuthProvider,
                                      final String oauthId,
                                      final String email,
@@ -73,7 +96,5 @@ public class AuthService {
         return oauthMember;
     }
 
-    private void getLoginResponse(final Member member, HttpServletResponse response) {
-        jwtTokenProvider.generateTokenPair(member.getId(), MemberRole.USER, response);
-    }
+
 }
