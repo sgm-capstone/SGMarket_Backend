@@ -4,14 +4,13 @@ import static shop.sgmarket.sgmarketbackend.global.constant.SecurityConstant.REF
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.web.server.Cookie.SameSite;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.WebUtils;
-import shop.sgmarket.sgmarketbackend.global.error.ErrorCode;
-import shop.sgmarket.sgmarketbackend.global.error.exception.CustomException;
 import shop.sgmarket.sgmarketbackend.global.properties.JwtProperties;
 
 @Component
@@ -43,10 +42,8 @@ public class CookieUtil {
     }
 
     public static String extractRefreshTokenFromCookie(HttpServletRequest request) {
-        Cookie cookie = WebUtils.getCookie(request, REFRESH_TOKEN_COOKIE_NAME);
-        if (cookie == null || cookie.getValue() == null) {
-            throw new CustomException(ErrorCode.REFRESH_TOKEN_NOT_FOUND);
-        }
-        return cookie.getValue();
+        return Optional.ofNullable(WebUtils.getCookie(request, REFRESH_TOKEN_COOKIE_NAME))
+                .map(Cookie::getValue)
+                .orElse(null);
     }
 }

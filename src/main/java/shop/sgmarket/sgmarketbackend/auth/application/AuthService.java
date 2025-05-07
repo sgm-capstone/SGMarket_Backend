@@ -83,8 +83,15 @@ public class AuthService {
     @Transactional(readOnly = true)
     public AccessTokenResponse getAccessToken(HttpServletRequest request) {
         String refreshToken = CookieUtil.extractRefreshTokenFromCookie(request);
+        validateRefreshToken(refreshToken);
         RefreshTokenDto refreshTokenDto = jwtTokenProvider.retrieveRefreshToken(refreshToken);
 
         return jwtTokenProvider.generateAccessToken(refreshTokenDto.memberId(), refreshTokenDto.memberRole());
+    }
+
+    private void validateRefreshToken(String refreshToken) {
+        if (refreshToken == null || refreshToken.isEmpty()) {
+            throw new CustomException(ErrorCode.INVALID_REFRESH_TOKEN);
+        }
     }
 }
