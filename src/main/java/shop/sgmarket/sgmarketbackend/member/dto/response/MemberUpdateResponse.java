@@ -10,6 +10,8 @@ public record MemberUpdateResponse(
         String nickname,
         String profileImageUrl,
         String memberRole,
+        Double latitude,
+        Double longitude,
         String address
 ) {
     public static MemberUpdateResponse from(final Member member) {
@@ -19,7 +21,9 @@ public record MemberUpdateResponse(
                 .nickname(member.getOauthInfo().getOauthNickname())
                 .profileImageUrl(member.getOauthInfo().getOauthProfileImageUrl())
                 .memberRole(member.getRole().getValue())
-                .address(member.getAddress())
+                .latitude(member.getLocation().getLatitude())
+                .longitude(member.getLocation().getLongitude())
+                .address(member.getLocation().getAddress())
                 .build();
     }
 }
