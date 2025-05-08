@@ -11,6 +11,9 @@ import shop.sgmarket.sgmarketbackend.auth.application.AuthService;
 import shop.sgmarket.sgmarketbackend.auth.domain.OAuthProvider;
 import shop.sgmarket.sgmarketbackend.auth.dto.response.OAuthTokenResponse;
 import shop.sgmarket.sgmarketbackend.auth.dto.response.SocialClientResponse;
+import shop.sgmarket.sgmarketbackend.auth.dto.response.UserInfoResponse;
+import shop.sgmarket.sgmarketbackend.global.util.MemberUtil;
+import shop.sgmarket.sgmarketbackend.member.domain.Member;
 
 @RestController
 @RequiredArgsConstructor
@@ -18,6 +21,7 @@ import shop.sgmarket.sgmarketbackend.auth.dto.response.SocialClientResponse;
 public class AuthController implements AuthDocs {
 
     private final AuthService authService;
+    private final MemberUtil memberUtil;
 
     @Override
     @GetMapping("/login")
@@ -38,6 +42,15 @@ public class AuthController implements AuthDocs {
                 socialClientResponse.nickname(),
                 socialClientResponse.profileImage(),
                 response
+        );
+    }
+
+    @GetMapping("/me")
+    public UserInfoResponse getCurrentUser() {
+        Member member = memberUtil.getCurrentMember();
+        return UserInfoResponse.of(
+            member.getOauthInfo().getOauthNickname(),
+            member.getOauthInfo().getOauthProfileImageUrl()
         );
     }
 
