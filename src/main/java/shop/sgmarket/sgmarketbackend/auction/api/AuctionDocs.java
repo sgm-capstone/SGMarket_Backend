@@ -44,16 +44,15 @@ public interface AuctionDocs {
             @PathVariable Long auctionId
     );
 
-    @Operation(summary = "주소 기반 경매 목록 조회", description = "카테고리(주소) 기준으로 경매 목록을 조회합니다.")
+    @Operation(summary = "주소 및 카테고리 기반 경매 목록 조회", description = "카테고리(주소) 기준으로 경매 목록을 조회합니다.")
     ApiResponseTemplate<SliceResponse<AuctionInfoResponse>> getAuctionsByAddressAndCategory(
-            @Parameter(description = "카테고리 (주소)", required = true)
-            @RequestParam("category") String category,
+            @Parameter(description = "카테고리")
+            @RequestParam(value = "category", required = false) String category,
 
             @ParameterObject
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
             Pageable pageable
     );
-
 
     @Operation(summary = "경매 수정", description = "경매 ID로 기존 경매를 수정합니다.")
     @PatchMapping(

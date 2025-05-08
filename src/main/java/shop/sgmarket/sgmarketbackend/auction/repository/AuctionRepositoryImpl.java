@@ -2,6 +2,7 @@ package shop.sgmarket.sgmarketbackend.auction.repository;
 
 import static com.querydsl.core.types.dsl.Expressions.numberTemplate;
 
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -11,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import shop.sgmarket.sgmarketbackend.auction.domain.Auction;
+import shop.sgmarket.sgmarketbackend.auction.domain.AuctionCategory;
 import shop.sgmarket.sgmarketbackend.auction.domain.QAuction;
 import shop.sgmarket.sgmarketbackend.global.domain.Status;
 
@@ -25,7 +27,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
             double lng,
             double radiusKm,
             Status status,
-            String categoryName,
+            AuctionCategory category,
             Pageable pageable
     ) {
         QAuction auction = QAuction.auction;
@@ -34,7 +36,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
                 .selectFrom(auction)
                 .where(
                         auction.status.eq(status),
-                        auction.category.name.eq(categoryName),
+                        eqCategory(category),
                         haversineDistance(auction.latitude, auction.longitude, lat, lng).loe(radiusKm)
                 )
                 .offset(pageable.getOffset())
@@ -48,6 +50,10 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
         }
 
         return new SliceImpl<>(content, pageable, hasNext);
+    }
+
+    private BooleanExpression eqCategory(AuctionCategory category) {
+        return category != null ? QAuction.auction.category.eq(category) : null;
     }
 
     private NumberExpression<Double> haversineDistance(

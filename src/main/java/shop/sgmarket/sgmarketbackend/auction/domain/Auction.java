@@ -18,6 +18,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import shop.sgmarket.sgmarketbackend.global.domain.BaseTimeEntity;
 import shop.sgmarket.sgmarketbackend.global.domain.Status;
+import shop.sgmarket.sgmarketbackend.member.domain.Member;
 
 @Entity
 @Getter
@@ -61,13 +62,16 @@ public class Auction extends BaseTimeEntity {
     @JoinColumn(name = "item_id", nullable = false)
     private Item item;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Member member;
+
     @Enumerated(EnumType.STRING)
     private Status status;
 
     @Builder(access = AccessLevel.PRIVATE)
     private Auction(String title, String description, LocalDateTime startDate, LocalDateTime endDate,
                     long startPrice, long currentPrice, long endPrice, Double latitude,
-                    Double longitude, AuctionCategory category, Item item, Status status) {
+                    Double longitude, AuctionCategory category, Item item, Member member, Status status) {
         this.title = title;
         this.description = description;
         this.startDate = startDate;
@@ -79,13 +83,13 @@ public class Auction extends BaseTimeEntity {
         this.longitude = longitude;
         this.category = category;
         this.item = item;
+        this.member = member;
         this.status = status;
     }
 
     public static Auction create(String title, String description, LocalDateTime endDate,
                                  long startPrice, long currentPrice, long endPrice, Double latitude, Double longitude,
-                                 AuctionCategory category,
-                                 Item item) {
+                                 AuctionCategory category, Item item, Member member) {
         return Auction.builder()
                 .title(title)
                 .description(description)
@@ -98,6 +102,7 @@ public class Auction extends BaseTimeEntity {
                 .longitude(longitude)
                 .category(category)
                 .item(item)
+                .member(member)
                 .status(Status.ACTIVE)
                 .build();
     }

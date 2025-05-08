@@ -1,6 +1,7 @@
 package shop.sgmarket.sgmarketbackend.auction.application;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ import shop.sgmarket.sgmarketbackend.auction.repository.AuctionCategoryRepositor
 import shop.sgmarket.sgmarketbackend.auction.repository.AuctionRepository;
 import shop.sgmarket.sgmarketbackend.auction.repository.ItemRepository;
 import shop.sgmarket.sgmarketbackend.global.domain.Status;
+import shop.sgmarket.sgmarketbackend.global.dto.PageResponse;
 import shop.sgmarket.sgmarketbackend.global.dto.SliceResponse;
 import shop.sgmarket.sgmarketbackend.global.error.ErrorCode;
 import shop.sgmarket.sgmarketbackend.global.error.exception.CustomException;
@@ -27,7 +29,7 @@ import shop.sgmarket.sgmarketbackend.member.domain.Member;
 @RequiredArgsConstructor
 public class AuctionService {
 
-    private static final double SEARCH_RADIUS_KM = 10.0;
+    private static final Double SEARCH_RADIUS_KM = 10000.0;
 
     private final ItemRepository itemRepository;
     private final AuctionRepository auctionRepository;
@@ -40,7 +42,7 @@ public class AuctionService {
         Member member = memberUtil.getCurrentMember();
 
         String imageUrl = getImageUrl(member, itemImage);
-        Item item = Item.createItem(request.itemRegisterRequest().itemName(), imageUrl, member);
+        Item item = Item.createItem(request.itemRegisterRequest().itemName(), imageUrl);
 
         AuctionCategory auctionCategory = auctionCategoryRepository.findByName(request.auctionCategory())
                 .orElseThrow(() -> new CustomException(ErrorCode.AUCTION_CATEGORY_NOT_FOUND));
@@ -55,7 +57,8 @@ public class AuctionService {
                 member.getLocation().getLatitude(),
                 member.getLocation().getLongitude(),
                 auctionCategory,
-                item
+                item,
+                member
         );
 
         itemRepository.save(item);
@@ -69,18 +72,39 @@ public class AuctionService {
         Auction auction = auctionRepository.findByIdAndStatus(auctionId, Status.ACTIVE)
                 .orElseThrow(() -> new CustomException(ErrorCode.AUCTION_NOT_FOUND));
 
-        return AuctionInfoResponse.of(auction, auction.getItem(), auction.getItem().getMember());
+        return AuctionInfoResponse.of(auction, auction.getItem(), auction.getMember());
+    }
+
+    @Transactional(readOnly = true)
+    public PageResponse<AuctionInfoResponse> getAllAuctions(Pageable pageable) {
+        Page<Auction> auctions = auctionRepository.findAllByStatus(Status.ACTIVE, pageable);
+
+        Page<AuctionInfoResponse> auctionInfoResponses = auctions.map(auction ->
+                AuctionInfoResponse.of(
+                        auction,
+                        auction.getItem(),
+                        auction.getMember()
+                )
+        );
+
+        return PageResponse.from(auctionInfoResponses);
     }
 
     @Transactional(readOnly = true)
     public SliceResponse<AuctionInfoResponse> getAuctionsByAddressAndCategory(String category, Pageable pageable) {
         Member member = memberUtil.getCurrentMember();
+        AuctionCategory auctionCategory = category == null
+                ? null
+                : auctionCategoryRepository.findByName(category)
+                        .orElseThrow(() -> new CustomException(
+                                ErrorCode.AUCTION_CATEGORY_NOT_FOUND));
+
         Slice<Auction> auctions = auctionRepository.findAuctionsWithinRadius(
                 member.getLocation().getLatitude(),
                 member.getLocation().getLongitude(),
                 SEARCH_RADIUS_KM,
                 Status.ACTIVE,
-                category,
+                auctionCategory,
                 pageable
         );
 
@@ -88,7 +112,7 @@ public class AuctionService {
                 AuctionInfoResponse.of(
                         auction,
                         auction.getItem(),
-                        auction.getItem().getMember()
+                        auction.getMember()
                 )
         );
 
@@ -116,7 +140,7 @@ public class AuctionService {
         String image = getImageUrl(member, itemImage);
         auction.getItem().update(request.itemName(), image);
 
-        return AuctionInfoResponse.of(auction, auction.getItem(), auction.getItem().getMember());
+        return AuctionInfoResponse.of(auction, auction.getItem(), auction.getMember());
     }
 
     @Transactional
@@ -134,7 +158,7 @@ public class AuctionService {
     }
 
     private void validateAuthority(Member member, Auction auction) {
-        if (!member.getId().equals(auction.getItem().getMember().getId())) {
+        if (!member.getId().equals(auction.getMember().getId())) {
             throw new CustomException(ErrorCode.UNAUTHORIZED_MEMBER);
         }
     }
