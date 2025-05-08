@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import shop.sgmarket.sgmarketbackend.auction.domain.Auction;
 import shop.sgmarket.sgmarketbackend.global.domain.Status;
 
-public interface AuctionRepository extends JpaRepository<Auction, Long> {
+public interface AuctionRepository extends JpaRepository<Auction, Long>, AuctionRepositoryCustom {
     Optional<Auction> findByIdAndStatus(Long id, Status status);
     Page<Auction> findAllByStatus(Status status, Pageable pageable);
 }

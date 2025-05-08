@@ -1,8 +1,8 @@
 package shop.sgmarket.sgmarketbackend.auction.application;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,7 +16,7 @@ import shop.sgmarket.sgmarketbackend.auction.repository.AuctionCategoryRepositor
 import shop.sgmarket.sgmarketbackend.auction.repository.AuctionRepository;
 import shop.sgmarket.sgmarketbackend.auction.repository.ItemRepository;
 import shop.sgmarket.sgmarketbackend.global.domain.Status;
-import shop.sgmarket.sgmarketbackend.global.dto.PageResponse;
+import shop.sgmarket.sgmarketbackend.global.dto.SliceResponse;
 import shop.sgmarket.sgmarketbackend.global.error.ErrorCode;
 import shop.sgmarket.sgmarketbackend.global.error.exception.CustomException;
 import shop.sgmarket.sgmarketbackend.global.service.S3UploadService;
@@ -26,6 +26,8 @@ import shop.sgmarket.sgmarketbackend.member.domain.Member;
 @Service
 @RequiredArgsConstructor
 public class AuctionService {
+
+    private static final double SEARCH_RADIUS_KM = 10.0;
 
     private final ItemRepository itemRepository;
     private final AuctionRepository auctionRepository;
@@ -50,6 +52,8 @@ public class AuctionService {
                 request.startPrice(),
                 request.currentPrice(),
                 request.endPrice(),
+                member.getLocation().getLatitude(),
+                member.getLocation().getLongitude(),
                 auctionCategory,
                 item
         );
@@ -69,10 +73,18 @@ public class AuctionService {
     }
 
     @Transactional(readOnly = true)
-    public PageResponse<AuctionInfoResponse> getAllAuctions(Pageable pageable) {
-        Page<Auction> auctions = auctionRepository.findAllByStatus(Status.ACTIVE, pageable);
+    public SliceResponse<AuctionInfoResponse> getAuctionsByAddressAndCategory(String category, Pageable pageable) {
+        Member member = memberUtil.getCurrentMember();
+        Slice<Auction> auctions = auctionRepository.findAuctionsWithinRadius(
+                member.getLocation().getLatitude(),
+                member.getLocation().getLongitude(),
+                SEARCH_RADIUS_KM,
+                Status.ACTIVE,
+                category,
+                pageable
+        );
 
-        Page<AuctionInfoResponse> auctionInfoResponses = auctions.map(auction ->
+        Slice<AuctionInfoResponse> auctionInfoResponses = auctions.map(auction ->
                 AuctionInfoResponse.of(
                         auction,
                         auction.getItem(),
@@ -80,9 +92,8 @@ public class AuctionService {
                 )
         );
 
-        return PageResponse.from(auctionInfoResponses);
+        return SliceResponse.from(auctionInfoResponses);
     }
-
 
     @Transactional
     public AuctionInfoResponse updateAuction(Long auctionId, AuctionUpdateRequest request, MultipartFile itemImage) {

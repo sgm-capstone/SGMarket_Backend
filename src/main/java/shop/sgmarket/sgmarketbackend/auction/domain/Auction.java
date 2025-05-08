@@ -47,6 +47,12 @@ public class Auction extends BaseTimeEntity {
     @Column(name = "end_price")
     private long endPrice;
 
+    @Column(name = "latitude")
+    private Double latitude;
+
+    @Column(name = "longitude")
+    private Double longitude;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
     private AuctionCategory category;
@@ -60,7 +66,8 @@ public class Auction extends BaseTimeEntity {
 
     @Builder(access = AccessLevel.PRIVATE)
     private Auction(String title, String description, LocalDateTime startDate, LocalDateTime endDate,
-                    long startPrice, long currentPrice, long endPrice, AuctionCategory category, Item item, Status status) {
+                    long startPrice, long currentPrice, long endPrice, Double latitude,
+                    Double longitude, AuctionCategory category, Item item, Status status) {
         this.title = title;
         this.description = description;
         this.startDate = startDate;
@@ -68,13 +75,16 @@ public class Auction extends BaseTimeEntity {
         this.startPrice = startPrice;
         this.currentPrice = currentPrice;
         this.endPrice = endPrice;
+        this.latitude = latitude;
+        this.longitude = longitude;
         this.category = category;
         this.item = item;
         this.status = status;
     }
 
     public static Auction create(String title, String description, LocalDateTime endDate,
-                                 long startPrice, long currentPrice, long endPrice, AuctionCategory category,
+                                 long startPrice, long currentPrice, long endPrice, Double latitude, Double longitude,
+                                 AuctionCategory category,
                                  Item item) {
         return Auction.builder()
                 .title(title)
@@ -84,6 +94,8 @@ public class Auction extends BaseTimeEntity {
                 .startPrice(startPrice)
                 .currentPrice(currentPrice)
                 .endPrice(endPrice)
+                .latitude(latitude)
+                .longitude(longitude)
                 .category(category)
                 .item(item)
                 .status(Status.ACTIVE)

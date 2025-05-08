@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,7 +19,7 @@ import shop.sgmarket.sgmarketbackend.auction.application.AuctionService;
 import shop.sgmarket.sgmarketbackend.auction.dto.request.AuctionRegisterRequest;
 import shop.sgmarket.sgmarketbackend.auction.dto.request.AuctionUpdateRequest;
 import shop.sgmarket.sgmarketbackend.auction.dto.response.AuctionInfoResponse;
-import shop.sgmarket.sgmarketbackend.global.dto.PageResponse;
+import shop.sgmarket.sgmarketbackend.global.dto.SliceResponse;
 import shop.sgmarket.sgmarketbackend.global.response.ApiResponseTemplate;
 
 @RestController
@@ -48,14 +49,18 @@ public class AuctionController implements AuctionDocs {
     }
 
     @Override
-    @GetMapping
-    public ApiResponseTemplate<PageResponse<AuctionInfoResponse>> getAllAuctions(@ParameterObject Pageable pageable) {
-        return ApiResponseTemplate.ok("경매 목록 조회에 성공했습니다.", auctionService.getAllAuctions(pageable));
+    @GetMapping()
+    public ApiResponseTemplate<SliceResponse<AuctionInfoResponse>> getAuctionsByAddressAndCategory(
+            @RequestParam("category") String category,
+            @ParameterObject Pageable pageable
+    ) {
+        return ApiResponseTemplate.ok("주소 기반 경매 목록 조회에 성공했습니다.",
+                auctionService.getAuctionsByAddressAndCategory(category, pageable));
     }
 
     @Override
     @PatchMapping(
-            value = "/{auctionId}", // ★ 여기에 추가해야 함
+            value = "/{auctionId}",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
