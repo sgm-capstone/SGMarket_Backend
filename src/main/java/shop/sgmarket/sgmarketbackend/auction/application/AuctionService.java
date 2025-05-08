@@ -1,7 +1,6 @@
 package shop.sgmarket.sgmarketbackend.auction.application;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -13,11 +12,9 @@ import shop.sgmarket.sgmarketbackend.auction.domain.Item;
 import shop.sgmarket.sgmarketbackend.auction.dto.request.AuctionRegisterRequest;
 import shop.sgmarket.sgmarketbackend.auction.dto.request.AuctionUpdateRequest;
 import shop.sgmarket.sgmarketbackend.auction.dto.response.AuctionInfoResponse;
-import shop.sgmarket.sgmarketbackend.auction.repository.AuctionCategoryRepository;
 import shop.sgmarket.sgmarketbackend.auction.repository.AuctionRepository;
 import shop.sgmarket.sgmarketbackend.auction.repository.ItemRepository;
 import shop.sgmarket.sgmarketbackend.global.domain.Status;
-import shop.sgmarket.sgmarketbackend.global.dto.PageResponse;
 import shop.sgmarket.sgmarketbackend.global.dto.SliceResponse;
 import shop.sgmarket.sgmarketbackend.global.error.ErrorCode;
 import shop.sgmarket.sgmarketbackend.global.error.exception.CustomException;
@@ -29,11 +26,11 @@ import shop.sgmarket.sgmarketbackend.member.domain.Member;
 @RequiredArgsConstructor
 public class AuctionService {
 
-    private static final Double SEARCH_RADIUS_KM = 10000.0;
+    private static final Double SEARCH_RADIUS_KM = 10.0;
+    private static final String AUCTION_IMAGE_PATH = "auction/";
 
     private final ItemRepository itemRepository;
     private final AuctionRepository auctionRepository;
-    private final AuctionCategoryRepository auctionCategoryRepository;
     private final MemberUtil memberUtil;
     private final S3UploadService s3UploadService;
 
@@ -44,9 +41,6 @@ public class AuctionService {
         String imageUrl = getImageUrl(member, itemImage);
         Item item = Item.createItem(request.itemRegisterRequest().itemName(), imageUrl);
 
-        AuctionCategory auctionCategory = auctionCategoryRepository.findByName(request.auctionCategory())
-                .orElseThrow(() -> new CustomException(ErrorCode.AUCTION_CATEGORY_NOT_FOUND));
-
         Auction auction = Auction.create(
                 request.title(),
                 request.description(),
@@ -56,7 +50,7 @@ public class AuctionService {
                 request.endPrice(),
                 member.getLocation().getLatitude(),
                 member.getLocation().getLongitude(),
-                auctionCategory,
+                AuctionCategory.from(request.auctionCategory()),
                 item,
                 member
         );
@@ -76,35 +70,15 @@ public class AuctionService {
     }
 
     @Transactional(readOnly = true)
-    public PageResponse<AuctionInfoResponse> getAllAuctions(Pageable pageable) {
-        Page<Auction> auctions = auctionRepository.findAllByStatus(Status.ACTIVE, pageable);
-
-        Page<AuctionInfoResponse> auctionInfoResponses = auctions.map(auction ->
-                AuctionInfoResponse.of(
-                        auction,
-                        auction.getItem(),
-                        auction.getMember()
-                )
-        );
-
-        return PageResponse.from(auctionInfoResponses);
-    }
-
-    @Transactional(readOnly = true)
     public SliceResponse<AuctionInfoResponse> getAuctionsByAddressAndCategory(String category, Pageable pageable) {
         Member member = memberUtil.getCurrentMember();
-        AuctionCategory auctionCategory = category == null
-                ? null
-                : auctionCategoryRepository.findByName(category)
-                        .orElseThrow(() -> new CustomException(
-                                ErrorCode.AUCTION_CATEGORY_NOT_FOUND));
 
         Slice<Auction> auctions = auctionRepository.findAuctionsWithinRadius(
                 member.getLocation().getLatitude(),
                 member.getLocation().getLongitude(),
                 SEARCH_RADIUS_KM,
                 Status.ACTIVE,
-                auctionCategory,
+                AuctionCategory.fromKebabCase(category),
                 pageable
         );
 
@@ -127,14 +101,12 @@ public class AuctionService {
                 .orElseThrow(() -> new CustomException(ErrorCode.AUCTION_NOT_FOUND));
 
         validateAuthority(member, auction);
-        AuctionCategory auctionCategory = auctionCategoryRepository.findByName(request.auctionCategory())
-                .orElseThrow(() -> new CustomException(ErrorCode.AUCTION_CATEGORY_NOT_FOUND));
 
         auction.update(
                 request.title(),
                 request.description(),
                 request.endDate(),
-                auctionCategory
+                AuctionCategory.from(request.auctionCategory())
         );
 
         String image = getImageUrl(member, itemImage);
@@ -154,7 +126,7 @@ public class AuctionService {
     }
 
     private String getImageUrl(Member member, MultipartFile itemImage) {
-        return s3UploadService.uploadImage(itemImage, "auction/" + member.getId());
+        return s3UploadService.uploadImage(itemImage, AUCTION_IMAGE_PATH + member.getId());
     }
 
     private void validateAuthority(Member member, Auction auction) {

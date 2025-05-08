@@ -54,8 +54,7 @@ public class Auction extends BaseTimeEntity {
     @Column(name = "longitude")
     private Double longitude;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id", nullable = false)
+    @Enumerated(EnumType.STRING)
     private AuctionCategory category;
 
     @OneToOne(fetch = FetchType.LAZY)

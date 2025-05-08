@@ -19,7 +19,6 @@ import shop.sgmarket.sgmarketbackend.auction.application.AuctionService;
 import shop.sgmarket.sgmarketbackend.auction.dto.request.AuctionRegisterRequest;
 import shop.sgmarket.sgmarketbackend.auction.dto.request.AuctionUpdateRequest;
 import shop.sgmarket.sgmarketbackend.auction.dto.response.AuctionInfoResponse;
-import shop.sgmarket.sgmarketbackend.global.dto.PageResponse;
 import shop.sgmarket.sgmarketbackend.global.dto.SliceResponse;
 import shop.sgmarket.sgmarketbackend.global.response.ApiResponseTemplate;
 
@@ -42,11 +41,6 @@ public class AuctionController implements AuctionDocs {
         return ApiResponseTemplate.created("경매 등록에 성공했습니다.", response);
     }
 
-    @GetMapping
-    public ApiResponseTemplate<PageResponse<AuctionInfoResponse>> getAllAuctions(@ParameterObject Pageable pageable) {
-        return ApiResponseTemplate.ok("경매 목록 조회에 성공했습니다.", auctionService.getAllAuctions(pageable));
-    }
-
     @Override
     @GetMapping("/{auctionId}")
     public ApiResponseTemplate<AuctionInfoResponse> getAuction(@PathVariable Long auctionId) {
@@ -54,12 +48,13 @@ public class AuctionController implements AuctionDocs {
         return ApiResponseTemplate.ok("경매 조회에 성공했습니다.", response);
     }
 
-    @GetMapping("/address")
+    @Override
+    @GetMapping
     public ApiResponseTemplate<SliceResponse<AuctionInfoResponse>> getAuctionsByAddressAndCategory(
             @RequestParam(value = "category", required = false) String category,
             @ParameterObject Pageable pageable
     ) {
-        return ApiResponseTemplate.ok("주소 기반 경매 목록 조회에 성공했습니다.",
+        return ApiResponseTemplate.ok("주소 및 카테고리 기반 경매 목록 조회에 성공했습니다.",
                 auctionService.getAuctionsByAddressAndCategory(category, pageable));
     }
 

@@ -36,7 +36,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
                 .selectFrom(auction)
                 .where(
                         auction.status.eq(status),
-                        eqCategory(category),
+                        eqCategory(auction, category),
                         haversineDistance(auction.latitude, auction.longitude, lat, lng).loe(radiusKm)
                 )
                 .offset(pageable.getOffset())
@@ -52,8 +52,11 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
         return new SliceImpl<>(content, pageable, hasNext);
     }
 
-    private BooleanExpression eqCategory(AuctionCategory category) {
-        return category != null ? QAuction.auction.category.eq(category) : null;
+    private BooleanExpression eqCategory(QAuction auction, AuctionCategory category) {
+        if (category != null) {
+            return auction.category.eq(category);
+        }
+        return null;
     }
 
     private NumberExpression<Double> haversineDistance(
@@ -73,4 +76,3 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
         );
     }
 }
-
