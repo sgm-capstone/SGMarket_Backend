@@ -50,12 +50,12 @@ public class Auction extends BaseTimeEntity {
     @Column(name = "end_price")
     private long endPrice;
 
-    @Column(nullable = false, precision = 9, scale = 6)
+    @Column(nullable = false)
     @DecimalMin(value = "-90.0")
     @DecimalMax(value = "90.0")
     private Double latitude;
 
-    @Column(nullable = false, precision = 9, scale = 6)
+    @Column(nullable = false)
     @DecimalMin(value = "-180.0")
     @DecimalMax(value = "180.0")
     private Double longitude;
