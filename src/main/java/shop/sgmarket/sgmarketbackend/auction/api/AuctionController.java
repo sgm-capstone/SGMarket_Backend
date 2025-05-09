@@ -49,6 +49,16 @@ public class AuctionController implements AuctionDocs {
     }
 
     @Override
+    @GetMapping("/{auctionId}/others")
+    public ApiResponseTemplate<SliceResponse<AuctionInfoResponse>> getOtherAuctionsBySameMember(
+            @PathVariable Long auctionId,
+            @ParameterObject Pageable pageable
+    ) {
+        SliceResponse<AuctionInfoResponse> response = auctionService.getOtherAuctionsBySameMember(auctionId, pageable);
+        return ApiResponseTemplate.ok("해당 작성자의 다른 경매 목록 조회에 성공했습니다.", response);
+    }
+
+    @Override
     @GetMapping
     public ApiResponseTemplate<SliceResponse<AuctionInfoResponse>> getAuctionsByAddressAndCategory(
             @RequestParam(value = "category", required = false) String category,
