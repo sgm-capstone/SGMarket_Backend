@@ -70,6 +70,21 @@ public class AuctionService {
     }
 
     @Transactional(readOnly = true)
+    public SliceResponse<AuctionInfoResponse> getOtherAuctionsBySameMember(Long auctionId, Pageable pageable) {
+        Auction auction = auctionRepository.findById(auctionId)
+                .orElseThrow(() -> new CustomException(ErrorCode.AUCTION_NOT_FOUND));
+        Member author = auction.getMember();
+
+        Slice<Auction> auctions = auctionRepository.findAllByMemberAndStatusAndIdNot(author, Status.ACTIVE, auctionId, pageable);
+
+        Slice<AuctionInfoResponse> auctionInfoResponses = auctions.map(otherAuction ->
+                AuctionInfoResponse.of(otherAuction, otherAuction.getItem(), otherAuction.getMember())
+        );
+
+        return SliceResponse.from(auctionInfoResponses);
+    }
+
+    @Transactional(readOnly = true)
     public SliceResponse<AuctionInfoResponse> getAuctionsByAddressAndCategory(String category, Pageable pageable) {
         Member member = memberUtil.getCurrentMember();
 

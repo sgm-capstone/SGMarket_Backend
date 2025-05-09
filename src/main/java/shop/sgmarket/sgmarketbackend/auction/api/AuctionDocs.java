@@ -44,6 +44,18 @@ public interface AuctionDocs {
             @PathVariable Long auctionId
     );
 
+    @Operation(summary = "해당 작성자의 다른 경매 목록 조회", description = "특정 경매 작성자의 다른 활성 경매 목록을 조회합니다.")
+    ApiResponseTemplate<SliceResponse<AuctionInfoResponse>> getOtherAuctionsBySameMember(
+            @Parameter(description = "조회할 경매 ID", required = true)
+            @PathVariable Long auctionId,
+
+            @Parameter(description = "페이지네이션 정보", required = true)
+            @ParameterObject
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
+            Pageable pageable
+    );
+
+
     @Operation(summary = "주소 및 카테고리 기반 경매 목록 조회", description = "주소와 카테고리 기준으로 경매 목록을 조회합니다.")
     ApiResponseTemplate<SliceResponse<AuctionInfoResponse>> getAuctionsByAddressAndCategory(
             @Parameter(
