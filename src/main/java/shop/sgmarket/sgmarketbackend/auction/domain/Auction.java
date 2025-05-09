@@ -11,6 +11,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -48,10 +50,14 @@ public class Auction extends BaseTimeEntity {
     @Column(name = "end_price")
     private long endPrice;
 
-    @Column(name = "latitude")
+    @Column(nullable = false, precision = 9, scale = 6)
+    @DecimalMin(value = "-90.0")
+    @DecimalMax(value = "90.0")
     private Double latitude;
 
-    @Column(name = "longitude")
+    @Column(nullable = false, precision = 9, scale = 6)
+    @DecimalMin(value = "-180.0")
+    @DecimalMax(value = "180.0")
     private Double longitude;
 
     @Enumerated(EnumType.STRING)
