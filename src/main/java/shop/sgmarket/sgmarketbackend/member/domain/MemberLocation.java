@@ -1,6 +1,5 @@
 package shop.sgmarket.sgmarketbackend.member.domain;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
@@ -16,12 +15,10 @@ public class MemberLocation {
 
     private String address;
 
-    @Column(nullable = false)
     @DecimalMin(value = "-90.0")
     @DecimalMax(value = "90.0")
     private Double latitude;
 
-    @Column(nullable = false)
     @DecimalMin(value = "-180.0")
     @DecimalMax(value = "180.0")
     private Double longitude;
