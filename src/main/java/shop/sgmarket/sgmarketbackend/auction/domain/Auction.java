@@ -11,6 +11,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -18,6 +20,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import shop.sgmarket.sgmarketbackend.global.domain.BaseTimeEntity;
 import shop.sgmarket.sgmarketbackend.global.domain.Status;
+import shop.sgmarket.sgmarketbackend.member.domain.Member;
 
 @Entity
 @Getter
@@ -47,20 +50,33 @@ public class Auction extends BaseTimeEntity {
     @Column(name = "end_price")
     private long endPrice;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id", nullable = false)
+    @Column(nullable = false, precision = 9, scale = 6)
+    @DecimalMin(value = "-90.0")
+    @DecimalMax(value = "90.0")
+    private Double latitude;
+
+    @Column(nullable = false, precision = 9, scale = 6)
+    @DecimalMin(value = "-180.0")
+    @DecimalMax(value = "180.0")
+    private Double longitude;
+
+    @Enumerated(EnumType.STRING)
     private AuctionCategory category;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id", nullable = false)
     private Item item;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Member member;
+
     @Enumerated(EnumType.STRING)
     private Status status;
 
     @Builder(access = AccessLevel.PRIVATE)
     private Auction(String title, String description, LocalDateTime startDate, LocalDateTime endDate,
-                    long startPrice, long currentPrice, long endPrice, AuctionCategory category, Item item, Status status) {
+                    long startPrice, long currentPrice, long endPrice, Double latitude,
+                    Double longitude, AuctionCategory category, Item item, Member member, Status status) {
         this.title = title;
         this.description = description;
         this.startDate = startDate;
@@ -68,14 +84,17 @@ public class Auction extends BaseTimeEntity {
         this.startPrice = startPrice;
         this.currentPrice = currentPrice;
         this.endPrice = endPrice;
+        this.latitude = latitude;
+        this.longitude = longitude;
         this.category = category;
         this.item = item;
+        this.member = member;
         this.status = status;
     }
 
     public static Auction create(String title, String description, LocalDateTime endDate,
-                                 long startPrice, long currentPrice, long endPrice, AuctionCategory category,
-                                 Item item) {
+                                 long startPrice, long currentPrice, long endPrice, Double latitude, Double longitude,
+                                 AuctionCategory category, Item item, Member member) {
         return Auction.builder()
                 .title(title)
                 .description(description)
@@ -84,8 +103,11 @@ public class Auction extends BaseTimeEntity {
                 .startPrice(startPrice)
                 .currentPrice(currentPrice)
                 .endPrice(endPrice)
+                .latitude(latitude)
+                .longitude(longitude)
                 .category(category)
                 .item(item)
+                .member(member)
                 .status(Status.ACTIVE)
                 .build();
     }

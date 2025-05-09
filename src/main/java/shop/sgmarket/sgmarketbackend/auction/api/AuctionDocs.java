@@ -13,12 +13,13 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 import shop.sgmarket.sgmarketbackend.auction.dto.request.AuctionRegisterRequest;
 import shop.sgmarket.sgmarketbackend.auction.dto.request.AuctionUpdateRequest;
 import shop.sgmarket.sgmarketbackend.auction.dto.response.AuctionInfoResponse;
-import shop.sgmarket.sgmarketbackend.global.dto.PageResponse;
+import shop.sgmarket.sgmarketbackend.global.dto.SliceResponse;
 import shop.sgmarket.sgmarketbackend.global.response.ApiResponseTemplate;
 
 @Tag(name = "경매 API", description = "경매 관련 API입니다.")
@@ -43,8 +44,14 @@ public interface AuctionDocs {
             @PathVariable Long auctionId
     );
 
-    @Operation(summary = "경매 목록 조회", description = "모든 경매를 페이지네이션하여 조회합니다.")
-    ApiResponseTemplate<PageResponse<AuctionInfoResponse>> getAllAuctions(
+    @Operation(summary = "주소 및 카테고리 기반 경매 목록 조회", description = "주소와 카테고리 기준으로 경매 목록을 조회합니다.")
+    ApiResponseTemplate<SliceResponse<AuctionInfoResponse>> getAuctionsByAddressAndCategory(
+            @Parameter(
+                    description = "카테고리 예시: digital-devices, home-appliances, furniture-interior, home-kitchen, kids,"
+                            + " kids-books, womens-clothing, womens-accessories, mens-fashion-accessories, beauty-cosmetics,"
+                            + " sports-recreation, hobbies"
+            )
+            @RequestParam(value = "category", required = false) String category,
             @ParameterObject
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
             Pageable pageable
