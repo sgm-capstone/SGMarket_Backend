@@ -71,14 +71,14 @@ public class AuctionService {
 
     @Transactional(readOnly = true)
     public SliceResponse<AuctionInfoResponse> getOtherAuctionsBySameMember(Long auctionId, Pageable pageable) {
-        Auction auction = auctionRepository.findById(auctionId)
+        Auction auction = auctionRepository.findByIdAndStatus(auctionId, Status.ACTIVE)
                 .orElseThrow(() -> new CustomException(ErrorCode.AUCTION_NOT_FOUND));
         Member author = auction.getMember();
 
         Slice<Auction> auctions = auctionRepository.findAllByMemberAndStatusAndIdNot(author, Status.ACTIVE, auctionId, pageable);
 
         Slice<AuctionInfoResponse> auctionInfoResponses = auctions.map(otherAuction ->
-                AuctionInfoResponse.of(otherAuction, otherAuction.getItem(), otherAuction.getMember())
+                AuctionInfoResponse.of(otherAuction, otherAuction.getItem(), author)
         );
 
         return SliceResponse.from(auctionInfoResponses);
