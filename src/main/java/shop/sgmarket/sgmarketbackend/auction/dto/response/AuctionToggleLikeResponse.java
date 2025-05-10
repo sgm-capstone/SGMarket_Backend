@@ -1,4 +1,4 @@
-package shop.sgmarket.sgmarketbackend.auction.dto.request;
+package shop.sgmarket.sgmarketbackend.auction.dto.response;
 
 import lombok.Builder;
 
@@ -6,9 +6,9 @@ import lombok.Builder;
 public record AuctionToggleLikeResponse(
         Long auctionId,
         boolean isLiked,
-        Long likeCount
+        long likeCount
 ) {
-    public static AuctionToggleLikeResponse of(Long auctionId, boolean isLiked, Long likeCount) {
+    public static AuctionToggleLikeResponse of(Long auctionId, boolean isLiked, long likeCount) {
         return AuctionToggleLikeResponse.builder()
                 .auctionId(auctionId)
                 .isLiked(isLiked)

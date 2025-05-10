@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shop.sgmarket.sgmarketbackend.auction.domain.Auction;
 import shop.sgmarket.sgmarketbackend.auction.domain.AuctionLike;
-import shop.sgmarket.sgmarketbackend.auction.dto.request.AuctionToggleLikeResponse;
+import shop.sgmarket.sgmarketbackend.auction.dto.response.AuctionToggleLikeResponse;
 import shop.sgmarket.sgmarketbackend.auction.repository.AuctionLikeRepository;
 import shop.sgmarket.sgmarketbackend.auction.repository.AuctionRepository;
 import shop.sgmarket.sgmarketbackend.global.domain.Status;

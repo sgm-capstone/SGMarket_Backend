@@ -62,7 +62,7 @@ public class Auction extends BaseTimeEntity {
     private AuctionCategory category;
 
     @Column(name = "like_count")
-    private Long likeCount;
+    private long likeCount;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id", nullable = false)
@@ -77,7 +77,7 @@ public class Auction extends BaseTimeEntity {
     @Builder(access = AccessLevel.PRIVATE)
     private Auction(String title, String description, LocalDateTime startDate, LocalDateTime endDate,
                     long startPrice, long currentPrice, long endPrice, Double latitude,
-                    Double longitude, AuctionCategory category, Long likeCount, Item item, Member member,
+                    Double longitude, AuctionCategory category, long likeCount, Item item, Member member,
                     Status status) {
         this.title = title;
         this.description = description;

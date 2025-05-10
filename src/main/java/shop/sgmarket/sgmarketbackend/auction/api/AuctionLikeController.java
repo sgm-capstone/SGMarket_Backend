@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import shop.sgmarket.sgmarketbackend.auction.application.AuctionLikeService;
-import shop.sgmarket.sgmarketbackend.auction.dto.request.AuctionToggleLikeResponse;
+import shop.sgmarket.sgmarketbackend.auction.dto.response.AuctionToggleLikeResponse;
 import shop.sgmarket.sgmarketbackend.global.response.ApiResponseTemplate;
 
 @RestController
