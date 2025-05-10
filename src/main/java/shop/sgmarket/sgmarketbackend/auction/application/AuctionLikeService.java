@@ -35,14 +35,14 @@ public class AuctionLikeService {
         if (existingLike.isPresent()) {
             auctionLikeRepository.delete(existingLike.get());
             auction.decrementLikeCount();
-
             boolean IS_LIKED = false;
+
             return AuctionToggleLikeResponse.of(auctionId, IS_LIKED, auction.getLikeCount());
         }
         auctionLikeRepository.save(AuctionLike.createAuctionLike(member, auction));
         auction.incrementLikeCount();
-
         boolean IS_NOT_LIKED = true;
+
         return AuctionToggleLikeResponse.of(auctionId, IS_NOT_LIKED, auction.getLikeCount());
     }
 }
