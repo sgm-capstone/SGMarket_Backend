@@ -41,11 +41,12 @@ public class AuctionLikeService {
         if (existingLike.isPresent()) {
             auctionLikeRepository.delete(existingLike.get());
             auction.decrementLikeCount();
+
             return false;
         }
-
         auctionLikeRepository.save(AuctionLike.createAuctionLike(member, auction));
         auction.incrementLikeCount();
+
         return true;
     }
 }
