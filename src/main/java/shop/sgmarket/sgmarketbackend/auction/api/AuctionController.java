@@ -41,7 +41,7 @@ public class AuctionController implements AuctionDocs {
             @RequestPart MultipartFile itemImage
     ) {
         AuctionInfoResponse response = auctionService.register(request, itemImage);
-        
+
         return ApiResponseTemplate.created("경매 등록에 성공했습니다.", response);
     }
 
@@ -100,6 +100,7 @@ public class AuctionController implements AuctionDocs {
         return ApiResponseTemplate.ok("경매 삭제에 성공했습니다.", null);
     }
 
+    @Override
     @PostMapping("/{auctionId}/like")
     public ApiResponseTemplate<AuctionToggleLikeResponse> toggleLike(
             @PathVariable Long auctionId
