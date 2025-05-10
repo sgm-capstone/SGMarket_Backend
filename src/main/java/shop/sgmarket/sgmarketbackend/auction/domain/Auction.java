@@ -61,6 +61,9 @@ public class Auction extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private AuctionCategory category;
 
+    @Column(name = "like_count")
+    private Long likeCount;
+
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id", nullable = false)
     private Item item;
@@ -74,7 +77,8 @@ public class Auction extends BaseTimeEntity {
     @Builder(access = AccessLevel.PRIVATE)
     private Auction(String title, String description, LocalDateTime startDate, LocalDateTime endDate,
                     long startPrice, long currentPrice, long endPrice, Double latitude,
-                    Double longitude, AuctionCategory category, Item item, Member member, Status status) {
+                    Double longitude, AuctionCategory category, Long likeCount, Item item, Member member,
+                    Status status) {
         this.title = title;
         this.description = description;
         this.startDate = startDate;
@@ -85,6 +89,7 @@ public class Auction extends BaseTimeEntity {
         this.latitude = latitude;
         this.longitude = longitude;
         this.category = category;
+        this.likeCount = likeCount;
         this.item = item;
         this.member = member;
         this.status = status;
@@ -104,6 +109,7 @@ public class Auction extends BaseTimeEntity {
                 .latitude(latitude)
                 .longitude(longitude)
                 .category(category)
+                .likeCount(0L)
                 .item(item)
                 .member(member)
                 .status(Status.ACTIVE)
@@ -120,5 +126,15 @@ public class Auction extends BaseTimeEntity {
 
     public void delete() {
         this.status = Status.DELETED;
+    }
+
+    public void incrementLikeCount() {
+        this.likeCount++;
+    }
+
+    public void decrementLikeCount() {
+        if (this.likeCount > 0) {
+            this.likeCount--;
+        }
     }
 }
