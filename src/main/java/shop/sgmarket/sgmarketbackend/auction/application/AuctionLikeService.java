@@ -30,19 +30,22 @@ public class AuctionLikeService {
                 .orElseThrow(() -> new CustomException(ErrorCode.AUCTION_NOT_FOUND));
 
         Member member = memberUtil.getCurrentMember();
+        boolean isLiked = updateLikeStatusForMember(member, auction);
+
+        return AuctionToggleLikeResponse.of(auctionId, isLiked, auction.getLikeCount());
+    }
+
+    private boolean updateLikeStatusForMember(Member member, Auction auction) {
         Optional<AuctionLike> existingLike = auctionLikeRepository.findByAuctionAndMember(auction, member);
 
         if (existingLike.isPresent()) {
             auctionLikeRepository.delete(existingLike.get());
             auction.decrementLikeCount();
-            boolean IS_LIKED = false;
-
-            return AuctionToggleLikeResponse.of(auctionId, IS_LIKED, auction.getLikeCount());
+            return false;
         }
+
         auctionLikeRepository.save(AuctionLike.createAuctionLike(member, auction));
         auction.incrementLikeCount();
-        boolean IS_NOT_LIKED = true;
-
-        return AuctionToggleLikeResponse.of(auctionId, IS_NOT_LIKED, auction.getLikeCount());
+        return true;
     }
 }
