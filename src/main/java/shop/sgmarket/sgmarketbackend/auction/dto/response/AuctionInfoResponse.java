@@ -17,6 +17,7 @@ public record AuctionInfoResponse(
         long auctionEndPrice,
         String auctionImageUrl,
         String auctionCategory,
+        long likeCount,
         ItemInfo auctionItem,
         MemberInfo auctionMember,
         String status
@@ -33,7 +34,8 @@ public record AuctionInfoResponse(
                 .auctionEndPrice(auction.getEndPrice())
                 .auctionImageUrl(item.getImageUrl())
                 .auctionCategory(auction.getCategory().getName())
-                .auctionItem(ItemInfo.from(item))
+                .likeCount(auction.getLikeCount())
+                .auctionItem(AuctionInfoResponse.ItemInfo.from(item))
                 .auctionMember(MemberInfo.from(member))
                 .status(auction.getStatus().name())
                 .build();
