@@ -12,7 +12,7 @@ import shop.sgmarket.sgmarketbackend.global.response.ApiResponseTemplate;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/auctions")
-public class AuctionLikeController {
+public class AuctionLikeController implements AuctionLikeDocs {
     private final AuctionLikeService auctionLikeService;
 
     @PostMapping("/{auctionId}/like")
