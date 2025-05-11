@@ -20,15 +20,13 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         registry.enableSimpleBroker("/sub");
-
         registry.setApplicationDestinationPrefixes("/pub");
     }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws-stomp")
-                .setAllowedOriginPatterns("*")
-                .withSockJS();
+                .setAllowedOriginPatterns("*");
     }
 
     @Override
@@ -42,6 +40,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                     String token = accessor.getFirstNativeHeader("Authorization");
                     if (token != null && token.startsWith("Bearer ")) {
                         token = token.substring(7);
+                        // JWT 토큰 검증 및 사용자 정보 설정
+                        // ... 토큰 검증 로직
                     }
                 }
                 return message;
