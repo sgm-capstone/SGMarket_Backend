@@ -17,12 +17,16 @@ public class ChatRoom {
     private String name;
     private Long creatorId;
     private LocalDateTime createdAt;
+    private boolean isDirectChat;
+    private Long participantId;  // 1:1 채팅의 경우 상대방 ID
 
     @Builder
-    public ChatRoom(String id, String name, Long creatorId) {
+    public ChatRoom(String id, String name, Long creatorId, boolean isDirectChat, Long participantId) {
         this.id = id;
         this.name = name;
         this.creatorId = creatorId;
         this.createdAt = LocalDateTime.now();
+        this.isDirectChat = isDirectChat == true;  // null 체크
+        this.participantId = participantId;
     }
 }
