@@ -15,6 +15,8 @@ public record AuctionUpdateRequest(
         @Schema(example = "애플의 최신 스마트폰 아이폰 15 프로입니다. 최상의 성능과 디스플레이를 자랑합니다. 수정된 설명입니다.", description = "경매에 대한 상세 설명")
         String description,
 
+        @NotNull
+        @Schema(example = "아이폰 15 프로", description = "아이템 이름")
         String itemName,
 
         @NotNull

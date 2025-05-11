@@ -34,7 +34,8 @@ public class Member extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private MemberRole role;
 
-    private String address;
+    @Embedded
+    private MemberLocation location;
 
     private String nickname;
 
@@ -45,10 +46,10 @@ public class Member extends BaseTimeEntity {
     private LocalDateTime lastLoginAt;
 
     @Builder(access = AccessLevel.PRIVATE)
-    private Member(OauthInfo oauthInfo, MemberRole role, String address, String nickname, Status status) {
+    private Member(OauthInfo oauthInfo, MemberRole role, MemberLocation location, String nickname, Status status) {
         this.oauthInfo = oauthInfo;
         this.role = role;
-        this.address = address;
+        this.location = location;
         this.nickname = nickname;
         this.status = status;
     }
@@ -78,8 +79,8 @@ public class Member extends BaseTimeEntity {
         this.lastLoginAt = LocalDateTime.now();
     }
 
-    public void updateProfile(final String address, final String nickname) {
-        this.address = address;
+    public void updateProfile(final MemberLocation location, final String nickname) {
+        this.location = location;
         this.nickname = nickname;
     }
 }

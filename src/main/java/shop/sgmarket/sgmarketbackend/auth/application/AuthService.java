@@ -1,5 +1,6 @@
 package shop.sgmarket.sgmarketbackend.auth.application;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Map;
@@ -10,6 +11,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shop.sgmarket.sgmarketbackend.auth.domain.OAuthProvider;
+import shop.sgmarket.sgmarketbackend.auth.dto.RefreshTokenDto;
+import shop.sgmarket.sgmarketbackend.auth.dto.response.AccessTokenResponse;
 import shop.sgmarket.sgmarketbackend.auth.dto.response.OAuthTokenResponse;
 import shop.sgmarket.sgmarketbackend.auth.dto.response.SocialClientResponse;
 import shop.sgmarket.sgmarketbackend.global.error.ErrorCode;
@@ -19,7 +22,6 @@ import shop.sgmarket.sgmarketbackend.global.security.JwtTokenProvider;
 import shop.sgmarket.sgmarketbackend.global.util.CookieUtil;
 import shop.sgmarket.sgmarketbackend.global.util.JwtUtil;
 import shop.sgmarket.sgmarketbackend.member.domain.Member;
-import shop.sgmarket.sgmarketbackend.member.domain.MemberRole;
 import shop.sgmarket.sgmarketbackend.member.repository.MemberRepository;
 
 @Slf4j
@@ -89,6 +91,10 @@ public class AuthService {
         response.sendRedirect(redirectUri);
     }
 
+    private void getLoginResponse(final Member member, HttpServletResponse response) {
+        jwtTokenProvider.generateRefreshToken(member.getId(), member.getRole(), response);
+    }
+
     private Member createOauthMember(final OAuthProvider oAuthProvider,
                                      final String oauthId,
                                      final String email,
@@ -101,7 +107,20 @@ public class AuthService {
         return oauthMember;
     }
 
+
     private void saveRefreshTokenToRedis(String userId, String refreshToken, long expirationTime) {
-        // Implementation of saving refresh token to Redis
+    @Transactional(readOnly = true)
+    public AccessTokenResponse getAccessToken(HttpServletRequest request) {
+        String refreshToken = CookieUtil.extractRefreshTokenFromCookie(request);
+        validateRefreshToken(refreshToken);
+        RefreshTokenDto refreshTokenDto = jwtTokenProvider.retrieveRefreshToken(refreshToken);
+
+        return jwtTokenProvider.generateAccessToken(refreshTokenDto.memberId(), refreshTokenDto.memberRole());
+    }
+
+    private void validateRefreshToken(String refreshToken) {
+        if (refreshToken == null || refreshToken.isEmpty()) {
+            throw new CustomException(ErrorCode.INVALID_REFRESH_TOKEN);
+        }
     }
 }

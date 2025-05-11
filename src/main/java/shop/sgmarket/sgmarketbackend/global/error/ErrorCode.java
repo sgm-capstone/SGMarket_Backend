@@ -19,6 +19,7 @@ public enum ErrorCode {
     // 401 UNAUTHORIZED
     UNAUTHORIZED_ACCESS(HttpStatus.UNAUTHORIZED, "AUTH_4011", "인증이 필요합니다."),
     UNAUTHORIZED_MEMBER(HttpStatus.UNAUTHORIZED, "AUTH_4012", "작성자가 아닙니다"),
+    INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED,"AUTH_4013", "리프레시 토큰이 유효하지 않습니다."),
 
     // 403 FORBIDDEN
     FORBIDDEN_ACCESS(HttpStatus.FORBIDDEN, "AUTH_4031", "접근 권한이 없습니다."),
@@ -27,6 +28,7 @@ public enum ErrorCode {
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER_4041", "회원을 찾을 수 없습니다."),
     AUCTION_NOT_FOUND(HttpStatus.NOT_FOUND, "AUCTION_4041", "경매를 찾을 수 없습니다."),
     AUCTION_CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "AUCTION_4042", "경매 카테고리를 찾을 수 없습니다."),
+    REFRESH_TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, "AUTH_4041", "리프레시 토큰을 찾을 수 없습니다."),
 
     // 500 INTERNAL SERVER ERROR
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "SYSTEM_5001", "서버 내부 오류가 발생했습니다."),

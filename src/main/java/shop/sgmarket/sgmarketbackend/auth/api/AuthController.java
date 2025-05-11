@@ -1,14 +1,17 @@
 package shop.sgmarket.sgmarketbackend.auth.api;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import shop.sgmarket.sgmarketbackend.auth.application.AuthService;
 import shop.sgmarket.sgmarketbackend.auth.domain.OAuthProvider;
+import shop.sgmarket.sgmarketbackend.auth.dto.response.AccessTokenResponse;
 import shop.sgmarket.sgmarketbackend.auth.dto.response.OAuthTokenResponse;
 import shop.sgmarket.sgmarketbackend.auth.dto.response.SocialClientResponse;
 import shop.sgmarket.sgmarketbackend.auth.dto.response.UserInfoResponse;
@@ -55,4 +58,8 @@ public class AuthController implements AuthDocs {
     }
 
     // TODO: 로그아웃 API 구현
+    @PostMapping("/access-token")
+    public AccessTokenResponse reissueAccessToken(HttpServletRequest request) {
+        return authService.getAccessToken(request);
+    }
 }

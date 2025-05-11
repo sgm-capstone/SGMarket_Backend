@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springdoc.core.annotations.ParameterObject;
@@ -13,12 +14,15 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 import shop.sgmarket.sgmarketbackend.auction.dto.request.AuctionRegisterRequest;
 import shop.sgmarket.sgmarketbackend.auction.dto.request.AuctionUpdateRequest;
 import shop.sgmarket.sgmarketbackend.auction.dto.response.AuctionInfoResponse;
-import shop.sgmarket.sgmarketbackend.global.dto.PageResponse;
+import shop.sgmarket.sgmarketbackend.auction.dto.response.AuctionToggleLikeResponse;
+import shop.sgmarket.sgmarketbackend.global.dto.SliceResponse;
 import shop.sgmarket.sgmarketbackend.global.response.ApiResponseTemplate;
 
 @Tag(name = "경매 API", description = "경매 관련 API입니다.")
@@ -43,8 +47,26 @@ public interface AuctionDocs {
             @PathVariable Long auctionId
     );
 
-    @Operation(summary = "경매 목록 조회", description = "모든 경매를 페이지네이션하여 조회합니다.")
-    ApiResponseTemplate<PageResponse<AuctionInfoResponse>> getAllAuctions(
+    @Operation(summary = "해당 작성자의 다른 경매 목록 조회", description = "특정 경매 작성자의 다른 활성 경매 목록을 조회합니다.")
+    ApiResponseTemplate<SliceResponse<AuctionInfoResponse>> getOtherAuctionsBySameMember(
+            @Parameter(description = "조회할 경매 ID", required = true)
+            @PathVariable Long auctionId,
+
+            @Parameter(description = "페이지네이션 정보", required = true)
+            @ParameterObject
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
+            Pageable pageable
+    );
+
+
+    @Operation(summary = "주소 및 카테고리 기반 경매 목록 조회", description = "주소와 카테고리 기준으로 경매 목록을 조회합니다.")
+    ApiResponseTemplate<SliceResponse<AuctionInfoResponse>> getAuctionsByAddressAndCategory(
+            @Parameter(
+                    description = "카테고리 예시: digital-devices, home-appliances, furniture-interior, home-kitchen, kids,"
+                            + " kids-books, womens-clothing, womens-accessories, mens-fashion-accessories, beauty-cosmetics,"
+                            + " sports-recreation, hobbies"
+            )
+            @RequestParam(value = "category", required = false) String category,
             @ParameterObject
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
             Pageable pageable
@@ -70,6 +92,21 @@ public interface AuctionDocs {
     @Operation(summary = "경매 삭제", description = "경매 ID로 경매를 삭제합니다.")
     ApiResponseTemplate<Void> deleteAuction(
             @Parameter(description = "삭제할 경매 ID", required = true)
+            @PathVariable Long auctionId
+    );
+
+    @Operation(
+            summary = "경매 좋아요 토글",
+            description = "특정 경매에 대해 좋아요를 추가하거나 제거합니다.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "경매 좋아요 토글에 성공했습니다."),
+                    @ApiResponse(responseCode = "404", description = "해당 ID의 경매가 존재하지 않습니다."),
+                    @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자입니다.")
+            }
+    )
+    @PostMapping("/auctions/{auctionId}/like")
+    ApiResponseTemplate<AuctionToggleLikeResponse> toggleLike(
+            @Parameter(description = "좋아요를 토글할 경매 ID")
             @PathVariable Long auctionId
     );
 }
