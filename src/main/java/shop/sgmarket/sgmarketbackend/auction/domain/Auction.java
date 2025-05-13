@@ -19,7 +19,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import shop.sgmarket.sgmarketbackend.global.domain.BaseTimeEntity;
-import shop.sgmarket.sgmarketbackend.global.domain.Status;
 import shop.sgmarket.sgmarketbackend.member.domain.Member;
 
 @Entity
@@ -72,13 +71,13 @@ public class Auction extends BaseTimeEntity {
     private Member member;
 
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private AuctionStatus status;
 
     @Builder(access = AccessLevel.PRIVATE)
     private Auction(String title, String description, LocalDateTime startDate, LocalDateTime endDate,
                     long startPrice, long currentPrice, long endPrice, Double latitude,
                     Double longitude, AuctionCategory category, long likeCount, Item item, Member member,
-                    Status status) {
+                    AuctionStatus status) {
         this.title = title;
         this.description = description;
         this.startDate = startDate;
@@ -112,7 +111,7 @@ public class Auction extends BaseTimeEntity {
                 .likeCount(0L)
                 .item(item)
                 .member(member)
-                .status(Status.ACTIVE)
+                .status(AuctionStatus.BIDDING)
                 .build();
     }
 
@@ -125,7 +124,7 @@ public class Auction extends BaseTimeEntity {
     }
 
     public void delete() {
-        this.status = Status.DELETED;
+        this.status = AuctionStatus.DELETED;
     }
 
     public void incrementLikeCount() {

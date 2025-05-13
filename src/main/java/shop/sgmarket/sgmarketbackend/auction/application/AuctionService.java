@@ -8,13 +8,13 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import shop.sgmarket.sgmarketbackend.auction.domain.Auction;
 import shop.sgmarket.sgmarketbackend.auction.domain.AuctionCategory;
+import shop.sgmarket.sgmarketbackend.auction.domain.AuctionStatus;
 import shop.sgmarket.sgmarketbackend.auction.domain.Item;
 import shop.sgmarket.sgmarketbackend.auction.dto.request.AuctionRegisterRequest;
 import shop.sgmarket.sgmarketbackend.auction.dto.request.AuctionUpdateRequest;
 import shop.sgmarket.sgmarketbackend.auction.dto.response.AuctionInfoResponse;
 import shop.sgmarket.sgmarketbackend.auction.repository.AuctionRepository;
 import shop.sgmarket.sgmarketbackend.auction.repository.ItemRepository;
-import shop.sgmarket.sgmarketbackend.global.domain.Status;
 import shop.sgmarket.sgmarketbackend.global.dto.SliceResponse;
 import shop.sgmarket.sgmarketbackend.global.error.ErrorCode;
 import shop.sgmarket.sgmarketbackend.global.error.exception.CustomException;
@@ -63,7 +63,7 @@ public class AuctionService {
 
     @Transactional(readOnly = true)
     public AuctionInfoResponse getAuction(Long auctionId) {
-        Auction auction = auctionRepository.findByIdAndStatus(auctionId, Status.ACTIVE)
+        Auction auction = auctionRepository.findByIdAndStatus(auctionId, AuctionStatus.BIDDING)
                 .orElseThrow(() -> new CustomException(ErrorCode.AUCTION_NOT_FOUND));
 
         return AuctionInfoResponse.of(auction, auction.getItem(), auction.getMember());
@@ -71,11 +71,11 @@ public class AuctionService {
 
     @Transactional(readOnly = true)
     public SliceResponse<AuctionInfoResponse> getOtherAuctionsBySameMember(Long auctionId, Pageable pageable) {
-        Auction auction = auctionRepository.findByIdAndStatus(auctionId, Status.ACTIVE)
+        Auction auction = auctionRepository.findByIdAndStatus(auctionId, AuctionStatus.BIDDING)
                 .orElseThrow(() -> new CustomException(ErrorCode.AUCTION_NOT_FOUND));
         Member author = auction.getMember();
 
-        Slice<Auction> auctions = auctionRepository.findAllByMemberAndStatusAndIdNot(author, Status.ACTIVE, auctionId, pageable);
+        Slice<Auction> auctions = auctionRepository.findAllByMemberAndStatusAndIdNot(author, AuctionStatus.BIDDING, auctionId, pageable);
 
         Slice<AuctionInfoResponse> auctionInfoResponses = auctions.map(otherAuction ->
                 AuctionInfoResponse.of(otherAuction, otherAuction.getItem(), author)
@@ -92,7 +92,6 @@ public class AuctionService {
                 member.getLocation().getLatitude(),
                 member.getLocation().getLongitude(),
                 SEARCH_RADIUS_KM,
-                Status.ACTIVE,
                 AuctionCategory.fromKebabCase(category),
                 pageable
         );
