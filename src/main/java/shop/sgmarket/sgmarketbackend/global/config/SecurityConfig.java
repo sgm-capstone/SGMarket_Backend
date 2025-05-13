@@ -31,7 +31,12 @@ public class SecurityConfig {
                                                 "/swagger-ui/**",
                                                 "/v3/api-docs/**",
                                                 "/swagger-resources/**",
-                                                "/webjars/**"
+                                                "/webjars/**",
+                                                "/ws-stomp/**",
+                                                "/ws-stomp",
+                                                "/chat/**",
+                                                "/sub/**",
+                                                "/pub/**"
                                         ).permitAll()
                                         .requestMatchers("/auth/**")
                                         .permitAll()

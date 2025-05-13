@@ -14,6 +14,9 @@ import shop.sgmarket.sgmarketbackend.auth.domain.OAuthProvider;
 import shop.sgmarket.sgmarketbackend.auth.dto.response.AccessTokenResponse;
 import shop.sgmarket.sgmarketbackend.auth.dto.response.OAuthTokenResponse;
 import shop.sgmarket.sgmarketbackend.auth.dto.response.SocialClientResponse;
+import shop.sgmarket.sgmarketbackend.auth.dto.response.UserInfoResponse;
+import shop.sgmarket.sgmarketbackend.global.util.MemberUtil;
+import shop.sgmarket.sgmarketbackend.member.domain.Member;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,6 +24,7 @@ import shop.sgmarket.sgmarketbackend.auth.dto.response.SocialClientResponse;
 public class AuthController implements AuthDocs {
 
     private final AuthService authService;
+    private final MemberUtil memberUtil;
 
     @Override
     @GetMapping("/login")
@@ -44,6 +48,16 @@ public class AuthController implements AuthDocs {
         );
     }
 
+    @GetMapping("/me")
+    public UserInfoResponse getCurrentUser() {
+        Member member = memberUtil.getCurrentMember();
+        return UserInfoResponse.of(
+            member.getOauthInfo().getOauthNickname(),
+            member.getOauthInfo().getOauthProfileImageUrl()
+        );
+    }
+
+    // TODO: 로그아웃 API 구현
     @PostMapping("/access-token")
     public AccessTokenResponse reissueAccessToken(HttpServletRequest request) {
         return authService.getAccessToken(request);
