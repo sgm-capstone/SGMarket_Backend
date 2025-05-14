@@ -1,5 +1,6 @@
 package shop.sgmarket.sgmarketbackend.auction.api;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
@@ -24,7 +25,7 @@ public class BidController implements BidDocs {
     @PostMapping
     public ApiResponseTemplate<BidInfoResponse> bid(
             @PathVariable Long auctionId,
-            @RequestBody BidRegisterRequest bidRegisterRequest
+            @RequestBody @Valid BidRegisterRequest bidRegisterRequest
     ) {
         BidInfoResponse response = bidService.bid(auctionId, bidRegisterRequest);
 
