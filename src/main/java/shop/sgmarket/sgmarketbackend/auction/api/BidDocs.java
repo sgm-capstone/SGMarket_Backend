@@ -40,7 +40,8 @@ public interface BidDocs {
 
     @Operation(
             summary = "경매 입찰 목록 조회",
-            description = "특정 경매에 대한 입찰 내역을 조회합니다.",
+            description = "특정 경매에 대한 입찰 내역을 조회합니다. " +
+                    "입찰 내역은 최신순으로 자동 정렬되며, 정렬 파라미터를 따로 줄 필요가 없습니다.",
             responses = {
                     @ApiResponse(responseCode = "200", description = "입찰 목록 조회에 성공했습니다."),
                     @ApiResponse(responseCode = "404", description = "해당 ID의 경매가 존재하지 않습니다.")
@@ -50,7 +51,7 @@ public interface BidDocs {
             @Parameter(description = "조회할 경매 ID", required = true)
             Long auctionId,
 
-            @Parameter(description = "페이지네이션 정보")
+            @Parameter(description = "페이지네이션 정보 (정렬은 최신순으로 고정됩니다)")
             @ParameterObject Pageable pageable
     );
 }
