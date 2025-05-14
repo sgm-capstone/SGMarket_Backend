@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import shop.sgmarket.sgmarketbackend.auction.application.BidService;
-import shop.sgmarket.sgmarketbackend.auction.dto.request.BidRequest;
+import shop.sgmarket.sgmarketbackend.auction.dto.request.BidRegisterRequest;
 import shop.sgmarket.sgmarketbackend.auction.dto.response.BidInfoResponse;
 import shop.sgmarket.sgmarketbackend.global.dto.SliceResponse;
 import shop.sgmarket.sgmarketbackend.global.response.ApiResponseTemplate;
@@ -24,9 +24,9 @@ public class BidController implements BidDocs {
     @PostMapping
     public ApiResponseTemplate<BidInfoResponse> bid(
             @PathVariable Long auctionId,
-            @RequestBody BidRequest bidRequest
+            @RequestBody BidRegisterRequest bidRegisterRequest
     ) {
-        BidInfoResponse response = bidService.bid(auctionId, bidRequest);
+        BidInfoResponse response = bidService.bid(auctionId, bidRegisterRequest);
 
         return ApiResponseTemplate.created("입찰이 완료되었습니다", response);
     }
