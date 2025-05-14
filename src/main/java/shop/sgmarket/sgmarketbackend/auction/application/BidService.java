@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shop.sgmarket.sgmarketbackend.auction.domain.Auction;
+import shop.sgmarket.sgmarketbackend.auction.domain.AuctionStatus;
 import shop.sgmarket.sgmarketbackend.auction.domain.Bid;
 import shop.sgmarket.sgmarketbackend.auction.dto.request.BidRegisterRequest;
 import shop.sgmarket.sgmarketbackend.auction.dto.response.BidInfoResponse;
@@ -31,6 +32,9 @@ public class BidService {
         Member member = memberUtil.getCurrentMember();
         Auction auction = auctionRepository.findById(auctionId)
                 .orElseThrow(() -> new CustomException(ErrorCode.AUCTION_NOT_FOUND));
+        if (auction.getStatus() != AuctionStatus.BIDDING) {
+            throw new CustomException(ErrorCode.AUCTION_NOT_BIDDING);
+        }
 
         if (member == auction.getMember()) {
             throw new CustomException(ErrorCode.CANNOT_BID_OWN_AUCTION);
