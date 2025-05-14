@@ -46,8 +46,6 @@ public class AuctionService {
                 request.description(),
                 request.endDate(),
                 request.startPrice(),
-                request.currentPrice(),
-                request.endPrice(),
                 member.getLocation().getLatitude(),
                 member.getLocation().getLongitude(),
                 AuctionCategory.from(request.auctionCategory()),

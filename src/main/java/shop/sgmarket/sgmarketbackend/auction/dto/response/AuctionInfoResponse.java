@@ -14,7 +14,7 @@ public record AuctionInfoResponse(
         String auctionEndDate,
         long auctionStartPrice,
         long auctionCurrentPrice,
-        long auctionEndPrice,
+        Long auctionEndPrice,
         String auctionImageUrl,
         String auctionCategory,
         long likeCount,
