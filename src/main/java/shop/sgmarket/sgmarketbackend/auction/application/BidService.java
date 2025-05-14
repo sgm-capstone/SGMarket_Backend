@@ -1,5 +1,6 @@
 package shop.sgmarket.sgmarketbackend.auction.application;
 
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -36,7 +37,7 @@ public class BidService {
             throw new CustomException(ErrorCode.AUCTION_NOT_BIDDING);
         }
 
-        if (member == auction.getMember()) {
+        if (Objects.equals(member.getId(), auction.getMember().getId())) {
             throw new CustomException(ErrorCode.CANNOT_BID_OWN_AUCTION);
         }
 
