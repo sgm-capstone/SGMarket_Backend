@@ -31,14 +31,6 @@ public record AuctionRegisterRequest(
         @Schema(example = "1200000", description = "경매 시작 가격")
         int startPrice,
 
-        @Min(1)
-        @Schema(example = "1300000", description = "현재 가격")
-        int currentPrice,
-
-        @Min(1)
-        @Schema(example = "1500000", description = "경매 종료 가격")
-        int endPrice,
-
         @NotNull
         @Schema(example = "디지털기기", description = "경매 카테고리")
         String auctionCategory

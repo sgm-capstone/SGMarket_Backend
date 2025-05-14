@@ -15,6 +15,10 @@ public enum ErrorCode {
     INVALID_KAKAO_TOKEN(HttpStatus.BAD_REQUEST, "KAKAO_4001", "카카오 토큰이 유효하지 않거나 비어 있습니다."),
     INVALID_GOOGLE_TOKEN(HttpStatus.BAD_REQUEST, "GOOGLE_4001", "구글 토큰이 유효하지 않거나 비어 있습니다."),
     INVALID_FILE_EXTENSION(HttpStatus.BAD_REQUEST, "IMAGE_4001", "파일 이름에 확장자가 없습니다."),
+    BID_PRICE_TOO_LOW_CURRENT_PRICE(HttpStatus.BAD_REQUEST, "AUCTION_4001", "입찰 금액이 현재가보다 낮습니다."),
+    BID_PRICE_TOO_LOW_STARTING_PRICE(HttpStatus.BAD_REQUEST, "AUCTION_4002", "입찰 금액이 시작가보다 낮습니다."),
+    CANNOT_BID_OWN_AUCTION(HttpStatus.BAD_REQUEST, "AUCTION_4003", "자신의 경매에 입찰할 수 없습니다."),
+    AUCTION_NOT_BIDDING(HttpStatus.BAD_REQUEST, "AUCTION_4004", "경매가 진행 중이 아닙니다."),
 
     // 401 UNAUTHORIZED
     UNAUTHORIZED_ACCESS(HttpStatus.UNAUTHORIZED, "AUTH_4011", "인증이 필요합니다."),

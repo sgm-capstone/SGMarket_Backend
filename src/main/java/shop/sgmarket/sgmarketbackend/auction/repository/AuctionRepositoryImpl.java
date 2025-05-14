@@ -13,8 +13,8 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import shop.sgmarket.sgmarketbackend.auction.domain.Auction;
 import shop.sgmarket.sgmarketbackend.auction.domain.AuctionCategory;
+import shop.sgmarket.sgmarketbackend.auction.domain.AuctionStatus;
 import shop.sgmarket.sgmarketbackend.auction.domain.QAuction;
-import shop.sgmarket.sgmarketbackend.global.domain.Status;
 
 @RequiredArgsConstructor
 public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
@@ -26,7 +26,6 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
             double lat,
             double lng,
             double radiusKm,
-            Status status,
             AuctionCategory category,
             Pageable pageable
     ) {
@@ -35,7 +34,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
         List<Auction> content = queryFactory
                 .selectFrom(auction)
                 .where(
-                        auction.status.eq(status),
+                        auction.status.eq(AuctionStatus.BIDDING),
                         eqCategory(auction, category),
                         haversineDistance(auction.latitude, auction.longitude, lat, lng).loe(radiusKm)
                 )

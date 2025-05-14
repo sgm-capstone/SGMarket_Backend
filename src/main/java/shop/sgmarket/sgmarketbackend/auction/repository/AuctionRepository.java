@@ -5,14 +5,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import shop.sgmarket.sgmarketbackend.auction.domain.Auction;
-import shop.sgmarket.sgmarketbackend.global.domain.Status;
+import shop.sgmarket.sgmarketbackend.auction.domain.AuctionStatus;
 import shop.sgmarket.sgmarketbackend.member.domain.Member;
 
 public interface AuctionRepository extends JpaRepository<Auction, Long>, AuctionRepositoryCustom {
-    Optional<Auction> findByIdAndStatus(Long id, Status status);
+    Optional<Auction> findByIdAndStatus(Long id, AuctionStatus status);
     Slice<Auction> findAllByMemberAndStatusAndIdNot(
             Member member,
-            Status status,
+            AuctionStatus status,
             Long excludedAuctionId,
             Pageable pageable
     );

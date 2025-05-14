@@ -6,10 +6,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shop.sgmarket.sgmarketbackend.auction.domain.Auction;
 import shop.sgmarket.sgmarketbackend.auction.domain.AuctionLike;
+import shop.sgmarket.sgmarketbackend.auction.domain.AuctionStatus;
 import shop.sgmarket.sgmarketbackend.auction.dto.response.AuctionToggleLikeResponse;
 import shop.sgmarket.sgmarketbackend.auction.repository.AuctionLikeRepository;
 import shop.sgmarket.sgmarketbackend.auction.repository.AuctionRepository;
-import shop.sgmarket.sgmarketbackend.global.domain.Status;
 import shop.sgmarket.sgmarketbackend.global.error.ErrorCode;
 import shop.sgmarket.sgmarketbackend.global.error.exception.CustomException;
 import shop.sgmarket.sgmarketbackend.global.util.MemberUtil;
@@ -26,7 +26,7 @@ public class AuctionLikeService {
 
     @Transactional
     public AuctionToggleLikeResponse toggleLike(Long auctionId) {
-        Auction auction = auctionRepository.findByIdAndStatus(auctionId, Status.ACTIVE)
+        Auction auction = auctionRepository.findByIdAndStatus(auctionId, AuctionStatus.BIDDING)
                 .orElseThrow(() -> new CustomException(ErrorCode.AUCTION_NOT_FOUND));
 
         Member member = memberUtil.getCurrentMember();

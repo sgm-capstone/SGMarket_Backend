@@ -1,5 +1,6 @@
 package shop.sgmarket.sgmarketbackend.auction.domain;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -10,16 +11,21 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.Version;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import shop.sgmarket.sgmarketbackend.global.domain.BaseTimeEntity;
-import shop.sgmarket.sgmarketbackend.global.domain.Status;
+import shop.sgmarket.sgmarketbackend.global.error.ErrorCode;
+import shop.sgmarket.sgmarketbackend.global.error.exception.CustomException;
 import shop.sgmarket.sgmarketbackend.member.domain.Member;
 
 @Entity
@@ -30,6 +36,9 @@ public class Auction extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Version
+    private Long version;
 
     private String title;
 
@@ -48,7 +57,7 @@ public class Auction extends BaseTimeEntity {
     private long currentPrice;
 
     @Column(name = "end_price")
-    private long endPrice;
+    private Long endPrice;
 
     @DecimalMin(value = "-90.0")
     @DecimalMax(value = "90.0")
@@ -71,14 +80,17 @@ public class Auction extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 
+    @OneToMany(mappedBy = "auction", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Bid> bids = new ArrayList<>();
+
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private AuctionStatus status;
 
     @Builder(access = AccessLevel.PRIVATE)
     private Auction(String title, String description, LocalDateTime startDate, LocalDateTime endDate,
-                    long startPrice, long currentPrice, long endPrice, Double latitude,
+                    long startPrice, long currentPrice, Long endPrice, Double latitude,
                     Double longitude, AuctionCategory category, long likeCount, Item item, Member member,
-                    Status status) {
+                    AuctionStatus status) {
         this.title = title;
         this.description = description;
         this.startDate = startDate;
@@ -96,7 +108,7 @@ public class Auction extends BaseTimeEntity {
     }
 
     public static Auction create(String title, String description, LocalDateTime endDate,
-                                 long startPrice, long currentPrice, long endPrice, Double latitude, Double longitude,
+                                 long startPrice, Double latitude, Double longitude,
                                  AuctionCategory category, Item item, Member member) {
         return Auction.builder()
                 .title(title)
@@ -104,15 +116,14 @@ public class Auction extends BaseTimeEntity {
                 .startDate(LocalDateTime.now())
                 .endDate(endDate)
                 .startPrice(startPrice)
-                .currentPrice(currentPrice)
-                .endPrice(endPrice)
+                .currentPrice(0)
                 .latitude(latitude)
                 .longitude(longitude)
                 .category(category)
                 .likeCount(0L)
                 .item(item)
                 .member(member)
-                .status(Status.ACTIVE)
+                .status(AuctionStatus.BIDDING)
                 .build();
     }
 
@@ -125,7 +136,7 @@ public class Auction extends BaseTimeEntity {
     }
 
     public void delete() {
-        this.status = Status.DELETED;
+        this.status = AuctionStatus.DELETED;
     }
 
     public void incrementLikeCount() {
@@ -135,6 +146,20 @@ public class Auction extends BaseTimeEntity {
     public void decrementLikeCount() {
         if (this.likeCount > 0) {
             this.likeCount--;
+        }
+    }
+
+    public void updateCurrentPrice(long bidPrice) {
+        validateBidPrice(bidPrice);
+        this.currentPrice = bidPrice;
+    }
+
+    private void validateBidPrice(long bidPrice) {
+        if (this.currentPrice >= bidPrice) {
+            throw new CustomException(ErrorCode.BID_PRICE_TOO_LOW_CURRENT_PRICE);
+        }
+        if (this.startPrice > bidPrice) {
+            throw new CustomException(ErrorCode.BID_PRICE_TOO_LOW_STARTING_PRICE);
         }
     }
 }
