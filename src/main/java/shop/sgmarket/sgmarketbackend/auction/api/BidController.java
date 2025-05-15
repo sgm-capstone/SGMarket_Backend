@@ -22,6 +22,7 @@ import shop.sgmarket.sgmarketbackend.global.response.ApiResponseTemplate;
 public class BidController implements BidDocs {
     private final BidService bidService;
 
+    @Override
     @PostMapping
     public ApiResponseTemplate<BidInfoResponse> bid(
             @PathVariable Long auctionId,
@@ -32,6 +33,7 @@ public class BidController implements BidDocs {
         return ApiResponseTemplate.created("입찰이 완료되었습니다", response);
     }
 
+    @Override
     @GetMapping
     public ApiResponseTemplate<SliceResponse<BidInfoResponse>> getBidsForAuction(
             @PathVariable Long auctionId,
@@ -42,6 +44,7 @@ public class BidController implements BidDocs {
         return ApiResponseTemplate.ok("입찰 목록 조회에 성공했습니다", response);
     }
 
+    @Override
     @PostMapping("/settle")
     public ApiResponseTemplate<BidInfoResponse> settleBid(@PathVariable Long auctionId) {
         BidInfoResponse response = bidService.settleBid(auctionId);
