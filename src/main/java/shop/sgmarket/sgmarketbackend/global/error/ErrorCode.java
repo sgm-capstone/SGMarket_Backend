@@ -19,6 +19,7 @@ public enum ErrorCode {
     BID_PRICE_TOO_LOW_STARTING_PRICE(HttpStatus.BAD_REQUEST, "AUCTION_4002", "입찰 금액이 시작가보다 낮습니다."),
     CANNOT_BID_OWN_AUCTION(HttpStatus.BAD_REQUEST, "AUCTION_4003", "자신의 경매에 입찰할 수 없습니다."),
     AUCTION_NOT_BIDDING(HttpStatus.BAD_REQUEST, "AUCTION_4004", "경매가 진행 중이 아닙니다."),
+    NOT_AUCTION_OWNER(HttpStatus.FORBIDDEN, "AUCTION_4031", "경매의 판매자가 아닙니다."),
 
     // 401 UNAUTHORIZED
     UNAUTHORIZED_ACCESS(HttpStatus.UNAUTHORIZED, "AUTH_4011", "인증이 필요합니다."),
@@ -33,6 +34,7 @@ public enum ErrorCode {
     AUCTION_NOT_FOUND(HttpStatus.NOT_FOUND, "AUCTION_4041", "경매를 찾을 수 없습니다."),
     AUCTION_CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "AUCTION_4042", "경매 카테고리를 찾을 수 없습니다."),
     REFRESH_TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, "AUTH_4041", "리프레시 토큰을 찾을 수 없습니다."),
+    BID_NOT_FOUND(HttpStatus.NOT_FOUND, "AUCTION_4043", "입찰을 찾을 수 없습니다."),
 
     // 500 INTERNAL SERVER ERROR
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "SYSTEM_5001", "서버 내부 오류가 발생했습니다."),
