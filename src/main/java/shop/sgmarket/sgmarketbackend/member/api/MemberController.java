@@ -16,9 +16,10 @@ import shop.sgmarket.sgmarketbackend.member.dto.response.MemberUpdateResponse;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/members")
-public class MemberController {
+public class MemberController implements MemberDocs {
     private final MemberService memberService;
 
+    @Override
     @GetMapping
     public ApiResponseTemplate<MemberInfoResponse> getMemberInfo() {
         MemberInfoResponse response = memberService.getMemberInfoFromId();
@@ -27,6 +28,7 @@ public class MemberController {
                 .message("회원 정보 조회 완료");
     }
 
+    @Override
     @PostMapping
     public ApiResponseTemplate<MemberUpdateResponse> updateProfile(
             @RequestBody @Valid final MemberUpdateRequest memberUpdateRequest) {
