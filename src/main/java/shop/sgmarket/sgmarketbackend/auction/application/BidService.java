@@ -2,15 +2,10 @@ package shop.sgmarket.sgmarketbackend.auction.application;
 
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import shop.sgmarket.sgmarketbackend.auction.domain.Auction;
-import shop.sgmarket.sgmarketbackend.auction.domain.AuctionStatus;
-import shop.sgmarket.sgmarketbackend.auction.domain.Bid;
+import shop.sgmarket.sgmarketbackend.auction.domain.*;
 import shop.sgmarket.sgmarketbackend.auction.dto.request.BidRegisterRequest;
 import shop.sgmarket.sgmarketbackend.auction.dto.response.BidInfoResponse;
 import shop.sgmarket.sgmarketbackend.auction.repository.AuctionRepository;
@@ -29,30 +24,24 @@ public class BidService {
     private final MemberUtil memberUtil;
 
     @Transactional
-    public BidInfoResponse bid(Long auctionId, BidRegisterRequest bidRegisterRequest) {
-        Member member = memberUtil.getCurrentMember();
-        Auction auction = auctionRepository.findById(auctionId)
-                .orElseThrow(() -> new CustomException(ErrorCode.AUCTION_NOT_FOUND));
-        if (auction.getStatus() != AuctionStatus.BIDDING) {
-            throw new CustomException(ErrorCode.AUCTION_NOT_BIDDING);
-        }
+    public BidInfoResponse bid(Long auctionId, BidRegisterRequest bidRequest) {
+        Member bidder = memberUtil.getCurrentMember();
+        Auction auction = getAuctionOrThrow(auctionId);
 
-        if (Objects.equals(member.getId(), auction.getMember().getId())) {
-            throw new CustomException(ErrorCode.CANNOT_BID_OWN_AUCTION);
-        }
+        validateBiddingStatus(auction);
+        validateNotOwner(bidder, auction);
 
-        auction.updateCurrentPrice(bidRegisterRequest.bidPrice());
-        Bid bid = Bid.createBid(member, auction, bidRegisterRequest.bidPrice());
+        auction.updateCurrentPrice(bidRequest.bidPrice());
+        Bid bid = Bid.createBid(bidder, auction, bidRequest.bidPrice());
 
         bidRepository.save(bid);
 
-        return BidInfoResponse.of(bidRegisterRequest.bidPrice(), member);
+        return BidInfoResponse.of(bid.getPrice(), bidder);
     }
 
     @Transactional(readOnly = true)
     public SliceResponse<BidInfoResponse> getBidsForAuction(Long auctionId, Pageable pageable) {
-        Auction auction = auctionRepository.findById(auctionId)
-                .orElseThrow(() -> new CustomException(ErrorCode.AUCTION_NOT_FOUND));
+        Auction auction = getAuctionOrThrow(auctionId);
 
         Pageable sortedPageable = PageRequest.of(
                 pageable.getPageNumber(),
@@ -62,31 +51,45 @@ public class BidService {
 
         Slice<Bid> bids = bidRepository.findAllByAuction(auction, sortedPageable);
 
-        return SliceResponse.from(
-                bids.map(bid -> BidInfoResponse.of(bid.getPrice(), bid.getMember()))
-        );
+        return SliceResponse.from(bids.map(bid -> BidInfoResponse.of(bid.getPrice(), bid.getMember())));
     }
 
     @Transactional
     public BidInfoResponse settleBid(Long auctionId) {
-        Member member = memberUtil.getCurrentMember();
-        Auction auction = auctionRepository.findById(auctionId)
-                .orElseThrow(() -> new CustomException(ErrorCode.AUCTION_NOT_FOUND));
+        Member owner = memberUtil.getCurrentMember();
+        Auction auction = getAuctionOrThrow(auctionId);
 
-        if (auction.getStatus() != AuctionStatus.BIDDING) {
-            throw new CustomException(ErrorCode.AUCTION_NOT_BIDDING);
-        }
+        validateBiddingStatus(auction);
+        validateAuctionOwner(owner, auction);
 
-        if (!Objects.equals(member.getId(), auction.getMember().getId())) {
-            throw new CustomException(ErrorCode.NOT_AUCTION_OWNER);
-        }
-
-        Bid bid = bidRepository.findTopByAuctionOrderByCreatedAtDesc(auction)
+        Bid winningBid = bidRepository.findTopByAuctionOrderByCreatedAtDesc(auction)
                 .orElseThrow(() -> new CustomException(ErrorCode.BID_NOT_FOUND));
 
         auction.updateStatus(AuctionStatus.COMPLETED);
 
-        return BidInfoResponse.of(bid.getPrice(), bid.getMember());
+        return BidInfoResponse.of(winningBid.getPrice(), winningBid.getMember());
     }
 
+    private Auction getAuctionOrThrow(Long auctionId) {
+        return auctionRepository.findById(auctionId)
+                .orElseThrow(() -> new CustomException(ErrorCode.AUCTION_NOT_FOUND));
+    }
+
+    private void validateBiddingStatus(Auction auction) {
+        if (auction.getStatus() != AuctionStatus.BIDDING) {
+            throw new CustomException(ErrorCode.AUCTION_NOT_BIDDING);
+        }
+    }
+
+    private void validateNotOwner(Member bidder, Auction auction) {
+        if (Objects.equals(bidder.getId(), auction.getMember().getId())) {
+            throw new CustomException(ErrorCode.CANNOT_BID_OWN_AUCTION);
+        }
+    }
+
+    private void validateAuctionOwner(Member member, Auction auction) {
+        if (!Objects.equals(member.getId(), auction.getMember().getId())) {
+            throw new CustomException(ErrorCode.NOT_AUCTION_OWNER);
+        }
+    }
 }
