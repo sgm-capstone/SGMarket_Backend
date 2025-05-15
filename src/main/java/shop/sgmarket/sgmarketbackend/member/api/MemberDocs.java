@@ -8,7 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import shop.sgmarket.sgmarketbackend.global.response.ApiResponseTemplate;
 import shop.sgmarket.sgmarketbackend.member.dto.request.MemberUpdateRequest;
@@ -43,7 +43,7 @@ public interface MemberDocs {
                     @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자입니다.")
             }
     )
-    @PostMapping("/profile")
+    @PatchMapping
     ApiResponseTemplate<MemberUpdateResponse> updateProfile(
             @Parameter(hidden = true)
             @RequestBody @Valid MemberUpdateRequest memberUpdateRequest
