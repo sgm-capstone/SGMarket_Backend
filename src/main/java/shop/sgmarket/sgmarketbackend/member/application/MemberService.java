@@ -7,12 +7,20 @@ import shop.sgmarket.sgmarketbackend.global.util.MemberUtil;
 import shop.sgmarket.sgmarketbackend.member.domain.Member;
 import shop.sgmarket.sgmarketbackend.member.domain.MemberLocation;
 import shop.sgmarket.sgmarketbackend.member.dto.request.MemberUpdateRequest;
+import shop.sgmarket.sgmarketbackend.member.dto.response.MemberInfoResponse;
 import shop.sgmarket.sgmarketbackend.member.dto.response.MemberUpdateResponse;
 
 @Service
 @RequiredArgsConstructor
 public class MemberService {
     private final MemberUtil memberUtil;
+
+    @Transactional(readOnly = true)
+    public MemberInfoResponse getMemberInfoFromId() {
+        Member member = memberUtil.getCurrentMember();
+
+        return MemberInfoResponse.from(member);
+    }
 
     @Transactional
     public MemberUpdateResponse updateProfile(final MemberUpdateRequest memberUpdateRequest) {
