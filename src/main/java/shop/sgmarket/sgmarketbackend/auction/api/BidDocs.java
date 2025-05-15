@@ -54,4 +54,19 @@ public interface BidDocs {
             @Parameter(description = "페이지네이션 정보 (정렬은 최신순으로 고정됩니다)")
             @ParameterObject Pageable pageable
     );
+
+    @Operation(
+            summary = "낙찰 처리",
+            description = "경매 종료 시 낙찰자를 확정합니다. 해당 경매의 최고 입찰자를 낙찰자로 설정합니다.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "낙찰 처리가 완료되었습니다."),
+                    @ApiResponse(responseCode = "400", description = "경매가 아직 종료되지 않았거나 낙찰 대상자가 없습니다."),
+                    @ApiResponse(responseCode = "404", description = "해당 ID의 경매가 존재하지 않습니다."),
+                    @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자입니다.")
+            }
+    )
+    ApiResponseTemplate<BidInfoResponse> settleBid(
+            @Parameter(description = "낙찰 처리할 경매 ID", required = true)
+            Long auctionId
+    );
 }
