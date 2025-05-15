@@ -116,7 +116,7 @@ public class Auction extends BaseTimeEntity {
                 .startDate(LocalDateTime.now())
                 .endDate(endDate)
                 .startPrice(startPrice)
-                .currentPrice(0)
+                .currentPrice(0L)
                 .latitude(latitude)
                 .longitude(longitude)
                 .category(category)
@@ -161,5 +161,9 @@ public class Auction extends BaseTimeEntity {
         if (this.startPrice > bidPrice) {
             throw new CustomException(ErrorCode.BID_PRICE_TOO_LOW_STARTING_PRICE);
         }
+    }
+
+    public void updateStatus(AuctionStatus status) {
+        this.status = status;
     }
 }

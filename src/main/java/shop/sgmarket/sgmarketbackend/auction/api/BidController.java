@@ -41,4 +41,11 @@ public class BidController implements BidDocs {
 
         return ApiResponseTemplate.ok("입찰 목록 조회에 성공했습니다", response);
     }
+
+    @PostMapping("/settle")
+    public ApiResponseTemplate<BidInfoResponse> settleBid(@PathVariable Long auctionId) {
+        BidInfoResponse response = bidService.settleBid(auctionId);
+
+        return ApiResponseTemplate.ok("낙찰 처리가 완료되었습니다", response);
+    }
 }

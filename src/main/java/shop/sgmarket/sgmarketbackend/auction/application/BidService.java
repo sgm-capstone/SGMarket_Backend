@@ -67,4 +67,26 @@ public class BidService {
         );
     }
 
+    @Transactional
+    public BidInfoResponse settleBid(Long auctionId) {
+        Member member = memberUtil.getCurrentMember();
+        Auction auction = auctionRepository.findById(auctionId)
+                .orElseThrow(() -> new CustomException(ErrorCode.AUCTION_NOT_FOUND));
+
+        if (auction.getStatus() != AuctionStatus.BIDDING) {
+            throw new CustomException(ErrorCode.AUCTION_NOT_BIDDING);
+        }
+
+        if (!Objects.equals(member.getId(), auction.getMember().getId())) {
+            throw new CustomException(ErrorCode.NOT_AUCTION_OWNER);
+        }
+
+        Bid bid = bidRepository.findTopByAuctionOrderByCreatedAtDesc(auction)
+                .orElseThrow(() -> new CustomException(ErrorCode.BID_NOT_FOUND));
+
+        auction.updateStatus(AuctionStatus.COMPLETED);
+
+        return BidInfoResponse.of(bid.getPrice(), bid.getMember());
+    }
+
 }
