@@ -39,7 +39,9 @@ public class AuctionService {
         Member member = memberUtil.getCurrentMember();
 
         String imageUrl = getImageUrl(member, itemImage);
-        Item item = Item.createItem(request.itemRegisterRequest().itemName());
+        String itemName = request.itemRegisterRequest().itemName();
+        Item item = itemRepository.findByName(itemName)
+                .orElseGet(() -> itemRepository.save(Item.createItem(itemName)));
 
         Auction auction = Auction.create(
                 request.title(),
@@ -74,7 +76,8 @@ public class AuctionService {
                 .orElseThrow(() -> new CustomException(ErrorCode.AUCTION_NOT_FOUND));
         Member author = auction.getMember();
 
-        Slice<Auction> auctions = auctionRepository.findAllByMemberAndStatusAndIdNot(author, AuctionStatus.BIDDING, auctionId, pageable);
+        Slice<Auction> auctions = auctionRepository.findAllByMemberAndStatusAndIdNot(author, AuctionStatus.BIDDING,
+                auctionId, pageable);
 
         Slice<AuctionInfoResponse> auctionInfoResponses = auctions.map(otherAuction ->
                 AuctionInfoResponse.of(otherAuction, otherAuction.getItem(), author)
