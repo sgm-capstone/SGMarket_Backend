@@ -44,6 +44,9 @@ public class Auction extends BaseTimeEntity {
 
     private String description;
 
+    @Column(name = "image_url")
+    private String imageUrl;
+
     @Column(name = "start_date")
     private LocalDateTime startDate;
 
@@ -87,12 +90,13 @@ public class Auction extends BaseTimeEntity {
     private AuctionStatus status;
 
     @Builder(access = AccessLevel.PRIVATE)
-    private Auction(String title, String description, LocalDateTime startDate, LocalDateTime endDate,
+    private Auction(String title, String description, String imageUrl, LocalDateTime startDate, LocalDateTime endDate,
                     long startPrice, long currentPrice, Long endPrice, Double latitude,
                     Double longitude, AuctionCategory category, long likeCount, Item item, Member member,
                     AuctionStatus status) {
         this.title = title;
         this.description = description;
+        this.imageUrl = imageUrl;
         this.startDate = startDate;
         this.endDate = endDate;
         this.startPrice = startPrice;
@@ -107,12 +111,13 @@ public class Auction extends BaseTimeEntity {
         this.status = status;
     }
 
-    public static Auction create(String title, String description, LocalDateTime endDate,
+    public static Auction create(String title, String description, String imageUrl, LocalDateTime endDate,
                                  long startPrice, Double latitude, Double longitude,
                                  AuctionCategory category, Item item, Member member) {
         return Auction.builder()
                 .title(title)
                 .description(description)
+                .imageUrl(imageUrl)
                 .startDate(LocalDateTime.now())
                 .endDate(endDate)
                 .startPrice(startPrice)
@@ -127,9 +132,10 @@ public class Auction extends BaseTimeEntity {
                 .build();
     }
 
-    public void update(String title, String description, LocalDateTime endDate,
+    public void update(String title, String description, String imageUrl, LocalDateTime endDate,
                        AuctionCategory category) {
         this.title = title;
+        this.imageUrl = imageUrl;
         this.description = description;
         this.endDate = endDate;
         this.category = category;

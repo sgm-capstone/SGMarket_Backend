@@ -39,11 +39,12 @@ public class AuctionService {
         Member member = memberUtil.getCurrentMember();
 
         String imageUrl = getImageUrl(member, itemImage);
-        Item item = Item.createItem(request.itemRegisterRequest().itemName(), imageUrl);
+        Item item = Item.createItem(request.itemRegisterRequest().itemName());
 
         Auction auction = Auction.create(
                 request.title(),
                 request.description(),
+                imageUrl,
                 request.endDate(),
                 request.startPrice(),
                 member.getLocation().getLatitude(),
@@ -117,12 +118,12 @@ public class AuctionService {
         auction.update(
                 request.title(),
                 request.description(),
+                getImageUrl(member, itemImage),
                 request.endDate(),
                 AuctionCategory.from(request.auctionCategory())
         );
 
-        String image = getImageUrl(member, itemImage);
-        auction.getItem().update(request.itemName(), image);
+        auction.getItem().update(request.itemName());
 
         return AuctionInfoResponse.of(auction, auction.getItem(), auction.getMember());
     }
