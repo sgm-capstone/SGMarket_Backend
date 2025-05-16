@@ -51,4 +51,14 @@ public class BidController implements BidDocs {
 
         return ApiResponseTemplate.ok("낙찰 처리가 완료되었습니다", response);
     }
+
+    @Override
+    @GetMapping("/max")
+    public ApiResponseTemplate<BidInfoResponse> getMaxBidForAuction(
+            @PathVariable Long auctionId
+    ) {
+        BidInfoResponse response = bidService.getMaxBidForAuction(auctionId);
+
+        return ApiResponseTemplate.ok("경매 최대 입찰가 조회에 성공했습니다.", response);
+    }
 }
