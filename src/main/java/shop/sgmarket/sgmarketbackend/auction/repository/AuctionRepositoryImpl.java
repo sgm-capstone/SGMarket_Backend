@@ -7,6 +7,7 @@ import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -73,5 +74,18 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
                 lngField,
                 lng
         );
+    }
+
+    @Override
+    public Optional<Long> findItemIdByAuctionId(Long auctionId) {
+        QAuction auction = QAuction.auction;
+
+        Long itemId = queryFactory
+                .select(auction.item.id)
+                .from(auction)
+                .where(auction.id.eq(auctionId))
+                .fetchOne();
+
+        return Optional.ofNullable(itemId);
     }
 }

@@ -2,14 +2,21 @@ package shop.sgmarket.sgmarketbackend.auction.application;
 
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import shop.sgmarket.sgmarketbackend.auction.domain.*;
+import shop.sgmarket.sgmarketbackend.auction.domain.Auction;
+import shop.sgmarket.sgmarketbackend.auction.domain.AuctionStatus;
+import shop.sgmarket.sgmarketbackend.auction.domain.Bid;
+import shop.sgmarket.sgmarketbackend.auction.domain.PriceHistory;
 import shop.sgmarket.sgmarketbackend.auction.dto.request.BidRegisterRequest;
 import shop.sgmarket.sgmarketbackend.auction.dto.response.BidInfoResponse;
 import shop.sgmarket.sgmarketbackend.auction.repository.AuctionRepository;
 import shop.sgmarket.sgmarketbackend.auction.repository.BidRepository;
+import shop.sgmarket.sgmarketbackend.auction.repository.PriceHistoryRepository;
 import shop.sgmarket.sgmarketbackend.global.dto.SliceResponse;
 import shop.sgmarket.sgmarketbackend.global.error.ErrorCode;
 import shop.sgmarket.sgmarketbackend.global.error.exception.CustomException;
@@ -19,9 +26,11 @@ import shop.sgmarket.sgmarketbackend.member.domain.Member;
 @Service
 @RequiredArgsConstructor
 public class BidService {
+
     private final AuctionRepository auctionRepository;
     private final BidRepository bidRepository;
     private final MemberUtil memberUtil;
+    private final PriceHistoryRepository priceHistoryRepository;
 
     @Transactional
     public BidInfoResponse bid(Long auctionId, BidRegisterRequest bidRequest) {
@@ -66,6 +75,11 @@ public class BidService {
                 .orElseThrow(() -> new CustomException(ErrorCode.BID_NOT_FOUND));
 
         auction.updateStatus(AuctionStatus.COMPLETED);
+        PriceHistory priceHistory = PriceHistory.createPriceHistory(
+                auction.getItem(),
+                winningBid.getPrice()
+        );
+        priceHistoryRepository.save(priceHistory);
 
         return BidInfoResponse.of(winningBid.getPrice(), winningBid.getMember());
     }

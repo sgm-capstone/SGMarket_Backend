@@ -16,4 +16,5 @@ public interface AuctionRepository extends JpaRepository<Auction, Long>, Auction
             Long excludedAuctionId,
             Pageable pageable
     );
+
 }

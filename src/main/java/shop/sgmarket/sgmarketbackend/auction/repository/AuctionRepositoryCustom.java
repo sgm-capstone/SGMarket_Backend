@@ -1,5 +1,6 @@
 package shop.sgmarket.sgmarketbackend.auction.repository;
 
+import java.util.Optional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import shop.sgmarket.sgmarketbackend.auction.domain.Auction;
@@ -13,6 +14,7 @@ public interface AuctionRepositoryCustom {
             AuctionCategory category,
             Pageable pageable
     );
+    Optional<Long> findItemIdByAuctionId(Long auctionId);
 }
 
 

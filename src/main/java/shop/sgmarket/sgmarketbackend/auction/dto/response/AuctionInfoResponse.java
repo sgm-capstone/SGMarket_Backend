@@ -32,7 +32,7 @@ public record AuctionInfoResponse(
                 .auctionStartPrice(auction.getStartPrice())
                 .auctionCurrentPrice(auction.getCurrentPrice())
                 .auctionEndPrice(auction.getEndPrice())
-                .auctionImageUrl(item.getImageUrl())
+                .auctionImageUrl(auction.getImageUrl())
                 .auctionCategory(auction.getCategory().getName())
                 .likeCount(auction.getLikeCount())
                 .auctionItem(AuctionInfoResponse.ItemInfo.from(item))
@@ -41,22 +41,29 @@ public record AuctionInfoResponse(
                 .build();
     }
 
+    @Builder
     public record ItemInfo(
             String itemName
     ) {
         public static ItemInfo from(Item item) {
-            return new ItemInfo(item.getName());
+            return ItemInfo.builder()
+                    .itemName(item.getName())
+                    .build();
         }
     }
 
+    @Builder
     public record MemberInfo(
             Long memberId,
             String memberName,
             String memberProfileImageUrl
     ) {
         public static MemberInfo from(Member member) {
-            return new MemberInfo(member.getId(), member.getNickname(),
-                    member.getOauthInfo().getOauthProfileImageUrl());
+            return MemberInfo.builder()
+                    .memberId(member.getId())
+                    .memberName(member.getNickname())
+                    .memberProfileImageUrl(member.getOauthInfo().getOauthProfileImageUrl())
+                    .build();
         }
     }
 }
