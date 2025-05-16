@@ -69,4 +69,18 @@ public interface BidDocs {
             @Parameter(description = "낙찰 처리할 경매 ID", required = true)
             Long auctionId
     );
+
+    @Operation(
+            summary = "경매 최대 입찰가 조회",
+            description = "특정 경매에서 현재까지 제시된 입찰 중 가장 높은 입찰가 정보를 조회합니다.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "경매 최대 입찰가 조회에 성공했습니다."),
+                    @ApiResponse(responseCode = "404", description = "해당 ID의 경매 또는 입찰이 존재하지 않습니다.")
+            }
+    )
+    ApiResponseTemplate<BidInfoResponse> getMaxBidForAuction(
+            @Parameter(description = "입찰 정보를 조회할 경매 ID", required = true)
+            Long auctionId
+    );
+
 }

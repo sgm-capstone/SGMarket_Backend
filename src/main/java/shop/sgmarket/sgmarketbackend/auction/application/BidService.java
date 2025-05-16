@@ -69,6 +69,16 @@ public class BidService {
 
         return BidInfoResponse.of(winningBid.getPrice(), winningBid.getMember());
     }
+    
+    @Transactional(readOnly = true)
+    public BidInfoResponse getMaxBidForAuction(Long auctionId) {
+        Auction auction = getAuctionOrThrow(auctionId);
+
+        Bid maxBid = bidRepository.findTopByAuctionOrderByPriceDesc(auction)
+                .orElseThrow(() -> new CustomException(ErrorCode.BID_NOT_FOUND));
+
+        return BidInfoResponse.of(maxBid.getPrice(), maxBid.getMember());
+    }
 
     private Auction getAuctionOrThrow(Long auctionId) {
         return auctionRepository.findById(auctionId)
