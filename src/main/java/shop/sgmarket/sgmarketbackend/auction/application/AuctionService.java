@@ -126,6 +126,13 @@ public class AuctionService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public AuctionInfoResponse getRandomAuction() {
+        Auction auction = auctionRepository.findRandomAuctionByStatus(AuctionStatus.BIDDING)
+                .orElseThrow(() -> new CustomException(ErrorCode.AUCTION_NOT_FOUND));
+
+        return AuctionInfoResponse.of(auction, auction.getItem(), auction.getMember());
+    }
 
     @Transactional
     public AuctionInfoResponse updateAuction(Long auctionId, AuctionUpdateRequest request, MultipartFile itemImage) {

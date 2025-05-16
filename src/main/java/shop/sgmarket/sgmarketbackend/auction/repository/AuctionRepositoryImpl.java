@@ -88,4 +88,30 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
 
         return Optional.ofNullable(itemId);
     }
+
+    @Override
+    public Optional<Auction> findRandomAuctionByStatus(AuctionStatus status) {
+        QAuction auction = QAuction.auction;
+
+        Long count = queryFactory
+                .select(auction.count())
+                .from(auction)
+                .where(auction.status.eq(status))
+                .fetchOne();
+
+        if (count == null || count == 0) {
+            return Optional.empty();
+        }
+
+        int randomOffset = (int) (Math.random() * count);
+
+        Auction result = queryFactory
+                .selectFrom(auction)
+                .where(auction.status.eq(status))
+                .offset(randomOffset)
+                .limit(1)
+                .fetchOne();
+
+        return Optional.ofNullable(result);
+    }
 }
