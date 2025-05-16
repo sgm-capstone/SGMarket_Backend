@@ -100,8 +100,14 @@ public class AuctionController implements AuctionDocs {
     ) {
         List<PriceHistoryInfoResponse> response = auctionService.getPriceHistoryByAuctionId(auctionId);
 
-        return ApiResponseTemplate.ok(response)
-                .message("경매 가격 이력 조회에 성공했습니다.");
+        return ApiResponseTemplate.ok("경매 가격 이력 조회에 성공했습니다.", response);
+    }
+
+    @GetMapping("/random")
+    public ApiResponseTemplate<AuctionInfoResponse> getRandomAuction() {
+        AuctionInfoResponse response = auctionService.getRandomAuction();
+
+        return ApiResponseTemplate.ok("랜덤 경매 조회에 성공했습니다.", response);
     }
 
     @Override

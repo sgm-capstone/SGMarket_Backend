@@ -106,6 +106,19 @@ public interface AuctionDocs {
             @PathVariable Long auctionId
     );
 
+    @Operation(
+            summary = "랜덤 경매 조회",
+            description = "활성화된 경매 중 하나를 랜덤으로 조회합니다.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "랜덤 경매 조회에 성공했습니다.",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = AuctionInfoResponse.class))
+                    ),
+                    @ApiResponse(responseCode = "404", description = "조건에 맞는 경매가 존재하지 않습니다.")
+            }
+    )
+    @GetMapping("/random")
+    ApiResponseTemplate<AuctionInfoResponse> getRandomAuction();
+
     @Operation(summary = "경매 삭제", description = "경매 ID로 경매를 삭제합니다.")
     ApiResponseTemplate<Void> deleteAuction(
             @Parameter(description = "삭제할 경매 ID", required = true)
