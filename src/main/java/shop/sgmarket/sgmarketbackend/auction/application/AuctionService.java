@@ -1,5 +1,6 @@
 package shop.sgmarket.sgmarketbackend.auction.application;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -10,11 +11,14 @@ import shop.sgmarket.sgmarketbackend.auction.domain.Auction;
 import shop.sgmarket.sgmarketbackend.auction.domain.AuctionCategory;
 import shop.sgmarket.sgmarketbackend.auction.domain.AuctionStatus;
 import shop.sgmarket.sgmarketbackend.auction.domain.Item;
+import shop.sgmarket.sgmarketbackend.auction.domain.PriceHistory;
 import shop.sgmarket.sgmarketbackend.auction.dto.request.AuctionRegisterRequest;
 import shop.sgmarket.sgmarketbackend.auction.dto.request.AuctionUpdateRequest;
 import shop.sgmarket.sgmarketbackend.auction.dto.response.AuctionInfoResponse;
+import shop.sgmarket.sgmarketbackend.auction.dto.response.PriceHistoryInfoResponse;
 import shop.sgmarket.sgmarketbackend.auction.repository.AuctionRepository;
 import shop.sgmarket.sgmarketbackend.auction.repository.ItemRepository;
+import shop.sgmarket.sgmarketbackend.auction.repository.PriceHistoryRepository;
 import shop.sgmarket.sgmarketbackend.global.dto.SliceResponse;
 import shop.sgmarket.sgmarketbackend.global.error.ErrorCode;
 import shop.sgmarket.sgmarketbackend.global.error.exception.CustomException;
@@ -33,6 +37,7 @@ public class AuctionService {
     private final AuctionRepository auctionRepository;
     private final MemberUtil memberUtil;
     private final S3UploadService s3UploadService;
+    private final PriceHistoryRepository priceHistoryRepository;
 
     @Transactional
     public AuctionInfoResponse register(AuctionRegisterRequest request, MultipartFile itemImage) {
@@ -108,6 +113,19 @@ public class AuctionService {
 
         return SliceResponse.from(auctionInfoResponses);
     }
+
+    @Transactional(readOnly = true)
+    public List<PriceHistoryInfoResponse> getPriceHistoryByAuctionId(Long auctionId) {
+        Long itemId = auctionRepository.findItemIdByAuctionId(auctionId)
+                .orElseThrow(() -> new CustomException(ErrorCode.AUCTION_NOT_FOUND));
+
+        List<PriceHistory> priceHistories = priceHistoryRepository.findAllByItemId(itemId);
+
+        return priceHistories.stream()
+                .map(PriceHistoryInfoResponse::from)
+                .toList();
+    }
+
 
     @Transactional
     public AuctionInfoResponse updateAuction(Long auctionId, AuctionUpdateRequest request, MultipartFile itemImage) {

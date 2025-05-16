@@ -1,6 +1,7 @@
 package shop.sgmarket.sgmarketbackend.auction.api;
 
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +22,7 @@ import shop.sgmarket.sgmarketbackend.auction.dto.request.AuctionRegisterRequest;
 import shop.sgmarket.sgmarketbackend.auction.dto.request.AuctionUpdateRequest;
 import shop.sgmarket.sgmarketbackend.auction.dto.response.AuctionInfoResponse;
 import shop.sgmarket.sgmarketbackend.auction.dto.response.AuctionToggleLikeResponse;
+import shop.sgmarket.sgmarketbackend.auction.dto.response.PriceHistoryInfoResponse;
 import shop.sgmarket.sgmarketbackend.global.dto.SliceResponse;
 import shop.sgmarket.sgmarketbackend.global.response.ApiResponseTemplate;
 
@@ -90,6 +92,16 @@ public class AuctionController implements AuctionDocs {
         AuctionInfoResponse response = auctionService.updateAuction(auctionId, request, itemImage);
 
         return ApiResponseTemplate.ok("경매 수정에 성공했습니다.", response);
+    }
+
+    @GetMapping("/{auctionId}/price-history")
+    public ApiResponseTemplate<List<PriceHistoryInfoResponse>> getPriceHistoryByAuctionId(
+            @PathVariable Long auctionId
+    ) {
+        List<PriceHistoryInfoResponse> response = auctionService.getPriceHistoryByAuctionId(auctionId);
+
+        return ApiResponseTemplate.ok(response)
+                .message("경매 가격 이력 조회에 성공했습니다.");
     }
 
     @Override
