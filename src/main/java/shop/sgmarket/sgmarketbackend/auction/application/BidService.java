@@ -1,6 +1,9 @@
 package shop.sgmarket.sgmarketbackend.auction.application;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -83,7 +86,7 @@ public class BidService {
 
         return BidInfoResponse.of(winningBid.getPrice(), winningBid.getMember());
     }
-    
+
     @Transactional(readOnly = true)
     public BidInfoResponse getMaxBidForAuction(Long auctionId) {
         Auction auction = getAuctionOrThrow(auctionId);
@@ -116,4 +119,32 @@ public class BidService {
             throw new CustomException(ErrorCode.NOT_AUCTION_OWNER);
         }
     }
+
+    @Transactional
+    public void closeExpiredAuctions() {
+        List<Auction> expiredAuctions = auctionRepository.findAllByEndDateBeforeAndStatus(
+                LocalDateTime.now(), AuctionStatus.BIDDING);
+
+        for (Auction auction : expiredAuctions) {
+            closeAuction(auction);
+        }
+    }
+
+    private void closeAuction(Auction auction) {
+        Optional<Bid> optionalHighestBid = bidRepository.findTopByAuctionOrderByPriceDesc(auction);
+
+        if (optionalHighestBid.isEmpty()) {
+            auction.updateStatus(AuctionStatus.FAILED);
+            return;
+        }
+
+        Bid highestBid = optionalHighestBid.get();
+        auction.updateStatus(AuctionStatus.COMPLETED);
+
+        PriceHistory priceHistory = PriceHistory.createPriceHistory(
+                auction.getItem(),
+                highestBid.getPrice());
+        priceHistoryRepository.save(priceHistory);
+    }
+
 }
