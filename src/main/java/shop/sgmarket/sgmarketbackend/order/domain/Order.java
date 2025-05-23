@@ -51,9 +51,10 @@ public class Order {
         this.orderDate = LocalDateTime.now();
     }
 
-    public void addOrderItem(OrderItem orderItem) {
+    public Order addOrderItem(OrderItem orderItem) {
         orderItems.add(orderItem);
-        orderItem.setOrder(this);
+        orderItem.assignToOrder(this);
+        return this;
     }
 
     public void cancel() {
