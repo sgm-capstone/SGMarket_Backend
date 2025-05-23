@@ -8,11 +8,13 @@ import shop.sgmarket.sgmarketbackend.member.domain.Member;
 import shop.sgmarket.sgmarketbackend.member.domain.MemberLocation;
 import shop.sgmarket.sgmarketbackend.member.dto.request.MemberUpdateRequest;
 import shop.sgmarket.sgmarketbackend.member.dto.response.MemberInfoResponse;
-import shop.sgmarket.sgmarketbackend.member.dto.response.MemberUpdateResponse;
 
 @Service
 @RequiredArgsConstructor
 public class MemberService {
+
+
+
     private final MemberUtil memberUtil;
 
     @Transactional(readOnly = true)
@@ -23,7 +25,7 @@ public class MemberService {
     }
 
     @Transactional
-    public MemberUpdateResponse updateProfile(final MemberUpdateRequest memberUpdateRequest) {
+    public MemberInfoResponse updateProfile(final MemberUpdateRequest memberUpdateRequest) {
         Member member = memberUtil.getCurrentMember();
         MemberLocation memberLocation = MemberLocation.createMemberLocation(
                 memberUpdateRequest.address(),
@@ -33,6 +35,6 @@ public class MemberService {
 
         member.updateProfile(memberLocation, memberUpdateRequest.nickname());
 
-        return MemberUpdateResponse.from(member);
+        return MemberInfoResponse.from(member);
     }
 }
