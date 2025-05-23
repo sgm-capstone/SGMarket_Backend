@@ -17,12 +17,13 @@ public record AuctionInfoResponse(
         Long auctionEndPrice,
         String auctionImageUrl,
         String auctionCategory,
+        boolean isLiked,
         long likeCount,
         ItemInfo auctionItem,
         MemberInfo auctionMember,
         String status
 ) {
-    public static AuctionInfoResponse of(Auction auction, Item item, Member member) {
+    public static AuctionInfoResponse of(Auction auction, Item item, Member member, boolean isLiked) {
         return AuctionInfoResponse.builder()
                 .auctionId(auction.getId())
                 .auctionTitle(auction.getTitle())
@@ -35,6 +36,7 @@ public record AuctionInfoResponse(
                 .auctionImageUrl(auction.getImageUrl())
                 .auctionCategory(auction.getCategory().getName())
                 .likeCount(auction.getLikeCount())
+                .isLiked(isLiked)
                 .auctionItem(AuctionInfoResponse.ItemInfo.from(item))
                 .auctionMember(MemberInfo.from(member))
                 .status(auction.getStatus().name())

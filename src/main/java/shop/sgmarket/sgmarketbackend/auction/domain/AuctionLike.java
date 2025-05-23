@@ -13,6 +13,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import shop.sgmarket.sgmarketbackend.global.domain.BaseTimeEntity;
 import shop.sgmarket.sgmarketbackend.member.domain.Member;
 
 @Entity
@@ -21,7 +22,7 @@ import shop.sgmarket.sgmarketbackend.member.domain.Member;
 @Table(
         uniqueConstraints = @UniqueConstraint(columnNames = {"member_id", "auction_id"})
 )
-public class AuctionLike {
+public class AuctionLike extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
