@@ -143,10 +143,15 @@ public class AuctionService {
 
         validateAuthority(member, auction);
 
+        String updatedImageUrl = auction.getImageUrl();
+        if (itemImage != null && !itemImage.isEmpty()) {
+            updatedImageUrl = getImageUrl(member, itemImage);
+        }
+
         auction.update(
                 request.title(),
                 request.description(),
-                getImageUrl(member, itemImage),
+                updatedImageUrl,
                 request.endDate(),
                 AuctionCategory.from(request.auctionCategory())
         );
