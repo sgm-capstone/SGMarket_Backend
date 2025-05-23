@@ -19,6 +19,7 @@ public enum ErrorCode {
     BID_PRICE_TOO_LOW_STARTING_PRICE(HttpStatus.BAD_REQUEST, "AUCTION_4002", "입찰 금액이 시작가보다 낮습니다."),
     CANNOT_BID_OWN_AUCTION(HttpStatus.BAD_REQUEST, "AUCTION_4003", "자신의 경매에 입찰할 수 없습니다."),
     AUCTION_NOT_BIDDING(HttpStatus.BAD_REQUEST, "AUCTION_4004", "경매가 진행 중이 아닙니다."),
+    PAYMENT_WEBHOOK_ERROR(HttpStatus.BAD_REQUEST, "PAYMENT_4001", "웹훅 처리 중 오류가 발생했습니다."),
     NOT_AUCTION_OWNER(HttpStatus.FORBIDDEN, "AUCTION_4031", "경매의 판매자가 아닙니다."),
 
     // 401 UNAUTHORIZED
