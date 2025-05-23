@@ -9,6 +9,7 @@ import shop.sgmarket.sgmarketbackend.global.response.ApiResponseTemplate;
 import shop.sgmarket.sgmarketbackend.order.application.OrderService;
 import shop.sgmarket.sgmarketbackend.order.dto.request.OrderRequest;
 import shop.sgmarket.sgmarketbackend.order.dto.response.OrderResponse;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -46,5 +47,17 @@ public class OrderController {
     ) {
         OrderResponse response = orderService.cancelOrder(orderId);
         return ApiResponseTemplate.ok("주문 취소에 성공했습니다.", response);
+    }
+
+    @GetMapping("/members/{memberId}")
+    @Operation(
+        summary = "회원별 주문 목록 조회", 
+        description = "특정 회원의 모든 주문 목록을 조회합니다."
+    )
+    public ApiResponseTemplate<List<OrderResponse>> getMemberOrders(
+            @Parameter(description = "회원 ID", required = true)
+            @PathVariable Long memberId) {
+        List<OrderResponse> response = orderService.getMemberOrders(memberId);
+        return ApiResponseTemplate.ok("회원의 주문 목록 조회에 성공했습니다.", response);
     }
 }
