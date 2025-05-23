@@ -36,7 +36,9 @@ public class SecurityConfig {
                                                 "/ws-stomp",
                                                 "/chat/**",
                                                 "/sub/**",
-                                                "/pub/**"
+                                                "/pub/**",
+                                                "/payments/**",
+                                                "/test/**"
                                         ).permitAll()
                                         .requestMatchers("/auth/**")
                                         .permitAll()

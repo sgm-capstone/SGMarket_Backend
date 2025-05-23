@@ -11,6 +11,8 @@ spring:
       - security
       - redis
       - cloud
+      - imp
+
 
 swagger:
   url: ${SERVER_URL:http://localhost:8080}
