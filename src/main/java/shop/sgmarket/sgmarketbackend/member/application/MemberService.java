@@ -98,6 +98,4 @@ public class MemberService {
 
         return SliceResponse.from(responseSlice);
     }
-
-
 }

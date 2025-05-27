@@ -40,6 +40,7 @@ public class MemberController implements MemberDocs {
                 .message("프로필 업데이트 완료");
     }
 
+    @Override
     @GetMapping("/auctions")
     public ApiResponseTemplate<SliceResponse<AuctionInfoResponse>> getMyAuctions(@ParameterObject Pageable pageable) {
         SliceResponse<AuctionInfoResponse> response = memberService.getMyAuctions(pageable);
@@ -48,6 +49,7 @@ public class MemberController implements MemberDocs {
                 .message("내 경매 목록 조회 완료");
     }
 
+    @Override
     @GetMapping("/auctions-likes")
     public ApiResponseTemplate<SliceResponse<AuctionInfoResponse>> getMyLikedAuctions(@ParameterObject Pageable pageable) {
         SliceResponse<AuctionInfoResponse> response = memberService.getMyLikedAuctions(pageable);
@@ -56,6 +58,7 @@ public class MemberController implements MemberDocs {
                 .message("내가 좋아요한 경매 목록 조회 완료");
     }
 
+    @Override
     @GetMapping("/auctions-bids")
     public ApiResponseTemplate<SliceResponse<AuctionInfoResponse>> getMyBiddedAuctions(@ParameterObject Pageable pageable) {
         SliceResponse<AuctionInfoResponse> response = memberService.getMyBiddedAuctions(pageable);
