@@ -65,7 +65,10 @@ public class ChatServiceImpl implements ChatService {
 
         // 새 1:1 채팅방 생성
         String roomId = UUID.randomUUID().toString();
-        String roomName = String.format("direct_%d_%d_item_%d", Math.min(senderId, receiverId), Math.max(senderId, receiverId),itemId);
+        String roomName = String.format("direct_%d_%d_item_%d", 
+            Math.min(senderId, receiverId), 
+            Math.max(senderId, receiverId),
+            itemId);
         
         ChatRoom room = ChatRoom.builder()
                 .id(roomId)
@@ -78,7 +81,7 @@ public class ChatServiceImpl implements ChatService {
         
         ChatRoom savedRoom = chatRoomRepository.createRoom(room);
 
-        // 초기 메시지가 있다면 전송
+        // 초기 메시지가 있고 비어있지 않은 경우에만 전송
         if (initialMessage != null && !initialMessage.trim().isEmpty()) {
             ChatMessage message = new ChatMessage(
                 roomId,
@@ -89,6 +92,7 @@ public class ChatServiceImpl implements ChatService {
                 LocalDateTime.now()
             );
             redisPublisher.publish(message);
+            chatMessageService.saveMessage(roomId, message);  // 메시지 저장 추가
         }
 
         return savedRoom;
