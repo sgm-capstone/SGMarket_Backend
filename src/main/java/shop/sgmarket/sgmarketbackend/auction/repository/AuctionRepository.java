@@ -20,4 +20,5 @@ public interface AuctionRepository extends JpaRepository<Auction, Long>, Auction
     );
 
     List<Auction> findAllByEndDateBeforeAndStatus(LocalDateTime time, AuctionStatus status);
+    Slice<Auction> findByMember(Member member, Pageable pageable);
 }

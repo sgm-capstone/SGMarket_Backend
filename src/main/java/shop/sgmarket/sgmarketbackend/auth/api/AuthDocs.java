@@ -13,7 +13,6 @@ import java.io.IOException;
 import org.springframework.web.bind.annotation.PostMapping;
 import shop.sgmarket.sgmarketbackend.auth.dto.response.AccessTokenResponse;
 import shop.sgmarket.sgmarketbackend.auth.dto.response.AuthTokenResponse;
-import shop.sgmarket.sgmarketbackend.auth.dto.response.UserInfoResponse;
 
 @Tag(name = "[인증 API]", description = "인증 관련 API")
 public interface AuthDocs {
@@ -32,14 +31,6 @@ public interface AuthDocs {
             HttpServletResponse response
     ) throws IOException;
 
-    @Operation(summary = "현재 로그인한 사용자 정보 조회", description = "현재 로그인한 사용자의 정보를 조회합니다.",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "사용자 정보 조회 성공",
-                            content = @Content(schema = @Schema(implementation = UserInfoResponse.class))),
-                    @ApiResponse(responseCode = "401", description = "인증되지 않은 접근"),
-                    @ApiResponse(responseCode = "500", description = "서버 오류")
-            })
-    UserInfoResponse getCurrentUser();
     @PostMapping("/access-token")
     @Operation(summary = "액세스 토큰 재발급", description = "리프레시 토큰을 통해 새로운 액세스 토큰을 발급합니다.",
             responses = {
