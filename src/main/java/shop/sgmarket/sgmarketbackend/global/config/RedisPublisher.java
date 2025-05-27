@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Service;
-import shop.sgmarket.sgmarketbackend.chat.dto.ChatMessage;
+import shop.sgmarket.sgmarketbackend.chat.dto.response.ChatMessage;
 
 @Slf4j
 @Service

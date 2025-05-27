@@ -1,4 +1,4 @@
-package shop.sgmarket.sgmarketbackend.chat.dto;
+package shop.sgmarket.sgmarketbackend.chat.dto.response;
 
 import shop.sgmarket.sgmarketbackend.chat.domain.MessageType;
 import java.time.LocalDateTime;

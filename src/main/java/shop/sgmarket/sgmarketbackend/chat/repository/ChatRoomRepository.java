@@ -42,8 +42,8 @@ public class ChatRoomRepository {
                 .getResultList();
     }
 
-    public ChatRoom findDirectChat(Long userId1, Long userId2) {
-        String roomName = String.format("direct_%d_%d", Math.min(userId1, userId2), Math.max(userId1, userId2));
+    public ChatRoom findDirectChat(Long userId1, Long userId2, Long itemId) {
+        String roomName = String.format("direct_%d_%d_item_%d", Math.min(userId1, userId2), Math.max(userId1, userId2),itemId);
         try {
             return em.createQuery("SELECT c FROM ChatRoom c WHERE c.name = :name AND c.isDirectChat = true", ChatRoom.class)
                     .setParameter("name", roomName)

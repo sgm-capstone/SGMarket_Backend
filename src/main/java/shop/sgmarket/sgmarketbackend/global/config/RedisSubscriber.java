@@ -7,7 +7,7 @@ import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
-import shop.sgmarket.sgmarketbackend.chat.dto.ChatMessage;
+import shop.sgmarket.sgmarketbackend.chat.dto.response.ChatMessage;
 
 @Slf4j
 @Service

@@ -3,7 +3,7 @@ package shop.sgmarket.sgmarketbackend.chat.application;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
-import shop.sgmarket.sgmarketbackend.chat.dto.ChatMessage;
+import shop.sgmarket.sgmarketbackend.chat.dto.response.ChatMessage;
 
 import java.util.List;
 
