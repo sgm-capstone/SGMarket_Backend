@@ -22,6 +22,7 @@ import shop.sgmarket.sgmarketbackend.chat.dto.response.ChatMessage;
 import shop.sgmarket.sgmarketbackend.chat.dto.request.DirectChatRequest;
 import shop.sgmarket.sgmarketbackend.chat.dto.response.DirectChatListResponse;
 import shop.sgmarket.sgmarketbackend.global.util.MemberUtil;
+import shop.sgmarket.sgmarketbackend.global.response.ApiResponseTemplate;
 
 import java.security.Principal;
 import java.util.List;
@@ -52,7 +53,7 @@ public class ChatController {
             @ApiResponse(responseCode = "400", description = "잘못된 요청 파라미터")
     })
     @PostMapping("/room")
-    public ChatRoom createRoom(
+    public ApiResponseTemplate<ChatRoom> createRoom(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "채팅방 생성 요청",
                     required    = true,
@@ -61,7 +62,7 @@ public class ChatController {
             @RequestBody ChatRoomRequest request
     ) {
         Long memberId = memberUtil.getCurrentMember().getId();
-        return chatService.createRoom(request.name(), memberId);
+        return ApiResponseTemplate.ok(chatService.createRoom(request.name(), memberId));
     }
 
     @Operation(
@@ -71,8 +72,8 @@ public class ChatController {
     @ApiResponse(responseCode = "200", description = "조회 성공",
             content = @Content(schema = @Schema(implementation = ChatRoom.class)))
     @GetMapping("/rooms")
-    public List<ChatRoom> getRooms() {
-        return chatService.findAllRooms();
+    public ApiResponseTemplate<List<ChatRoom>> getRooms() {
+        return ApiResponseTemplate.ok(chatService.findAllRooms());
     }
 
     // --------------------------- 1:1 DM --------------------------- //
@@ -87,7 +88,7 @@ public class ChatController {
             @ApiResponse(responseCode = "404", description = "수신자 회원을 찾을 수 없음")
     })
     @PostMapping("/direct")
-    public ChatRoom createDirectChat(
+    public ApiResponseTemplate<ChatRoom> createDirectChat(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "DM 생성 요청",
                     required    = true,
@@ -96,7 +97,7 @@ public class ChatController {
             @RequestBody DirectChatRequest request
     ) {
         Long senderId = memberUtil.getCurrentMember().getId();
-        return chatService.createDirectChat(senderId, request.receiverId(), request.itemId(), request.initialMessage());
+        return ApiResponseTemplate.ok(chatService.createDirectChat(senderId, request.receiverId(), request.itemId(), request.initialMessage()));
     }
 
     @Operation(
@@ -110,9 +111,9 @@ public class ChatController {
         content = @Content(schema = @Schema(implementation = DirectChatListResponse.class))
     )
     @GetMapping("/direct")
-    public List<DirectChatListResponse> getDirectChats() {
+    public ApiResponseTemplate<List<DirectChatListResponse>> getDirectChats() {
         Long userId = memberUtil.getCurrentMember().getId();
-        return chatService.findDirectChatsWithDetails(userId);
+        return ApiResponseTemplate.ok(chatService.findDirectChatsWithDetails(userId));
     }
 
     // --------------------------- WebSocket --------------------------- //
@@ -149,9 +150,9 @@ public class ChatController {
         }
     )
     @GetMapping("/room/{roomId}/messages")
-    public List<ChatMessage> getChatMessages(
+    public ApiResponseTemplate<List<ChatMessage>> getChatMessages(
             @PathVariable String roomId,
             @RequestParam(defaultValue = "50") int count) {
-        return chatMessageService.getMessages(roomId, count);
+        return ApiResponseTemplate.ok(chatMessageService.getMessages(roomId, count));
     }
 }
