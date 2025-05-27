@@ -18,7 +18,7 @@ import shop.sgmarket.sgmarketbackend.auction.domain.PriceHistory;
 import shop.sgmarket.sgmarketbackend.auction.dto.request.BidRegisterRequest;
 import shop.sgmarket.sgmarketbackend.auction.dto.response.BidInfoResponse;
 import shop.sgmarket.sgmarketbackend.auction.repository.AuctionRepository;
-import shop.sgmarket.sgmarketbackend.auction.repository.BidRepository;
+import shop.sgmarket.sgmarketbackend.auction.repository.bid.BidRepository;
 import shop.sgmarket.sgmarketbackend.auction.repository.PriceHistoryRepository;
 import shop.sgmarket.sgmarketbackend.global.dto.SliceResponse;
 import shop.sgmarket.sgmarketbackend.global.error.ErrorCode;

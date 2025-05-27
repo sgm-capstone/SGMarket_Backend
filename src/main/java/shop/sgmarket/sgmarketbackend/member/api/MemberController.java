@@ -55,4 +55,12 @@ public class MemberController implements MemberDocs {
         return ApiResponseTemplate.ok(response)
                 .message("내가 좋아요한 경매 목록 조회 완료");
     }
+
+    @GetMapping("/auctions-bids")
+    public ApiResponseTemplate<SliceResponse<AuctionInfoResponse>> getMyBiddedAuctions(@ParameterObject Pageable pageable) {
+        SliceResponse<AuctionInfoResponse> response = memberService.getMyBiddedAuctions(pageable);
+
+        return ApiResponseTemplate.ok(response)
+                .message("내가 입찰한 경매 목록 조회 완료");
+    }
 }

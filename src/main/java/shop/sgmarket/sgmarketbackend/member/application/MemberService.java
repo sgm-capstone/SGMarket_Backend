@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import shop.sgmarket.sgmarketbackend.auction.domain.Auction;
 import shop.sgmarket.sgmarketbackend.auction.dto.response.AuctionInfoResponse;
 import shop.sgmarket.sgmarketbackend.auction.repository.AuctionRepository;
+import shop.sgmarket.sgmarketbackend.auction.repository.bid.BidRepository;
 import shop.sgmarket.sgmarketbackend.auction.repository.auctionLike.AuctionLikeRepository;
 import shop.sgmarket.sgmarketbackend.global.dto.SliceResponse;
 import shop.sgmarket.sgmarketbackend.global.util.MemberUtil;
@@ -25,6 +26,7 @@ public class MemberService {
     private final MemberUtil memberUtil;
     private final AuctionRepository auctionRepository;
     private final AuctionLikeRepository auctionLikeRepository;
+    private final BidRepository bidRepository;
 
     @Transactional(readOnly = true)
     public MemberInfoResponse getMemberInfoFromId() {
@@ -77,4 +79,25 @@ public class MemberService {
         );
         return SliceResponse.from(responseSlice);
     }
+
+    @Transactional(readOnly = true)
+    public SliceResponse<AuctionInfoResponse> getMyBiddedAuctions(Pageable pageable) {
+        Member member = memberUtil.getCurrentMember();
+
+        Slice<Auction> auctionSlice =
+                bidRepository.findAuctionsByMember(member, pageable);
+
+        Slice<AuctionInfoResponse> responseSlice = auctionSlice.map(auction ->
+                AuctionInfoResponse.of(
+                        auction,
+                        auction.getItem(),
+                        member,
+                        auctionLikeRepository.existsByAuctionAndMember(auction, member)
+                )
+        );
+
+        return SliceResponse.from(responseSlice);
+    }
+
+
 }
