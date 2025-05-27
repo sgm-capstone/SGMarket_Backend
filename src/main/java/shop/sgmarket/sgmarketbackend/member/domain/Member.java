@@ -1,5 +1,6 @@
 package shop.sgmarket.sgmarketbackend.member.domain;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -44,7 +45,7 @@ public class Member extends BaseTimeEntity {
 
     private String nickname;
 
-    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     private List<Auction> auctions = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)

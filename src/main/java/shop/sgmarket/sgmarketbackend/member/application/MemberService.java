@@ -68,4 +68,13 @@ public class MemberService {
         return SliceResponse.from(auctionInfoResponses);
     }
 
+    @Transactional(readOnly = true)
+    public SliceResponse<AuctionInfoResponse> getMyLikedAuctions(Pageable pageable) {
+        Member member = memberUtil.getCurrentMember();
+        Slice<Auction> auctionSlice = auctionLikeRepository.findAuctionsByMember(member, pageable);
+        Slice<AuctionInfoResponse> responseSlice = auctionSlice.map(auction ->
+                AuctionInfoResponse.of(auction, auction.getItem(), member, true)
+        );
+        return SliceResponse.from(responseSlice);
+    }
 }
