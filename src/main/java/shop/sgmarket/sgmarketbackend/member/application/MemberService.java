@@ -87,12 +87,18 @@ public class MemberService {
         Slice<Auction> auctionSlice =
                 bidRepository.findAuctionsByMember(member, pageable);
 
+        List<Long> auctionIds = auctionSlice.stream()
+                .map(Auction::getId)
+                .toList();
+        List<Long> likedAuctionIds = auctionLikeRepository.findAuctionIdsByMemberAndAuctionIds(member, auctionIds);
+        Set<Long> likedAuctionIdSet = new HashSet<>(likedAuctionIds);
+
         Slice<AuctionInfoResponse> responseSlice = auctionSlice.map(auction ->
                 AuctionInfoResponse.of(
                         auction,
                         auction.getItem(),
                         member,
-                        auctionLikeRepository.existsByAuctionAndMember(auction, member)
+                        likedAuctionIdSet.contains(auction.getId())
                 )
         );
 
