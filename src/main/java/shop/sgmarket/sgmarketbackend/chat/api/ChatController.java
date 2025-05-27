@@ -18,8 +18,9 @@ import org.springframework.web.bind.annotation.*;
 import shop.sgmarket.sgmarketbackend.chat.application.ChatMessageService;
 import shop.sgmarket.sgmarketbackend.chat.application.ChatService;
 import shop.sgmarket.sgmarketbackend.chat.domain.ChatRoom;
-import shop.sgmarket.sgmarketbackend.chat.dto.ChatMessage;
-import shop.sgmarket.sgmarketbackend.chat.dto.DirectChatRequest;
+import shop.sgmarket.sgmarketbackend.chat.dto.response.ChatMessage;
+import shop.sgmarket.sgmarketbackend.chat.dto.request.DirectChatRequest;
+import shop.sgmarket.sgmarketbackend.chat.dto.response.DirectChatListResponse;
 import shop.sgmarket.sgmarketbackend.global.util.MemberUtil;
 
 import java.security.Principal;
@@ -95,19 +96,23 @@ public class ChatController {
             @RequestBody DirectChatRequest request
     ) {
         Long senderId = memberUtil.getCurrentMember().getId();
-        return chatService.createDirectChat(senderId, request.receiverId(), request.initialMessage());
+        return chatService.createDirectChat(senderId, request.receiverId(), request.itemId(), request.initialMessage());
     }
 
     @Operation(
             summary     = "내 DM 목록 조회",
-            description = "현재 로그인한 사용자가 참여 중인 모든 1:1 DM 채팅방을 반환합니다."
+            description = "현재 로그인한 사용자가 참여 중인 모든 1:1 DM 채팅방을 반환합니다. " +
+                         "각 채팅방의 상대방 정보와 마지막 메시지를 포함합니다."
     )
-    @ApiResponse(responseCode = "200", description = "조회 성공",
-            content = @Content(schema = @Schema(implementation = ChatRoom.class)))
+    @ApiResponse(
+        responseCode = "200", 
+        description = "조회 성공",
+        content = @Content(schema = @Schema(implementation = DirectChatListResponse.class))
+    )
     @GetMapping("/direct")
-    public List<ChatRoom> getDirectChats() {
+    public List<DirectChatListResponse> getDirectChats() {
         Long userId = memberUtil.getCurrentMember().getId();
-        return chatService.findDirectChats(userId);
+        return chatService.findDirectChatsWithDetails(userId);
     }
 
     // --------------------------- WebSocket --------------------------- //
