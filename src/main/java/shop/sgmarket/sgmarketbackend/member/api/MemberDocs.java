@@ -7,13 +7,16 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import shop.sgmarket.sgmarketbackend.auction.dto.response.AuctionInfoResponse;
+import shop.sgmarket.sgmarketbackend.global.dto.SliceResponse;
 import shop.sgmarket.sgmarketbackend.global.response.ApiResponseTemplate;
 import shop.sgmarket.sgmarketbackend.member.dto.request.MemberUpdateRequest;
 import shop.sgmarket.sgmarketbackend.member.dto.response.MemberInfoResponse;
-import shop.sgmarket.sgmarketbackend.member.dto.response.MemberUpdateResponse;
 
 @Tag(name = "회원 API", description = "회원 관련 API입니다.")
 public interface MemberDocs {
@@ -22,7 +25,8 @@ public interface MemberDocs {
             summary = "회원 정보 조회",
             description = "현재 로그인한 회원의 정보를 조회합니다.",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "회원 정보 조회 성공", content = @Content(schema = @Schema(implementation = MemberInfoResponse.class))),
+                    @ApiResponse(responseCode = "200", description = "회원 정보 조회 성공",
+                            content = @Content(schema = @Schema(implementation = MemberInfoResponse.class))),
                     @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자입니다.")
             }
     )
@@ -38,14 +42,57 @@ public interface MemberDocs {
                     content = @Content(schema = @Schema(implementation = MemberUpdateRequest.class))
             ),
             responses = {
-                    @ApiResponse(responseCode = "200", description = "프로필 수정 성공", content = @Content(schema = @Schema(implementation = MemberUpdateResponse.class))),
+                    @ApiResponse(responseCode = "200", description = "프로필 수정 성공",
+                            content = @Content(schema = @Schema(implementation = MemberInfoResponse.class))),
                     @ApiResponse(responseCode = "400", description = "유효하지 않은 요청입니다."),
                     @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자입니다.")
             }
     )
     @PatchMapping
-    ApiResponseTemplate<MemberUpdateResponse> updateProfile(
+    ApiResponseTemplate<MemberInfoResponse> updateProfile(
             @Parameter(hidden = true)
             @RequestBody @Valid MemberUpdateRequest memberUpdateRequest
+    );
+
+    @Operation(
+            summary = "내 경매 목록 조회",
+            description = "현재 로그인한 회원이 등록한 경매 목록을 페이지 단위로 조회합니다.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "내 경매 목록 조회 성공",
+                            content = @Content(schema = @Schema(implementation = SliceResponse.class))),
+                    @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자입니다.")
+            }
+    )
+    @GetMapping("/auctions")
+    ApiResponseTemplate<SliceResponse<AuctionInfoResponse>> getMyAuctions(
+            @ParameterObject Pageable pageable
+    );
+
+    @Operation(
+            summary = "내가 좋아요한 경매 목록 조회",
+            description = "현재 로그인한 회원이 좋아요한 경매 목록을 페이지 단위로 조회합니다.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "내가 좋아요한 경매 목록 조회 성공",
+                            content = @Content(schema = @Schema(implementation = SliceResponse.class))),
+                    @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자입니다.")
+            }
+    )
+    @GetMapping("/auctions-likes")
+    ApiResponseTemplate<SliceResponse<AuctionInfoResponse>> getMyLikedAuctions(
+            @ParameterObject Pageable pageable
+    );
+
+    @Operation(
+            summary = "내가 입찰한 경매 목록 조회",
+            description = "현재 로그인한 회원이 입찰한 경매 목록을 페이지 단위로 조회합니다.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "내가 입찰한 경매 목록 조회 성공",
+                            content = @Content(schema = @Schema(implementation = SliceResponse.class))),
+                    @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자입니다.")
+            }
+    )
+    @GetMapping("/auctions-bids")
+    ApiResponseTemplate<SliceResponse<AuctionInfoResponse>> getMyBiddedAuctions(
+            @ParameterObject Pageable pageable
     );
 }

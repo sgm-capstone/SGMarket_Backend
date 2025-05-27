@@ -1,19 +1,25 @@
 package shop.sgmarket.sgmarketbackend.member.domain;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import shop.sgmarket.sgmarketbackend.auction.domain.Auction;
 import shop.sgmarket.sgmarketbackend.auth.domain.OAuthProvider;
 import shop.sgmarket.sgmarketbackend.global.domain.BaseTimeEntity;
 import shop.sgmarket.sgmarketbackend.global.domain.Status;
@@ -38,6 +44,9 @@ public class Member extends BaseTimeEntity {
     private MemberLocation location;
 
     private String nickname;
+
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    private List<Auction> auctions = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     private Status status;
