@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shop.sgmarket.sgmarketbackend.auction.domain.Auction;
 import shop.sgmarket.sgmarketbackend.auction.dto.response.AuctionInfoResponse;
-import shop.sgmarket.sgmarketbackend.auction.repository.AuctionRepository;
+import shop.sgmarket.sgmarketbackend.auction.repository.auction.AuctionRepository;
 import shop.sgmarket.sgmarketbackend.auction.repository.bid.BidRepository;
 import shop.sgmarket.sgmarketbackend.auction.repository.auctionLike.AuctionLikeRepository;
 import shop.sgmarket.sgmarketbackend.global.dto.SliceResponse;
