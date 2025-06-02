@@ -19,6 +19,8 @@ import shop.sgmarket.sgmarketbackend.auction.domain.QAuction;
 import shop.sgmarket.sgmarketbackend.auction.domain.QAuctionLike;
 import shop.sgmarket.sgmarketbackend.auction.dto.response.AuctionInfoResponse;
 import shop.sgmarket.sgmarketbackend.auction.dto.response.QAuctionInfoResponse;
+import shop.sgmarket.sgmarketbackend.auction.dto.response.QAuctionInfoResponse_ItemInfo;
+import shop.sgmarket.sgmarketbackend.auction.dto.response.QAuctionInfoResponse_MemberInfo;
 import shop.sgmarket.sgmarketbackend.member.domain.Member;
 
 @RequiredArgsConstructor
@@ -137,24 +139,28 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
                         auction.endPrice,
                         auction.imageUrl,
                         auction.category.stringValue(),
-                        // isLiked 계산: viewer 와 연관된 auction_like left join + coalesce
-                        auctionLike.member.eq(viewer)
-                                .and(auctionLike.auction.eq(auction))
-                                .coalesce(false),
+                        auctionLike.id.isNotNull().coalesce(false),
                         auction.likeCount,
-                        auction.item.name,
-                        auction.member.id,
-                        auction.member.nickname,
-                        auction.member.oauthInfo.oauthProfileImageUrl,
+                        new QAuctionInfoResponse_ItemInfo(
+                                auction.item.name
+                        ),
+                        new QAuctionInfoResponse_MemberInfo(
+                                auction.member.id,
+                                auction.member.nickname,
+                                auction.member.oauthInfo.oauthProfileImageUrl
+                        ),
                         auction.status.stringValue()
                 ))
                 .from(auction)
                 .join(auction.item, item)
                 .join(auction.member, member)
                 .leftJoin(auctionLike)
-                .on(auctionLike.auction.eq(auction)
-                        .and(auctionLike.member.eq(viewer)));
+                .on(
+                        auctionLike.auction.eq(auction)
+                                .and(auctionLike.member.eq(viewer))
+                );
     }
+
 
     private Slice<AuctionInfoResponse> fetchSlice(
             JPAQuery<AuctionInfoResponse> query,
