@@ -48,7 +48,7 @@ public class BidService {
 
         bidRepository.save(bid);
 
-        return BidInfoResponse.of(bid.getPrice(), bidder);
+        return BidInfoResponse.of(bid);
     }
 
     @Transactional(readOnly = true)
@@ -63,7 +63,7 @@ public class BidService {
 
         Slice<Bid> bids = bidRepository.findAllByAuction(auction, sortedPageable);
 
-        return SliceResponse.from(bids.map(bid -> BidInfoResponse.of(bid.getPrice(), bid.getMember())));
+        return SliceResponse.from(bids.map(BidInfoResponse::of));
     }
 
     @Transactional
@@ -84,7 +84,7 @@ public class BidService {
         );
         priceHistoryRepository.save(priceHistory);
 
-        return BidInfoResponse.of(winningBid.getPrice(), winningBid.getMember());
+        return BidInfoResponse.of(winningBid);
     }
 
     @Transactional(readOnly = true)
@@ -94,7 +94,7 @@ public class BidService {
         Bid maxBid = bidRepository.findTopByAuctionOrderByPriceDesc(auction)
                 .orElseThrow(() -> new CustomException(ErrorCode.BID_NOT_FOUND));
 
-        return BidInfoResponse.of(maxBid.getPrice(), maxBid.getMember());
+        return BidInfoResponse.of(maxBid);
     }
 
     private Auction getAuctionOrThrow(Long auctionId) {
