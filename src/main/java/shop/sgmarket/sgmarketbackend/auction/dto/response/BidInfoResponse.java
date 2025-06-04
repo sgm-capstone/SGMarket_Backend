@@ -1,17 +1,21 @@
 package shop.sgmarket.sgmarketbackend.auction.dto.response;
 
+import java.time.LocalDateTime;
 import lombok.Builder;
+import shop.sgmarket.sgmarketbackend.auction.domain.Bid;
 import shop.sgmarket.sgmarketbackend.member.domain.Member;
 
 @Builder
 public record BidInfoResponse(
         long bidPrice,
-        MemberInfo memberInfo
+        MemberInfo memberInfo,
+        LocalDateTime bidTime
 ) {
-    public static BidInfoResponse of(long bidPrice, Member member) {
+    public static BidInfoResponse of(Bid bid) {
         return BidInfoResponse.builder()
-                .bidPrice(bidPrice)
-                .memberInfo(MemberInfo.from(member))
+                .bidPrice(bid.getPrice())
+                .memberInfo(MemberInfo.from(bid.getMember()))
+                .bidTime(bid.getCreatedAt())
                 .build();
     }
 
