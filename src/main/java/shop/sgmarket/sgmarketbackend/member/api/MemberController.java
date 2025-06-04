@@ -88,6 +88,4 @@ public class MemberController implements MemberDocs {
         return ApiResponseTemplate.ok(response)
                 .message("해당 멤버의 경매 목록 조회 완료");
     }
-
-
 }
