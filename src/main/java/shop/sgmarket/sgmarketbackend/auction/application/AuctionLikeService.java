@@ -9,7 +9,7 @@ import shop.sgmarket.sgmarketbackend.auction.domain.AuctionLike;
 import shop.sgmarket.sgmarketbackend.auction.domain.AuctionStatus;
 import shop.sgmarket.sgmarketbackend.auction.dto.response.AuctionToggleLikeResponse;
 import shop.sgmarket.sgmarketbackend.auction.repository.auctionLike.AuctionLikeRepository;
-import shop.sgmarket.sgmarketbackend.auction.repository.AuctionRepository;
+import shop.sgmarket.sgmarketbackend.auction.repository.auction.AuctionRepository;
 import shop.sgmarket.sgmarketbackend.global.error.ErrorCode;
 import shop.sgmarket.sgmarketbackend.global.error.exception.CustomException;
 import shop.sgmarket.sgmarketbackend.global.util.MemberUtil;

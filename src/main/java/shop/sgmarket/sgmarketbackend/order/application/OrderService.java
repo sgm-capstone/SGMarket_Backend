@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import shop.sgmarket.sgmarketbackend.auction.domain.Item;
 import shop.sgmarket.sgmarketbackend.auction.domain.PriceHistory;
 import shop.sgmarket.sgmarketbackend.auction.repository.ItemRepository;
-import shop.sgmarket.sgmarketbackend.auction.repository.PriceHistoryRepository;
+import shop.sgmarket.sgmarketbackend.auction.repository.pricehistory.PriceHistoryRepository;
 import shop.sgmarket.sgmarketbackend.member.domain.Member;
 import shop.sgmarket.sgmarketbackend.member.repository.MemberRepository;
 import shop.sgmarket.sgmarketbackend.order.domain.Order;

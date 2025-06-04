@@ -1,5 +1,6 @@
 package shop.sgmarket.sgmarketbackend.auction.dto.response;
 
+import com.querydsl.core.annotations.QueryProjection;
 import lombok.Builder;
 import shop.sgmarket.sgmarketbackend.auction.domain.Auction;
 import shop.sgmarket.sgmarketbackend.auction.domain.Item;
@@ -23,6 +24,11 @@ public record AuctionInfoResponse(
         MemberInfo auctionMember,
         String status
 ) {
+
+    @QueryProjection
+    public AuctionInfoResponse {
+    }
+
     public static AuctionInfoResponse of(Auction auction, Item item, Member member, boolean isLiked) {
         return AuctionInfoResponse.builder()
                 .auctionId(auction.getId())
@@ -35,9 +41,9 @@ public record AuctionInfoResponse(
                 .auctionEndPrice(auction.getEndPrice())
                 .auctionImageUrl(auction.getImageUrl())
                 .auctionCategory(auction.getCategory().getName())
-                .likeCount(auction.getLikeCount())
                 .isLiked(isLiked)
-                .auctionItem(AuctionInfoResponse.ItemInfo.from(item))
+                .likeCount(auction.getLikeCount())
+                .auctionItem(ItemInfo.from(item))
                 .auctionMember(MemberInfo.from(member))
                 .status(auction.getStatus().name())
                 .build();
@@ -47,6 +53,10 @@ public record AuctionInfoResponse(
     public record ItemInfo(
             String itemName
     ) {
+        @QueryProjection
+        public ItemInfo {
+        }
+
         public static ItemInfo from(Item item) {
             return ItemInfo.builder()
                     .itemName(item.getName())
@@ -60,6 +70,11 @@ public record AuctionInfoResponse(
             String memberName,
             String memberProfileImageUrl
     ) {
+
+        @QueryProjection
+        public MemberInfo {
+        }
+
         public static MemberInfo from(Member member) {
             return MemberInfo.builder()
                     .memberId(member.getId())

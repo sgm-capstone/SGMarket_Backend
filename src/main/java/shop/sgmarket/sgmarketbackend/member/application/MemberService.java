@@ -9,10 +9,11 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shop.sgmarket.sgmarketbackend.auction.domain.Auction;
+import shop.sgmarket.sgmarketbackend.auction.domain.Item;
 import shop.sgmarket.sgmarketbackend.auction.dto.response.AuctionInfoResponse;
-import shop.sgmarket.sgmarketbackend.auction.repository.AuctionRepository;
-import shop.sgmarket.sgmarketbackend.auction.repository.bid.BidRepository;
+import shop.sgmarket.sgmarketbackend.auction.repository.auction.AuctionRepository;
 import shop.sgmarket.sgmarketbackend.auction.repository.auctionLike.AuctionLikeRepository;
+import shop.sgmarket.sgmarketbackend.auction.repository.bid.BidRepository;
 import shop.sgmarket.sgmarketbackend.global.dto.SliceResponse;
 import shop.sgmarket.sgmarketbackend.global.util.MemberUtil;
 import shop.sgmarket.sgmarketbackend.member.domain.Member;
@@ -51,24 +52,30 @@ public class MemberService {
 
     @Transactional(readOnly = true)
     public SliceResponse<AuctionInfoResponse> getMyAuctions(Pageable pageable) {
-        Member member = memberUtil.getCurrentMember();
-        Slice<Auction> myAuctions = auctionRepository.findByMember(member, pageable);
+        Member me = memberUtil.getCurrentMember();
 
-        List<Long> auctionIds = myAuctions.stream()
-                .map(Auction::getId)
-                .toList();
+        // 한 번의 쿼리로 경매 리스트를 가져온다
+        Slice<Auction> auctions = auctionRepository.findByMember(me, pageable);
 
-        List<Long> likedAuctionIds = auctionLikeRepository.findAuctionIdsByMemberAndAuctionIds(member, auctionIds);
+        // ▶ 여기부터 N+1 발생!
+        Slice<AuctionInfoResponse> dtos = auctions.map(auction -> {
+            // (1) auction.getItem() 호출 시 N번의 select item 쿼리
+            Item item = auction.getItem();
 
-        Set<Long> likedAuctionIdSet = new HashSet<>(likedAuctionIds);
+            // (2) existsByAuctionAndMember 호출 시 N번의 select auction_like 쿼리
+            boolean isLiked = auctionLikeRepository.existsByAuctionAndMember(auction, me);
 
-        Slice<AuctionInfoResponse> auctionInfoResponses = myAuctions.map(otherAuction -> {
-            boolean isLiked = likedAuctionIdSet.contains(otherAuction.getId());
-            return AuctionInfoResponse.of(otherAuction, otherAuction.getItem(), member, isLiked);
+            return AuctionInfoResponse.of(
+                    auction,        // 엔티티
+                    item,           // 연관 엔티티
+                    me,
+                    isLiked
+            );
         });
 
-        return SliceResponse.from(auctionInfoResponses);
+        return SliceResponse.from(dtos);
     }
+
 
     @Transactional(readOnly = true)
     public SliceResponse<AuctionInfoResponse> getMyLikedAuctions(Pageable pageable) {

@@ -1,4 +1,4 @@
-package shop.sgmarket.sgmarketbackend.auction.repository;
+package shop.sgmarket.sgmarketbackend.auction.repository.auction;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -12,13 +12,8 @@ import shop.sgmarket.sgmarketbackend.member.domain.Member;
 
 public interface AuctionRepository extends JpaRepository<Auction, Long>, AuctionRepositoryCustom {
     Optional<Auction> findByIdAndStatus(Long id, AuctionStatus status);
-    Slice<Auction> findAllByMemberAndStatusAndIdNot(
-            Member member,
-            AuctionStatus status,
-            Long excludedAuctionId,
-            Pageable pageable
-    );
 
     List<Auction> findAllByEndDateBeforeAndStatus(LocalDateTime time, AuctionStatus status);
+
     Slice<Auction> findByMember(Member member, Pageable pageable);
 }

@@ -1,8 +1,6 @@
 package shop.sgmarket.sgmarketbackend.auction.application;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -13,14 +11,13 @@ import shop.sgmarket.sgmarketbackend.auction.domain.Auction;
 import shop.sgmarket.sgmarketbackend.auction.domain.AuctionCategory;
 import shop.sgmarket.sgmarketbackend.auction.domain.AuctionStatus;
 import shop.sgmarket.sgmarketbackend.auction.domain.Item;
-import shop.sgmarket.sgmarketbackend.auction.domain.PriceHistory;
 import shop.sgmarket.sgmarketbackend.auction.dto.request.AuctionRegisterRequest;
 import shop.sgmarket.sgmarketbackend.auction.dto.request.AuctionUpdateRequest;
 import shop.sgmarket.sgmarketbackend.auction.dto.response.AuctionInfoResponse;
 import shop.sgmarket.sgmarketbackend.auction.dto.response.PriceHistoryInfoResponse;
-import shop.sgmarket.sgmarketbackend.auction.repository.AuctionRepository;
 import shop.sgmarket.sgmarketbackend.auction.repository.ItemRepository;
-import shop.sgmarket.sgmarketbackend.auction.repository.PriceHistoryRepository;
+import shop.sgmarket.sgmarketbackend.auction.repository.pricehistory.PriceHistoryRepository;
+import shop.sgmarket.sgmarketbackend.auction.repository.auction.AuctionRepository;
 import shop.sgmarket.sgmarketbackend.auction.repository.auctionLike.AuctionLikeRepository;
 import shop.sgmarket.sgmarketbackend.global.dto.SliceResponse;
 import shop.sgmarket.sgmarketbackend.global.error.ErrorCode;
@@ -72,66 +69,50 @@ public class AuctionService {
 
     @Transactional(readOnly = true)
     public AuctionInfoResponse getAuction(Long auctionId) {
-        Member member = memberUtil.getCurrentMember();
-        Auction auction = auctionRepository.findByIdAndStatus(auctionId, AuctionStatus.BIDDING)
-                .orElseThrow(() -> new CustomException(ErrorCode.AUCTION_NOT_FOUND));
-        boolean isLiked = auctionLikeRepository.existsByAuctionAndMember(auction, member);
+        Member viewer = memberUtil.getCurrentMember();
 
-        return AuctionInfoResponse.of(auction, auction.getItem(), auction.getMember(), isLiked);
+        return auctionRepository.findAuctionInfoByIdAndStatus(
+                auctionId, AuctionStatus.BIDDING, viewer
+        ).orElseThrow(() -> new CustomException(ErrorCode.AUCTION_NOT_FOUND));
     }
 
     @Transactional(readOnly = true)
-    public SliceResponse<AuctionInfoResponse> getOtherAuctionsBySameMember(Long auctionId, Pageable pageable) {
+    public SliceResponse<AuctionInfoResponse> getOtherAuctionsBySameMember(
+            Long auctionId,
+            Pageable pageable
+    ) {
         Auction auction = auctionRepository.findByIdAndStatus(auctionId, AuctionStatus.BIDDING)
                 .orElseThrow(() -> new CustomException(ErrorCode.AUCTION_NOT_FOUND));
-        Member member = memberUtil.getCurrentMember();
         Member author = auction.getMember();
 
-        Slice<Auction> auctions = auctionRepository.findAllByMemberAndStatusAndIdNot(author, AuctionStatus.BIDDING,
-                auctionId, pageable);
+        Member viewer = memberUtil.getCurrentMember();
 
-        List<Long> auctionIds = auctions.stream()
-                .map(Auction::getId)
-                .toList();
+        Slice<AuctionInfoResponse> slice = auctionRepository.findAuctionInfoByMemberExcept(
+                author,
+                auctionId,
+                AuctionStatus.BIDDING,
+                pageable,
+                viewer
+        );
 
-        List<Long> likedAuctionIds = auctionLikeRepository.findAuctionIdsByMemberAndAuctionIds(member, auctionIds);
-
-        Set<Long> likedAuctionIdSet = new HashSet<>(likedAuctionIds);
-
-        Slice<AuctionInfoResponse> auctionInfoResponses = auctions.map(otherAuction -> {
-            boolean isLiked = likedAuctionIdSet.contains(otherAuction.getId());
-            return AuctionInfoResponse.of(otherAuction, otherAuction.getItem(), author, isLiked);
-        });
-
-        return SliceResponse.from(auctionInfoResponses);
+        return SliceResponse.from(slice);
     }
+
 
     @Transactional(readOnly = true)
     public SliceResponse<AuctionInfoResponse> getAuctionsByAddressAndCategory(String category, Pageable pageable) {
         Member member = memberUtil.getCurrentMember();
 
-        Slice<Auction> auctions = auctionRepository.findAuctionsWithinRadius(
+        Slice<AuctionInfoResponse> auctions = auctionRepository.findAuctionsWithinRadius(
                 member.getLocation().getLatitude(),
                 member.getLocation().getLongitude(),
                 SEARCH_RADIUS_KM,
                 AuctionCategory.fromKebabCase(category),
-                pageable
+                pageable,
+                member
         );
 
-        List<Long> auctionIds = auctions.stream()
-                .map(Auction::getId)
-                .toList();
-
-        List<Long> likedAuctionIds = auctionLikeRepository.findAuctionIdsByMemberAndAuctionIds(member, auctionIds);
-
-        Set<Long> likedAuctionIdSet = new HashSet<>(likedAuctionIds);
-
-        Slice<AuctionInfoResponse> auctionInfoResponses = auctions.map(auction -> {
-            boolean isLiked = likedAuctionIdSet.contains(auction.getId());
-            return AuctionInfoResponse.of(auction, auction.getItem(), auction.getMember(), isLiked);
-        });
-
-        return SliceResponse.from(auctionInfoResponses);
+        return SliceResponse.from(auctions);
     }
 
     @Transactional(readOnly = true)
@@ -139,21 +120,16 @@ public class AuctionService {
         Long itemId = auctionRepository.findItemIdByAuctionId(auctionId)
                 .orElseThrow(() -> new CustomException(ErrorCode.AUCTION_NOT_FOUND));
 
-        List<PriceHistory> priceHistories = priceHistoryRepository.findAllByItemId(itemId);
-
-        return priceHistories.stream()
-                .map(PriceHistoryInfoResponse::from)
-                .toList();
+        return priceHistoryRepository.findPriceHistoryInfoByItemId(itemId);
     }
 
     @Transactional(readOnly = true)
     public AuctionInfoResponse getRandomAuction() {
-        Member member = memberUtil.getCurrentMember();
-        Auction auction = auctionRepository.findRandomAuctionByStatus(AuctionStatus.BIDDING)
-                .orElseThrow(() -> new CustomException(ErrorCode.AUCTION_NOT_FOUND));
-        boolean isLiked = auctionLikeRepository.existsByAuctionAndMember(auction, member);
+        Member viewer = memberUtil.getCurrentMember();
 
-        return AuctionInfoResponse.of(auction, auction.getItem(), auction.getMember(), isLiked);
+        return auctionRepository.findRandomAuctionInfoByStatus(
+                AuctionStatus.BIDDING, viewer
+        ).orElseThrow(() -> new CustomException(ErrorCode.AUCTION_NOT_FOUND));
     }
 
     @Transactional
