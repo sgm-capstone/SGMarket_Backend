@@ -155,4 +155,16 @@ public class ChatController {
             @RequestParam(defaultValue = "50") int count) {
         return ApiResponseTemplate.ok(chatMessageService.getMessages(roomId, count));
     }
+
+    @Operation(
+            summary = "채팅방 삭제",
+            description = "roomId 에 해당하는 채팅방과 Redis 에 저장된 메시지 기록을 모두 삭제합니다.",
+            parameters = @Parameter(name = "roomId", description = "채팅방 ID", required = true)
+    )
+    @ApiResponse(responseCode = "200", description = "삭제 성공")
+    @DeleteMapping("/room/{roomId}")
+    public ApiResponseTemplate<Void> deleteRoom(@PathVariable String roomId) {
+        chatService.deleteRoom(roomId);
+        return ApiResponseTemplate.ok();
+    }
 }
