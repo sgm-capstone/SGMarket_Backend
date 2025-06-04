@@ -51,7 +51,7 @@ public class ChatServiceImpl implements ChatService {
                 LocalDateTime.now()
         );
         redisPublisher.publish(authenticatedMessage);
-        chatMessageService.saveMessage(message.roomId(), authenticatedMessage);
+        chatMessageService.saveMessage(authenticatedMessage.roomId(), authenticatedMessage);
     }
 
     @Override
@@ -141,5 +141,12 @@ public class ChatServiceImpl implements ChatService {
                 );
             })
             .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public void deleteRoom(String roomId) {
+        chatRoomRepository.deleteRoom(roomId);      // DB 삭제
+        chatMessageService.deleteMessages(roomId);  // Redis 삭제
     }
 }
