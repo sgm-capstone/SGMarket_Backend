@@ -30,4 +30,10 @@ public class ChatMessageService {
                 .map(obj -> (ChatMessage) obj)
                 .toList();
     }
+
+
+    // 채팅방 메시지 전체 삭제
+    public void deleteMessages(String roomId) {
+        redisTemplate.delete(CHAT_KEY_PREFIX + roomId);
+    }
 }
