@@ -120,6 +120,22 @@ public interface MemberDocs {
     );
 
     @Operation(
+            summary = "특정 회원 정보 조회",
+            description = "회원 ID를 통해 특정 회원의 정보를 조회합니다. 관리자용 기능으로 사용됩니다.",
+            parameters = {
+                    @Parameter(name = "memberId", description = "조회할 회원 ID", required = true, example = "1")
+            },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "회원 정보 조회 성공",
+                            content = @Content(schema = @Schema(implementation = MemberInfoResponse.class))),
+                    @ApiResponse(responseCode = "404", description = "해당 회원을 찾을 수 없습니다."),
+                    @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자입니다.")
+            }
+    )
+    @GetMapping("/{memberId}")
+    ApiResponseTemplate<MemberInfoResponse> getMemberInfoById(@PathVariable Long memberId);
+
+    @Operation(
             summary = "특정 멤버의 경매 목록 조회",
             description = "특정 멤버가 등록한 경매 목록을 페이지 단위로 조회합니다.",
             parameters = {

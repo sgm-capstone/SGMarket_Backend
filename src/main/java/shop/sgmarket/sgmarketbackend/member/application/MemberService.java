@@ -119,6 +119,13 @@ public class MemberService {
     }
 
     @Transactional(readOnly = true)
+    public MemberInfoResponse getMemberInfoById(Long memberId) {
+        Member member = memberUtil.getMemberByMemberId(memberId);
+        return MemberInfoResponse.from(member);
+    }
+
+
+    @Transactional(readOnly = true)
     public SliceResponse<AuctionInfoResponse> getAuctionsByMemberId(Long memberId, Pageable pageable) {
         Member targetMember = memberUtil.getMemberByMemberId(memberId);
 
@@ -139,5 +146,4 @@ public class MemberService {
 
         return SliceResponse.from(responseSlice);
     }
-
 }
