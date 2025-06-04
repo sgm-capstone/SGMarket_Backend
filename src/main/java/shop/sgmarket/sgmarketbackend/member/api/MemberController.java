@@ -78,6 +78,16 @@ public class MemberController implements MemberDocs {
                 .message("코인 충전 완료");
     }
 
+    @Override
+    @GetMapping("/{memberId}")
+    public ApiResponseTemplate<MemberInfoResponse> getMemberInfoById(@PathVariable Long memberId) {
+        MemberInfoResponse response = memberService.getMemberInfoById(memberId);
+        return ApiResponseTemplate.ok(response)
+                .message("해당 회원 정보 조회 완료");
+    }
+
+
+    @Override
     @GetMapping("/{memberId}/auctions")
     public ApiResponseTemplate<SliceResponse<AuctionInfoResponse>> getAuctionsByMemberId(
             @PathVariable Long memberId,
