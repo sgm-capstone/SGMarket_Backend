@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import shop.sgmarket.sgmarketbackend.auction.dto.response.AuctionInfoResponse;
 import shop.sgmarket.sgmarketbackend.global.dto.SliceResponse;
 import shop.sgmarket.sgmarketbackend.global.response.ApiResponseTemplate;
+import shop.sgmarket.sgmarketbackend.member.dto.request.ChargeCoinRequest;
 import shop.sgmarket.sgmarketbackend.member.dto.request.MemberUpdateRequest;
 import shop.sgmarket.sgmarketbackend.member.dto.response.MemberInfoResponse;
 
@@ -95,4 +96,26 @@ public interface MemberDocs {
     ApiResponseTemplate<SliceResponse<AuctionInfoResponse>> getMyBiddedAuctions(
             @ParameterObject Pageable pageable
     );
+
+    @Operation(
+            summary = "코인 충전",
+            description = "현재 로그인한 회원의 코인을 충전합니다.",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "충전할 금액 정보",
+                    required = true,
+                    content = @Content(schema = @Schema(implementation = ChargeCoinRequest.class))
+            ),
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "코인 충전 성공",
+                            content = @Content(schema = @Schema(implementation = MemberInfoResponse.class))),
+                    @ApiResponse(responseCode = "400", description = "유효하지 않은 요청입니다."),
+                    @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자입니다.")
+            }
+    )
+    @PatchMapping("/charge-coin")
+    ApiResponseTemplate<MemberInfoResponse> chargeCoin(
+            @Parameter(hidden = true)
+            @RequestBody @Valid ChargeCoinRequest chargeCoinRequest
+    );
+
 }

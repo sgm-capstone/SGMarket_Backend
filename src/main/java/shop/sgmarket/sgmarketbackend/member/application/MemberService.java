@@ -18,6 +18,7 @@ import shop.sgmarket.sgmarketbackend.global.dto.SliceResponse;
 import shop.sgmarket.sgmarketbackend.global.util.MemberUtil;
 import shop.sgmarket.sgmarketbackend.member.domain.Member;
 import shop.sgmarket.sgmarketbackend.member.domain.MemberLocation;
+import shop.sgmarket.sgmarketbackend.member.dto.request.ChargeCoinRequest;
 import shop.sgmarket.sgmarketbackend.member.dto.request.MemberUpdateRequest;
 import shop.sgmarket.sgmarketbackend.member.dto.response.MemberInfoResponse;
 
@@ -54,20 +55,16 @@ public class MemberService {
     public SliceResponse<AuctionInfoResponse> getMyAuctions(Pageable pageable) {
         Member me = memberUtil.getCurrentMember();
 
-        // 한 번의 쿼리로 경매 리스트를 가져온다
         Slice<Auction> auctions = auctionRepository.findByMember(me, pageable);
 
-        // ▶ 여기부터 N+1 발생!
         Slice<AuctionInfoResponse> dtos = auctions.map(auction -> {
-            // (1) auction.getItem() 호출 시 N번의 select item 쿼리
             Item item = auction.getItem();
 
-            // (2) existsByAuctionAndMember 호출 시 N번의 select auction_like 쿼리
             boolean isLiked = auctionLikeRepository.existsByAuctionAndMember(auction, me);
 
             return AuctionInfoResponse.of(
-                    auction,        // 엔티티
-                    item,           // 연관 엔티티
+                    auction,
+                    item,
                     me,
                     isLiked
             );
@@ -110,5 +107,13 @@ public class MemberService {
         );
 
         return SliceResponse.from(responseSlice);
+    }
+
+    @Transactional(readOnly = true)
+    public MemberInfoResponse chargeCoin(ChargeCoinRequest chargeCoinRequest) {
+        Member member = memberUtil.getCurrentMember();
+        member.chargeCoin(chargeCoinRequest.price());
+
+        return MemberInfoResponse.from(member);
     }
 }

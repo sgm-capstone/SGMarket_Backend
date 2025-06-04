@@ -13,6 +13,7 @@ import shop.sgmarket.sgmarketbackend.auction.dto.response.AuctionInfoResponse;
 import shop.sgmarket.sgmarketbackend.global.dto.SliceResponse;
 import shop.sgmarket.sgmarketbackend.global.response.ApiResponseTemplate;
 import shop.sgmarket.sgmarketbackend.member.application.MemberService;
+import shop.sgmarket.sgmarketbackend.member.dto.request.ChargeCoinRequest;
 import shop.sgmarket.sgmarketbackend.member.dto.request.MemberUpdateRequest;
 import shop.sgmarket.sgmarketbackend.member.dto.response.MemberInfoResponse;
 
@@ -65,5 +66,13 @@ public class MemberController implements MemberDocs {
 
         return ApiResponseTemplate.ok(response)
                 .message("내가 입찰한 경매 목록 조회 완료");
+    }
+
+    @PatchMapping("/charge-coin")
+    public ApiResponseTemplate<MemberInfoResponse> chargeCoin(@RequestBody @Valid ChargeCoinRequest chargeCoinRequest) {
+        MemberInfoResponse response = memberService.chargeCoin(chargeCoinRequest);
+
+        return ApiResponseTemplate.ok(response)
+                .message("코인 충전 완료");
     }
 }
