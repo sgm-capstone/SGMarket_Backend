@@ -18,4 +18,6 @@ public interface ChatService {
     
     // DM 목록 조회 메서드 추가
     List<DirectChatListResponse> findDirectChatsWithDetails(Long userId);
+
+    void deleteRoom(String roomId);
 }
