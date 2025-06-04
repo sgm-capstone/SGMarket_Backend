@@ -58,4 +58,12 @@ public class ChatRoomRepository {
                 .setParameter("userId", userId)
                 .getResultList();
     }
+
+    @Transactional
+    public void deleteRoom(String roomId) {
+        ChatRoom room = findRoomById(roomId);
+        if (room != null) {
+            em.remove(room);
+        }
+    }
 }
