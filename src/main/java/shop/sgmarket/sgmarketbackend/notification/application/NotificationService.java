@@ -22,7 +22,7 @@ public class NotificationService {
     private final NotificationEmitterRegistry emitterRegistry;
 
     @Transactional
-    public SseEmitter InitializeSseConnection() {
+    public SseEmitter initializeSseConnection() {
         Member member = memberUtil.getCurrentMember();
         SseEmitter emitter = emitterRegistry.createEmitter(member.getId());
 

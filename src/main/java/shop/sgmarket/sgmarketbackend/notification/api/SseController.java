@@ -17,6 +17,6 @@ public class SseController {
 
     @GetMapping(value = "/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter subscribe() {
-        return notificationService.InitializeSseConnection();
+        return notificationService.initializeSseConnection();
     }
 }
