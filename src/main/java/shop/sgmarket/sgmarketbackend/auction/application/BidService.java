@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -28,6 +29,7 @@ import shop.sgmarket.sgmarketbackend.member.domain.Member;
 import shop.sgmarket.sgmarketbackend.notification.application.NotificationService;
 import shop.sgmarket.sgmarketbackend.notification.domain.NotificationEventType;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BidService {
@@ -122,7 +124,11 @@ public class BidService {
                 LocalDateTime.now(), AuctionStatus.BIDDING);
 
         for (Auction auction : expiredAuctions) {
-            closeAuction(auction);
+            try {
+                closeAuction(auction);
+            } catch (Exception e) {
+                log.error("[closeExpiredAuctions] auctionId={} 처리 중 오류 발생: {}", auction.getId(), e.getMessage(), e);
+            }
         }
     }
 
