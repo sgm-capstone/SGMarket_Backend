@@ -44,8 +44,9 @@ public class NotificationEmitterRegistry implements DisposableBean {
             emitterList.add(emitter);
             return emitterList;
         });
+        int size = emitterMap.get(memberId).size();
         log.debug("[EmitterRegistry] 새로운 Emitter 등록: memberId={}, 현재 구독 개수={}",
-                memberId, emitterMap.get(memberId).size());
+                memberId, size);
     }
 
     private void registerLifecycleCallbacks(Long memberId, SseEmitter emitter) {
