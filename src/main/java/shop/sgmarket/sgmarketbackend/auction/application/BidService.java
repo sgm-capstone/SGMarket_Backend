@@ -34,10 +34,10 @@ public class BidService {
 
     private static final String BID_NOTIFICATION_MESSAGE = "새로운 입찰이 등록되었습니다: %s (입찰가: %d)";
     private static final String AUCTION_SETTLED_NOTIFICATION_MESSAGE = "경매가 낙찰되었습니다: %s (낙찰가: %d)";
-
+    private static final String AUCTION_FAILED_NOTIFICATION_MESSAGE = "경매가 종료되었지만 입찰이 없어 실패로 처리되었습니다: %s";
+    private static final String WINNER_NOTIFICATION_MESSAGE = "입찰한 경매 \"%s\"에 낙찰되었습니다: %d";
 
     private final NotificationService notificationService;
-
     private final AuctionRepository auctionRepository;
     private final BidRepository bidRepository;
     private final MemberUtil memberUtil;
@@ -53,7 +53,6 @@ public class BidService {
 
         auction.updateCurrentPrice(bidRequest.bidPrice());
         Bid bid = Bid.createBid(bidder, auction, bidRequest.bidPrice());
-
         bidRepository.save(bid);
 
         String message = String.format(
@@ -81,7 +80,6 @@ public class BidService {
         );
 
         Slice<Bid> bids = bidRepository.findAllByAuction(auction, sortedPageable);
-
         return SliceResponse.from(bids.map(BidInfoResponse::of));
     }
 
@@ -103,16 +101,7 @@ public class BidService {
         );
         priceHistoryRepository.save(priceHistory);
 
-        String message = String.format(
-                AUCTION_SETTLED_NOTIFICATION_MESSAGE,
-                auction.getTitle(),
-                winningBid.getPrice()
-        );
-        notificationService.createAndSendNotification(
-                winningBid.getMember(),
-                NotificationEventType.AUCTION_SETTLED,
-                message
-        );
+        notifyAuctionSettled(auction, winningBid);
 
         return BidInfoResponse.of(winningBid);
     }
@@ -125,6 +114,78 @@ public class BidService {
                 .orElseThrow(() -> new CustomException(ErrorCode.BID_NOT_FOUND));
 
         return BidInfoResponse.of(maxBid);
+    }
+
+    @Transactional
+    public void closeExpiredAuctions() {
+        List<Auction> expiredAuctions = auctionRepository.findAllByEndDateBeforeAndStatus(
+                LocalDateTime.now(), AuctionStatus.BIDDING);
+
+        for (Auction auction : expiredAuctions) {
+            closeAuction(auction);
+        }
+    }
+
+    private void closeAuction(Auction auction) {
+        Optional<Bid> optionalHighestBid = bidRepository.findTopByAuctionOrderByPriceDesc(auction);
+
+        if (optionalHighestBid.isEmpty()) {
+            auction.updateStatus(AuctionStatus.FAILED);
+            notifyAuctionFailed(auction);
+            return;
+        }
+
+        Bid highestBid = optionalHighestBid.get();
+        auction.updateStatus(AuctionStatus.COMPLETED);
+
+        PriceHistory priceHistory = PriceHistory.createPriceHistory(
+                auction.getItem(),
+                highestBid.getPrice()
+        );
+        priceHistoryRepository.save(priceHistory);
+
+        notifyAuctionSettled(auction, highestBid);
+    }
+
+    private void notifyAuctionSettled(Auction auction, Bid winningBid) {
+        String title = auction.getTitle();
+        long price = winningBid.getPrice();
+
+        String toWinnerMsg = String.format(
+                WINNER_NOTIFICATION_MESSAGE,
+                title,
+                price
+        );
+        notificationService.createAndSendNotification(
+                winningBid.getMember(),
+                NotificationEventType.AUCTION_SETTLED,
+                toWinnerMsg
+        );
+
+        String toOwnerMsg = String.format(
+                AUCTION_SETTLED_NOTIFICATION_MESSAGE,
+                title,
+                price
+        );
+        notificationService.createAndSendNotification(
+                auction.getMember(),
+                NotificationEventType.AUCTION_SETTLED,
+                toOwnerMsg
+        );
+    }
+
+    private void notifyAuctionFailed(Auction auction) {
+        String title = auction.getTitle();
+
+        String message = String.format(
+                AUCTION_FAILED_NOTIFICATION_MESSAGE,
+                title
+        );
+        notificationService.createAndSendNotification(
+                auction.getMember(),
+                NotificationEventType.AUCTION_FAILED,
+                message
+        );
     }
 
     private Auction getAuctionOrThrow(Long auctionId) {
@@ -149,32 +210,4 @@ public class BidService {
             throw new CustomException(ErrorCode.NOT_AUCTION_OWNER);
         }
     }
-
-    @Transactional
-    public void closeExpiredAuctions() {
-        List<Auction> expiredAuctions = auctionRepository.findAllByEndDateBeforeAndStatus(
-                LocalDateTime.now(), AuctionStatus.BIDDING);
-
-        for (Auction auction : expiredAuctions) {
-            closeAuction(auction);
-        }
-    }
-
-    private void closeAuction(Auction auction) {
-        Optional<Bid> optionalHighestBid = bidRepository.findTopByAuctionOrderByPriceDesc(auction);
-
-        if (optionalHighestBid.isEmpty()) {
-            auction.updateStatus(AuctionStatus.FAILED);
-            return;
-        }
-
-        Bid highestBid = optionalHighestBid.get();
-        auction.updateStatus(AuctionStatus.COMPLETED);
-
-        PriceHistory priceHistory = PriceHistory.createPriceHistory(
-                auction.getItem(),
-                highestBid.getPrice());
-        priceHistoryRepository.save(priceHistory);
-    }
-
 }
