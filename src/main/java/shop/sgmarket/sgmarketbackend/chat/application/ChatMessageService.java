@@ -1,5 +1,6 @@
 package shop.sgmarket.sgmarketbackend.chat.application;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -10,7 +11,10 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class ChatMessageService {
+
     private final RedisTemplate<String, Object> redisTemplate;
+    private final ObjectMapper objectMapper;
+
     private static final String CHAT_KEY_PREFIX = "chat:room:";
 
     // 메시지 저장
@@ -25,12 +29,14 @@ public class ChatMessageService {
         Long size = redisTemplate.opsForList().size(key);
         if (size == null || size == 0) return List.of();
         long start = Math.max(0, size - count);
+
         return redisTemplate.opsForList().range(key, start, size - 1)
                 .stream()
-                .map(obj -> (ChatMessage) obj)
+                .map(obj -> obj instanceof ChatMessage
+                        ? (ChatMessage) obj
+                        : objectMapper.convertValue(obj, ChatMessage.class))
                 .toList();
     }
-
 
     // 채팅방 메시지 전체 삭제
     public void deleteMessages(String roomId) {

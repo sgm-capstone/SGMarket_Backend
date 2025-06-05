@@ -17,13 +17,17 @@ public class RedisSubscriber implements MessageListener {
 
     private final RedisTemplate<String, Object> redisTemplate;
     private final SimpMessageSendingOperations messagingTemplate;
+    private final ObjectMapper objectMapper;
 
     @Override
     public void onMessage(Message message, byte[] pattern) {
         try {
-            ChatMessage chatMessage = (ChatMessage) redisTemplate
-                    .getValueSerializer()
-                    .deserialize(message.getBody());
+            Object raw = redisTemplate.getValueSerializer().deserialize(message.getBody());
+
+            ChatMessage chatMessage =
+                    (raw instanceof ChatMessage)
+                            ? (ChatMessage) raw
+                            : objectMapper.convertValue(raw, ChatMessage.class);
 
             messagingTemplate.convertAndSend(
                     "/sub/chat/room/" + chatMessage.roomId(),
