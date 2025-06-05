@@ -3,6 +3,7 @@ package shop.sgmarket.sgmarketbackend.global.config;
 import java.time.Duration;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -24,6 +25,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 @Configuration
 @RequiredArgsConstructor
 @EnableRedisRepositories
+@EnableConfigurationProperties(RedisProperties.class)
 public class RedisConfig {
 
     private final RedisProperties redisProperties;

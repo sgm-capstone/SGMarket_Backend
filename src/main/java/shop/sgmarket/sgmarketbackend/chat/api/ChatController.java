@@ -120,15 +120,12 @@ public class ChatController {
     // Swagger 문서에 노출할 필요가 없으므로 Hidden 처리
     @Hidden
     @MessageMapping("/chat/message")
-    @SendTo("/sub/chat/room")
     public void message(
-            @Parameter(description = "채팅 메시지") @Payload ChatMessage message,
-            Principal principal
+            @Parameter(description = "채팅 메시지") @Payload ChatMessage message
     ) {
-        String userId = principal.getName();
-        chatService.sendMessage(message, userId);
+        chatService.sendMessage(message, message.senderId());
     }
-
+    
     // 채팅방 메시지 내역 조회
     @Operation(
         summary = "채팅방 메시지 내역 조회",
