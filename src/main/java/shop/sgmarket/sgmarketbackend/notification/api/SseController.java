@@ -6,12 +6,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import shop.sgmarket.sgmarketbackend.notification.api.docs.SseDocs;
 import shop.sgmarket.sgmarketbackend.notification.application.NotificationService;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/sse")
-public class SseController {
+public class SseController implements SseDocs {
 
     private final NotificationService notificationService;
 

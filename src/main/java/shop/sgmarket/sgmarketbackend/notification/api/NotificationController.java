@@ -10,13 +10,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import shop.sgmarket.sgmarketbackend.global.dto.SliceResponse;
 import shop.sgmarket.sgmarketbackend.global.response.ApiResponseTemplate;
+import shop.sgmarket.sgmarketbackend.notification.api.docs.NotificationDocs;
 import shop.sgmarket.sgmarketbackend.notification.application.NotificationQueryService;
 import shop.sgmarket.sgmarketbackend.notification.dto.NotificationInfoResponse;
 
 @RestController
 @RequestMapping("/notifications")
 @RequiredArgsConstructor
-public class NotificationController {
+public class NotificationController implements NotificationDocs {
 
     private final NotificationQueryService notificationQueryService;
 
