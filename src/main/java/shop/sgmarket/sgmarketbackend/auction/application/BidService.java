@@ -33,6 +33,7 @@ import shop.sgmarket.sgmarketbackend.notification.domain.NotificationEventType;
 public class BidService {
 
     private static final String BID_NOTIFICATION_MESSAGE = "새로운 입찰이 등록되었습니다: %s (입찰가: %d)";
+    private static final String AUCTION_SETTLED_NOTIFICATION_MESSAGE = "경매가 낙찰되었습니다: %s (낙찰가: %d)";
 
 
     private final NotificationService notificationService;
@@ -101,6 +102,17 @@ public class BidService {
                 winningBid.getPrice()
         );
         priceHistoryRepository.save(priceHistory);
+
+        String message = String.format(
+                AUCTION_SETTLED_NOTIFICATION_MESSAGE,
+                auction.getTitle(),
+                winningBid.getPrice()
+        );
+        notificationService.createAndSendNotification(
+                winningBid.getMember(),
+                NotificationEventType.AUCTION_SETTLED,
+                message
+        );
 
         return BidInfoResponse.of(winningBid);
     }
