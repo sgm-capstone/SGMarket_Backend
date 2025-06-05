@@ -30,7 +30,8 @@ public class NotificationService {
                 null,
                 NotificationEventType.INIT,
                 "SSE 연결이 성공적으로 열렸습니다.",
-                null
+                null,
+                false
         );
         emitterRegistry.sendEvent(member.getId(), initPayload);
 

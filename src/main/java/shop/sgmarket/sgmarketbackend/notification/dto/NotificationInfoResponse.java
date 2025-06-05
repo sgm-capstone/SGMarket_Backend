@@ -10,7 +10,8 @@ public record NotificationInfoResponse(
         Long notificationId,
         NotificationEventType eventType,
         String message,
-        LocalDateTime occurredAt
+        LocalDateTime occurredAt,
+        boolean isRead
 ) {
     public static NotificationInfoResponse from(Notification notification) {
         return NotificationInfoResponse.builder()
@@ -18,6 +19,7 @@ public record NotificationInfoResponse(
                 .eventType(notification.getEventType())
                 .message(notification.getMessage())
                 .occurredAt(notification.getCreatedAt())
+                .isRead(notification.isRead())
                 .build();
     }
 }

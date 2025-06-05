@@ -38,11 +38,10 @@ public class Notification extends BaseTimeEntity {
     private String message;
 
     @Column(name = "is_read", nullable = false)
-    private Boolean isRead = false;
-
+    private boolean isRead = false;
 
     @Builder
-    public Notification(Member member, NotificationEventType eventType, String message, Boolean isRead) {
+    public Notification(Member member, NotificationEventType eventType, String message, boolean isRead) {
         this.member = member;
         this.eventType = eventType;
         this.message = message;
