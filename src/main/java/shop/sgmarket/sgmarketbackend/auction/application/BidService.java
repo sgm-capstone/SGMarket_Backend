@@ -25,10 +25,17 @@ import shop.sgmarket.sgmarketbackend.global.error.ErrorCode;
 import shop.sgmarket.sgmarketbackend.global.error.exception.CustomException;
 import shop.sgmarket.sgmarketbackend.global.util.MemberUtil;
 import shop.sgmarket.sgmarketbackend.member.domain.Member;
+import shop.sgmarket.sgmarketbackend.notification.application.NotificationService;
+import shop.sgmarket.sgmarketbackend.notification.domain.NotificationEventType;
 
 @Service
 @RequiredArgsConstructor
 public class BidService {
+
+    private static final String BID_NOTIFICATION_MESSAGE = "새로운 입찰이 등록되었습니다: %s (입찰가: %d)";
+
+
+    private final NotificationService notificationService;
 
     private final AuctionRepository auctionRepository;
     private final BidRepository bidRepository;
@@ -47,6 +54,17 @@ public class BidService {
         Bid bid = Bid.createBid(bidder, auction, bidRequest.bidPrice());
 
         bidRepository.save(bid);
+
+        String message = String.format(
+                BID_NOTIFICATION_MESSAGE,
+                auction.getTitle(),
+                bidRequest.bidPrice()
+        );
+        notificationService.createAndSendNotification(
+                auction.getMember(),
+                NotificationEventType.BID,
+                message
+        );
 
         return BidInfoResponse.of(bid);
     }
