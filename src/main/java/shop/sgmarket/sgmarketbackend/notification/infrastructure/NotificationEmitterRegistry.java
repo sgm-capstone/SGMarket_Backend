@@ -7,13 +7,14 @@ import java.util.Map;
 import java.util.concurrent.*;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import shop.sgmarket.sgmarketbackend.notification.dto.NotificationInfoResponse;
 
 @Slf4j
 @Component
-public class NotificationEmitterRegistry {
+public class NotificationEmitterRegistry implements DisposableBean {
 
     private static final long DEFAULT_TIMEOUT = 30 * 60 * 1000L;   // 30분
     private static final int MAX_RETRY = 3;
@@ -22,20 +23,14 @@ public class NotificationEmitterRegistry {
 
     private final Map<Long, List<SseEmitter>> emitterMap = new ConcurrentHashMap<>();
     private final Map<SseEmitter, ScheduledFuture<?>> heartbeatTasks = new ConcurrentHashMap<>();
-    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-
+    private final ScheduledExecutorService scheduler =
+            Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors());
 
     public SseEmitter createEmitter(Long memberId) {
-        // 1) 새 Emitter 생성
         SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
 
-        // 2) Emitter를 Map에 추가
         addEmitter(memberId, emitter);
-
-        // 3) 완료/타임아웃/에러 시 Emitter 제거 콜백 등록
         registerLifecycleCallbacks(memberId, emitter);
-
-        // 4) Heartbeat 스케줄 등록
         scheduleHeartbeat(memberId, emitter);
 
         return emitter;
@@ -125,7 +120,6 @@ public class NotificationEmitterRegistry {
     }
 
     private void removeEmitter(Long memberId, SseEmitter emitter) {
-        // 1) emitterMap에서 해당 Emitter만 제거
         List<SseEmitter> emitterList = emitterMap.get(memberId);
         if (emitterList != null) {
             boolean removed = emitterList.remove(emitter);
@@ -139,11 +133,24 @@ public class NotificationEmitterRegistry {
             }
         }
 
-        // 2) heartbeatTasks에서 해당 Emitter의 ScheduledFuture를 가져와 취소
         ScheduledFuture<?> future = heartbeatTasks.remove(emitter);
         if (future != null) {
             future.cancel(true);
             log.debug("[EmitterRegistry] Heartbeat 스케줄 취소: memberId={}, emitter={}", memberId, emitter);
         }
+    }
+
+    @Override
+    public void destroy() {
+        scheduler.shutdown();
+        try {
+            if (!scheduler.awaitTermination(5, TimeUnit.SECONDS)) {
+                scheduler.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            scheduler.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
+        log.info("[EmitterRegistry] scheduler 종료 완료");
     }
 }
