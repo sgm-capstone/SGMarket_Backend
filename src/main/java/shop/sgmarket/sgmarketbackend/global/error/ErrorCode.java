@@ -28,6 +28,7 @@ public enum ErrorCode {
     UNAUTHORIZED_ACCESS(HttpStatus.UNAUTHORIZED, "AUTH_4011", "인증이 필요합니다."),
     UNAUTHORIZED_MEMBER(HttpStatus.UNAUTHORIZED, "AUTH_4012", "작성자가 아닙니다"),
     INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED,"AUTH_4013", "리프레시 토큰이 유효하지 않습니다."),
+    NOTIFICATION_ACCESS_DENIED(HttpStatus.UNAUTHORIZED, "NOTIFICATION_4011", "알림 접근 권한이 없습니다."),
 
     // 403 FORBIDDEN
     FORBIDDEN_ACCESS(HttpStatus.FORBIDDEN, "AUTH_4031", "접근 권한이 없습니다."),

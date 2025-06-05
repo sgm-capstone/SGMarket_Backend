@@ -30,8 +30,14 @@ public class NotificationQueryService {
 
     @Transactional
     public void markAsRead(Long notificationId) {
+        Member member = memberUtil.getCurrentMember();
         Notification notification = notificationRepository.findById(notificationId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOTIFICATION_NOT_FOUND));
+
+        if (!notification.getMember().equals(member)) {
+            throw new CustomException(ErrorCode.NOTIFICATION_ACCESS_DENIED);
+        }
+
         notification.markAsRead();
     }
 }
