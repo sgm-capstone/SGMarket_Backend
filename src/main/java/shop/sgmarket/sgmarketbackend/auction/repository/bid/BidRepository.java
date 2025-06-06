@@ -9,6 +9,6 @@ import shop.sgmarket.sgmarketbackend.auction.domain.Bid;
 
 public interface BidRepository extends JpaRepository<Bid, Long>, BidRepositoryCustom {
     Slice<Bid> findAllByAuction(Auction auction, Pageable pageable);
-    Optional<Bid> findTopByAuctionOrderByCreatedAtDesc(Auction auction);
+    Optional<Bid> findTopByAuctionOrderByCreatedAtDescPriceDesc(Auction auction);
     Optional<Bid> findTopByAuctionOrderByPriceDesc(Auction auction);
 }

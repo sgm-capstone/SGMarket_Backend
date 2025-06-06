@@ -6,6 +6,7 @@ import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -68,11 +69,33 @@ public class MemberController implements MemberDocs {
                 .message("내가 입찰한 경매 목록 조회 완료");
     }
 
+    @Override
     @PatchMapping("/charge-coin")
     public ApiResponseTemplate<MemberInfoResponse> chargeCoin(@RequestBody @Valid ChargeCoinRequest chargeCoinRequest) {
         MemberInfoResponse response = memberService.chargeCoin(chargeCoinRequest);
 
         return ApiResponseTemplate.ok(response)
                 .message("코인 충전 완료");
+    }
+
+    @Override
+    @GetMapping("/{memberId}")
+    public ApiResponseTemplate<MemberInfoResponse> getMemberInfoById(@PathVariable Long memberId) {
+        MemberInfoResponse response = memberService.getMemberInfoById(memberId);
+        return ApiResponseTemplate.ok(response)
+                .message("해당 회원 정보 조회 완료");
+    }
+
+
+    @Override
+    @GetMapping("/{memberId}/auctions")
+    public ApiResponseTemplate<SliceResponse<AuctionInfoResponse>> getAuctionsByMemberId(
+            @PathVariable Long memberId,
+            @ParameterObject Pageable pageable) {
+
+        SliceResponse<AuctionInfoResponse> response = memberService.getAuctionsByMemberId(memberId, pageable);
+
+        return ApiResponseTemplate.ok(response)
+                .message("해당 멤버의 경매 목록 조회 완료");
     }
 }

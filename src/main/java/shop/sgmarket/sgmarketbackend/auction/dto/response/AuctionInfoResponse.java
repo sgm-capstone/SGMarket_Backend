@@ -68,7 +68,8 @@ public record AuctionInfoResponse(
     public record MemberInfo(
             Long memberId,
             String memberName,
-            String memberProfileImageUrl
+            String memberProfileImageUrl,
+            Long coin
     ) {
 
         @QueryProjection
@@ -80,6 +81,7 @@ public record AuctionInfoResponse(
                     .memberId(member.getId())
                     .memberName(member.getNickname())
                     .memberProfileImageUrl(member.getOauthInfo().getOauthProfileImageUrl())
+                    .coin(member.getCoin())
                     .build();
         }
     }

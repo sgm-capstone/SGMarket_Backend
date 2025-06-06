@@ -9,6 +9,7 @@ public record MemberInfoResponse(
         String email,
         String profileImageUrl,
         String nickname,
+        Long coin,
         String address,
         Double latitude,
         Double longitude
@@ -19,6 +20,7 @@ public record MemberInfoResponse(
                 .email(member.getOauthInfo().getOauthEmail())
                 .profileImageUrl(member.getOauthInfo().getOauthProfileImageUrl())
                 .nickname(member.getNickname())
+                .coin(member.getCoin())
                 .address(member.getLocation().getAddress())
                 .latitude(member.getLocation().getLatitude())
                 .longitude(member.getLocation().getLongitude())
