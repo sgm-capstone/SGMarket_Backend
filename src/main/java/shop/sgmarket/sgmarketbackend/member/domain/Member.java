@@ -96,7 +96,7 @@ public class Member extends BaseTimeEntity {
 
     public void deductCoin(final Long price) {
         if (coin < price) {
-            throw new CustomException(ErrorCode.INSUFFICIENT_COINS, "잔액이 부족합니다.");
+            throw new CustomException(ErrorCode.INSUFFICIENT_COINS);
         }
         coin -= price;
     }
