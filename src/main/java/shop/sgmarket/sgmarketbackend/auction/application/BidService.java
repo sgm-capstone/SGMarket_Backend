@@ -16,6 +16,7 @@ import shop.sgmarket.sgmarketbackend.auction.domain.Auction;
 import shop.sgmarket.sgmarketbackend.auction.domain.AuctionStatus;
 import shop.sgmarket.sgmarketbackend.auction.domain.Bid;
 import shop.sgmarket.sgmarketbackend.auction.domain.PriceHistory;
+import shop.sgmarket.sgmarketbackend.auction.dto.RefundAmount;
 import shop.sgmarket.sgmarketbackend.auction.dto.request.BidRegisterRequest;
 import shop.sgmarket.sgmarketbackend.auction.dto.response.BidInfoResponse;
 import shop.sgmarket.sgmarketbackend.auction.repository.auction.AuctionRepository;
@@ -97,15 +98,13 @@ public class BidService {
         priceHistoryRepository.save(priceHistory);
 
         Long winningBidId = winningBid.getId();
-        List<Object[]> refundData = bidRepository.findRefundAmountsByAuctionExceptWinning(auctionId, winningBidId);
+        List<RefundAmount> refundData = bidRepository.findRefundAmountsByAuctionExceptWinning(auctionId, winningBidId);
 
-        for (Object[] row : refundData) {
-            Long memberId    = (Long) row[0];
-            Long refundAmount = (Long) row[1];
-
-            Member bidderMember = memberUtil.getMemberByMemberId(memberId);
-            bidderMember.chargeCoin(refundAmount);
+        for (RefundAmount refundAmount : refundData) {
+            Member bidderMember = memberUtil.getMemberByMemberId(refundAmount.memberId());
+            bidderMember.chargeCoin(refundAmount.totalAmount());
         }
+
         notifyAuctionSettled(auction, winningBid);
 
         return BidInfoResponse.of(winningBid);

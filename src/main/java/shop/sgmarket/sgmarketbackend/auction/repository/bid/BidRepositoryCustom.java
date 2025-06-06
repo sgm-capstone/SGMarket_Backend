@@ -4,11 +4,12 @@ import java.util.List;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import shop.sgmarket.sgmarketbackend.auction.domain.Auction;
+import shop.sgmarket.sgmarketbackend.auction.dto.RefundAmount;
 import shop.sgmarket.sgmarketbackend.member.domain.Member;
 
 public interface BidRepositoryCustom {
     Slice<Auction> findAuctionsByMember(Member member, Pageable pageable);
-    List<Object[]> findRefundAmountsByAuctionExceptWinning(
+    List<RefundAmount> findRefundAmountsByAuctionExceptWinning(
             Long auctionId,
             Long winningBidId
     );

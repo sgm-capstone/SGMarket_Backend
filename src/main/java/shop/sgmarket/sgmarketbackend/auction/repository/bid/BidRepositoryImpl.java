@@ -10,6 +10,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import shop.sgmarket.sgmarketbackend.auction.domain.Auction;
 import shop.sgmarket.sgmarketbackend.auction.domain.QBid;
+import shop.sgmarket.sgmarketbackend.auction.dto.RefundAmount;
 import shop.sgmarket.sgmarketbackend.member.domain.Member;
 
 @RequiredArgsConstructor
@@ -36,7 +37,7 @@ public class BidRepositoryImpl implements BidRepositoryCustom {
     }
 
     @Override
-    public List<Object[]> findRefundAmountsByAuctionExceptWinning(Long auctionId, Long winningBidId) {
+    public List<RefundAmount> findRefundAmountsByAuctionExceptWinning(Long auctionId, Long winningBidId) {
         List<Tuple> tuples = queryFactory
                 .select(bid.member.id, bid.price.sum())
                 .from(bid)
@@ -48,10 +49,10 @@ public class BidRepositoryImpl implements BidRepositoryCustom {
                 .fetch();
 
         return tuples.stream()
-                .map(t -> new Object[]{
+                .map(t -> new RefundAmount(
                         t.get(bid.member.id),
                         t.get(bid.price.sum())
-                })
+                ))
                 .collect(Collectors.toList());
     }
 }
