@@ -147,7 +147,8 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
                         new QAuctionInfoResponse_MemberInfo(
                                 auction.member.id,
                                 auction.member.nickname,
-                                auction.member.oauthInfo.oauthProfileImageUrl
+                                auction.member.oauthInfo.oauthProfileImageUrl,
+                                auction.member.coin
                         ),
                         auction.status.stringValue()
                 ))
