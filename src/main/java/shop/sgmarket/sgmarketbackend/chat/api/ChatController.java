@@ -20,6 +20,7 @@ import shop.sgmarket.sgmarketbackend.chat.application.ChatService;
 import shop.sgmarket.sgmarketbackend.chat.domain.ChatRoom;
 import shop.sgmarket.sgmarketbackend.chat.dto.response.ChatMessage;
 import shop.sgmarket.sgmarketbackend.chat.dto.request.DirectChatRequest;
+import shop.sgmarket.sgmarketbackend.chat.dto.response.ChatMessagePage;
 import shop.sgmarket.sgmarketbackend.chat.dto.response.DirectChatListResponse;
 import shop.sgmarket.sgmarketbackend.global.util.MemberUtil;
 import shop.sgmarket.sgmarketbackend.global.response.ApiResponseTemplate;
@@ -125,7 +126,7 @@ public class ChatController {
     ) {
         chatService.sendMessage(message, message.senderId());
     }
-    
+
     // 채팅방 메시지 내역 조회
     @Operation(
         summary = "채팅방 메시지 내역 조회",
@@ -163,5 +164,28 @@ public class ChatController {
     public ApiResponseTemplate<Void> deleteRoom(@PathVariable String roomId) {
         chatService.deleteRoom(roomId);
         return ApiResponseTemplate.ok();
+    }
+
+    @Operation(
+            summary = "채팅방 메시지 페이지네이션 조회",
+            description = """
+                 무한 스크롤용 API 입니다.
+                 • cursor 가 없으면 최신부터 size 만큼 반환  
+                 • 이후 cursor(다음 호출용) 과 hasMore 를 응답에 포함합니다.
+                 """,
+            parameters = {
+                    @Parameter(name = "roomId", description = "채팅방 ID", required = true),
+                    @Parameter(name = "cursor", description = "다음에 조회할 endCursor(없으면 최신)", required = false),
+                    @Parameter(name = "size",   description = "가져올 메시지 수(기본 50)",     required = false)
+            }
+    )
+    @ApiResponse(responseCode = "200", description = "조회 성공")
+    @GetMapping("/room/{roomId}/messages-page")
+    public ApiResponseTemplate<ChatMessagePage> getChatMessagesPage(
+            @PathVariable String roomId,
+            @RequestParam(required = false) Long cursor,
+            @RequestParam(defaultValue = "50") int size
+    ) {
+        return ApiResponseTemplate.ok(chatMessageService.getMessagesPage(roomId, cursor, size));
     }
 }
