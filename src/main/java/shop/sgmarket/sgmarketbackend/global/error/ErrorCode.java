@@ -23,6 +23,7 @@ public enum ErrorCode {
     NOT_AUCTION_OWNER(HttpStatus.FORBIDDEN, "AUCTION_4031", "경매의 판매자가 아닙니다."),
     PAYMENT_AMOUNT_MISMATCH(HttpStatus.BAD_REQUEST, "PAYMENT_4002", "결제 금액이 일치하지 않습니다."),
     PAYMENT_NOT_COMPLETED(HttpStatus.BAD_REQUEST, "PAYMENT_4003", "결제가 완료되지 않았습니다."),
+    INSUFFICIENT_COINS(HttpStatus.BAD_REQUEST, "MEMBER_4001", "코인이 부족합니다."),
 
     // 401 UNAUTHORIZED
     UNAUTHORIZED_ACCESS(HttpStatus.UNAUTHORIZED, "AUTH_4011", "인증이 필요합니다."),

@@ -1,7 +1,9 @@
 package shop.sgmarket.sgmarketbackend.auction.repository.bid;
 
+import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -31,5 +33,25 @@ public class BidRepositoryImpl implements BidRepositoryCustom {
         }
 
         return new SliceImpl<>(content, pageable, hasNext);
+    }
+
+    @Override
+    public List<Object[]> findRefundAmountsByAuctionExceptWinning(Long auctionId, Long winningBidId) {
+        List<Tuple> tuples = queryFactory
+                .select(bid.member.id, bid.price.sum())
+                .from(bid)
+                .where(
+                        bid.auction.id.eq(auctionId)
+                                .and(bid.id.ne(winningBidId))
+                )
+                .groupBy(bid.member.id)
+                .fetch();
+
+        return tuples.stream()
+                .map(t -> new Object[]{
+                        t.get(bid.member.id),
+                        t.get(bid.price.sum())
+                })
+                .collect(Collectors.toList());
     }
 }

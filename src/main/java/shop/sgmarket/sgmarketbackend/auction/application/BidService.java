@@ -50,23 +50,16 @@ public class BidService {
         Member bidder = memberUtil.getCurrentMember();
         Auction auction = getAuctionOrThrow(auctionId);
 
+        validateBidderHasEnoughCoins(bidder, bidRequest.bidPrice());
         validateBiddingStatus(auction);
         validateNotOwner(bidder, auction);
 
         auction.updateCurrentPrice(bidRequest.bidPrice());
         Bid bid = Bid.createBid(bidder, auction, bidRequest.bidPrice());
-        bidRepository.save(bid);
 
-        String message = String.format(
-                BID_NOTIFICATION_MESSAGE,
-                auction.getTitle(),
-                bidRequest.bidPrice()
-        );
-        notificationService.createAndSendNotification(
-                auction.getMember(),
-                NotificationEventType.BID,
-                message
-        );
+        bidder.deductCoin(bidRequest.bidPrice());
+        bidRepository.save(bid);
+        sendBidNotification(auction, bidRequest);
 
         return BidInfoResponse.of(bid);
     }
@@ -93,7 +86,7 @@ public class BidService {
         validateBiddingStatus(auction);
         validateAuctionOwner(owner, auction);
 
-        Bid winningBid = bidRepository.findTopByAuctionOrderByCreatedAtDesc(auction)
+        Bid winningBid = bidRepository.findTopByAuctionOrderByCreatedAtDescPriceDesc(auction)
                 .orElseThrow(() -> new CustomException(ErrorCode.BID_NOT_FOUND));
 
         auction.updateStatus(AuctionStatus.COMPLETED);
@@ -103,6 +96,16 @@ public class BidService {
         );
         priceHistoryRepository.save(priceHistory);
 
+        Long winningBidId = winningBid.getId();
+        List<Object[]> refundData = bidRepository.findRefundAmountsByAuctionExceptWinning(auctionId, winningBidId);
+
+        for (Object[] row : refundData) {
+            Long memberId    = (Long) row[0];
+            Long refundAmount = (Long) row[1];
+
+            Member bidderMember = memberUtil.getMemberByMemberId(memberId);
+            bidderMember.chargeCoin(refundAmount);
+        }
         notifyAuctionSettled(auction, winningBid);
 
         return BidInfoResponse.of(winningBid);
@@ -153,6 +156,19 @@ public class BidService {
         notifyAuctionSettled(auction, highestBid);
     }
 
+    private void sendBidNotification(Auction auction, BidRegisterRequest bidRequest) {
+        String message = String.format(
+                BID_NOTIFICATION_MESSAGE,
+                auction.getTitle(),
+                bidRequest.bidPrice()
+        );
+        notificationService.createAndSendNotification(
+                auction.getMember(),
+                NotificationEventType.BID,
+                message
+        );
+    }
+
     private void notifyAuctionSettled(Auction auction, Bid winningBid) {
         String title = auction.getTitle();
         long price = winningBid.getPrice();
@@ -197,6 +213,12 @@ public class BidService {
     private Auction getAuctionOrThrow(Long auctionId) {
         return auctionRepository.findById(auctionId)
                 .orElseThrow(() -> new CustomException(ErrorCode.AUCTION_NOT_FOUND));
+    }
+
+    private void validateBidderHasEnoughCoins(Member bidder, long bidPrice) {
+        if (bidder.getCoin() < bidPrice) {
+            throw new CustomException(ErrorCode.INSUFFICIENT_COINS);
+        }
     }
 
     private void validateBiddingStatus(Auction auction) {
