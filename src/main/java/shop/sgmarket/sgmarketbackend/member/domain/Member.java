@@ -17,6 +17,8 @@ import lombok.NoArgsConstructor;
 import shop.sgmarket.sgmarketbackend.auth.domain.OAuthProvider;
 import shop.sgmarket.sgmarketbackend.global.domain.BaseTimeEntity;
 import shop.sgmarket.sgmarketbackend.global.domain.Status;
+import shop.sgmarket.sgmarketbackend.global.error.ErrorCode;
+import shop.sgmarket.sgmarketbackend.global.error.exception.CustomException;
 
 @Entity
 @Getter
@@ -34,9 +36,12 @@ public class Member extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private MemberRole role;
 
-    private String address;
+    @Embedded
+    private MemberLocation location;
 
     private String nickname;
+
+    private Long coin;
 
     @Enumerated(EnumType.STRING)
     private Status status;
@@ -45,11 +50,12 @@ public class Member extends BaseTimeEntity {
     private LocalDateTime lastLoginAt;
 
     @Builder(access = AccessLevel.PRIVATE)
-    private Member(OauthInfo oauthInfo, MemberRole role, String address, String nickname, Status status) {
+    private Member(OauthInfo oauthInfo, MemberRole role, MemberLocation location, String nickname, Status status, Long coin) {
         this.oauthInfo = oauthInfo;
         this.role = role;
-        this.address = address;
+        this.location = location;
         this.nickname = nickname;
+        this.coin = coin;
         this.status = status;
     }
 
@@ -70,6 +76,7 @@ public class Member extends BaseTimeEntity {
         return Member.builder()
                 .oauthInfo(oauthInfo)
                 .role(MemberRole.USER)
+                .coin(0L)
                 .status(Status.ACTIVE)
                 .build();
     }
@@ -78,8 +85,19 @@ public class Member extends BaseTimeEntity {
         this.lastLoginAt = LocalDateTime.now();
     }
 
-    public void updateProfile(final String address, final String nickname) {
-        this.address = address;
+    public void updateProfile(final MemberLocation location, final String nickname) {
+        this.location = location;
         this.nickname = nickname;
+    }
+
+    public void chargeCoin(final Long price) {
+        coin += price;
+    }
+
+    public void deductCoin(final Long price) {
+        if (coin < price) {
+            throw new CustomException(ErrorCode.INSUFFICIENT_COINS);
+        }
+        coin -= price;
     }
 }

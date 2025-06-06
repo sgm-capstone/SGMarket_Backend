@@ -1,0 +1,191 @@
+package shop.sgmarket.sgmarketbackend.chat.api;
+
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.web.bind.annotation.*;
+
+import shop.sgmarket.sgmarketbackend.chat.application.ChatMessageService;
+import shop.sgmarket.sgmarketbackend.chat.application.ChatService;
+import shop.sgmarket.sgmarketbackend.chat.domain.ChatRoom;
+import shop.sgmarket.sgmarketbackend.chat.dto.response.ChatMessage;
+import shop.sgmarket.sgmarketbackend.chat.dto.request.DirectChatRequest;
+import shop.sgmarket.sgmarketbackend.chat.dto.response.ChatMessagePage;
+import shop.sgmarket.sgmarketbackend.chat.dto.response.DirectChatListResponse;
+import shop.sgmarket.sgmarketbackend.global.util.MemberUtil;
+import shop.sgmarket.sgmarketbackend.global.response.ApiResponseTemplate;
+
+import java.security.Principal;
+import java.util.List;
+
+@Tag(
+        name        = "채팅 API",
+        description = "채팅방/DM 생성·조회 등 채팅 관련 REST API"
+)
+@RestController
+@RequestMapping("/chat")
+@RequiredArgsConstructor
+public class ChatController {
+
+    private final ChatService chatService;
+    private final MemberUtil  memberUtil;
+    private final ChatMessageService chatMessageService;
+
+    // --------------------------- 그룹 채팅 --------------------------- //
+
+    @Operation(
+            summary     = "그룹 채팅방 생성",
+            description = "요청 본문으로 전달된 방 이름을 사용해 새로운 그룹 채팅방을 생성합니다. " +
+                    "생성자는 현재 로그인한 사용자입니다."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "채팅방 생성 성공",
+                    content = @Content(schema = @Schema(implementation = ChatRoom.class))),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청 파라미터")
+    })
+    @PostMapping("/room")
+    public ApiResponseTemplate<ChatRoom> createRoom(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "채팅방 생성 요청",
+                    required    = true,
+                    content     = @Content(schema = @Schema(implementation = ChatRoomRequest.class))
+            )
+            @RequestBody ChatRoomRequest request
+    ) {
+        Long memberId = memberUtil.getCurrentMember().getId();
+        return ApiResponseTemplate.ok(chatService.createRoom(request.name(), memberId));
+    }
+
+    @Operation(
+            summary     = "모든 그룹 채팅방 목록 조회",
+            description = "서버에 존재하는 모든 그룹 채팅방을 반환합니다."
+    )
+    @ApiResponse(responseCode = "200", description = "조회 성공",
+            content = @Content(schema = @Schema(implementation = ChatRoom.class)))
+    @GetMapping("/rooms")
+    public ApiResponseTemplate<List<ChatRoom>> getRooms() {
+        return ApiResponseTemplate.ok(chatService.findAllRooms());
+    }
+
+    // --------------------------- 1:1 DM --------------------------- //
+
+    @Operation(
+            summary     = "1:1 DM 채팅방 생성",
+            description = "요청 본문에 받는 사람 ID와 첫 메시지를 포함하여 1:1 대화방을 생성합니다."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "DM 방 생성 성공",
+                    content = @Content(schema = @Schema(implementation = ChatRoom.class))),
+            @ApiResponse(responseCode = "404", description = "수신자 회원을 찾을 수 없음")
+    })
+    @PostMapping("/direct")
+    public ApiResponseTemplate<ChatRoom> createDirectChat(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "DM 생성 요청",
+                    required    = true,
+                    content     = @Content(schema = @Schema(implementation = DirectChatRequest.class))
+            )
+            @RequestBody DirectChatRequest request
+    ) {
+        Long senderId = memberUtil.getCurrentMember().getId();
+        return ApiResponseTemplate.ok(chatService.createDirectChat(senderId, request.receiverId(), request.itemId(), request.initialMessage()));
+    }
+
+    @Operation(
+            summary     = "내 DM 목록 조회",
+            description = "현재 로그인한 사용자가 참여 중인 모든 1:1 DM 채팅방을 반환합니다. " +
+                         "각 채팅방의 상대방 정보와 마지막 메시지를 포함합니다."
+    )
+    @ApiResponse(
+        responseCode = "200", 
+        description = "조회 성공",
+        content = @Content(schema = @Schema(implementation = DirectChatListResponse.class))
+    )
+    @GetMapping("/direct")
+    public ApiResponseTemplate<List<DirectChatListResponse>> getDirectChats() {
+        Long userId = memberUtil.getCurrentMember().getId();
+        return ApiResponseTemplate.ok(chatService.findDirectChatsWithDetails(userId));
+    }
+
+    // --------------------------- WebSocket --------------------------- //
+    // Swagger 문서에 노출할 필요가 없으므로 Hidden 처리
+    @Hidden
+    @MessageMapping("/chat/message")
+    public void message(
+            @Parameter(description = "채팅 메시지") @Payload ChatMessage message
+    ) {
+        chatService.sendMessage(message, message.senderId());
+    }
+
+    // 채팅방 메시지 내역 조회
+    @Operation(
+        summary = "채팅방 메시지 내역 조회",
+        description = "특정 채팅방의 최신 메시지 내역을 조회합니다.",
+        parameters = {
+            @Parameter(name = "roomId", description = "채팅방 ID", required = true),
+            @Parameter(name = "count", description = "가져올 메시지 개수(기본값 50)", required = false)
+        },
+        responses = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "메시지 내역 조회 성공",
+                content = @Content(mediaType = "application/json", schema = @Schema(implementation = ChatMessage.class))
+            ),
+            @ApiResponse(
+                responseCode = "401",
+                description = "인증 실패"
+            )
+        }
+    )
+    @GetMapping("/room/{roomId}/messages")
+    public ApiResponseTemplate<List<ChatMessage>> getChatMessages(
+            @PathVariable String roomId,
+            @RequestParam(defaultValue = "50") int count) {
+        return ApiResponseTemplate.ok(chatMessageService.getMessages(roomId, count));
+    }
+
+    @Operation(
+            summary = "채팅방 삭제",
+            description = "roomId 에 해당하는 채팅방과 Redis 에 저장된 메시지 기록을 모두 삭제합니다.",
+            parameters = @Parameter(name = "roomId", description = "채팅방 ID", required = true)
+    )
+    @ApiResponse(responseCode = "200", description = "삭제 성공")
+    @DeleteMapping("/room/{roomId}")
+    public ApiResponseTemplate<Void> deleteRoom(@PathVariable String roomId) {
+        chatService.deleteRoom(roomId);
+        return ApiResponseTemplate.ok();
+    }
+
+    @Operation(
+            summary = "채팅방 메시지 페이지네이션 조회",
+            description = """
+                 무한 스크롤용 API 입니다.
+                 • cursor 가 없으면 최신부터 size 만큼 반환  
+                 • 이후 cursor(다음 호출용) 과 hasMore 를 응답에 포함합니다.
+                 """,
+            parameters = {
+                    @Parameter(name = "roomId", description = "채팅방 ID", required = true),
+                    @Parameter(name = "cursor", description = "다음에 조회할 endCursor(없으면 최신)", required = false),
+                    @Parameter(name = "size",   description = "가져올 메시지 수(기본 50)",     required = false)
+            }
+    )
+    @ApiResponse(responseCode = "200", description = "조회 성공")
+    @GetMapping("/room/{roomId}/messages-page")
+    public ApiResponseTemplate<ChatMessagePage> getChatMessagesPage(
+            @PathVariable String roomId,
+            @RequestParam(required = false) Long cursor,
+            @RequestParam(defaultValue = "50") int size
+    ) {
+        return ApiResponseTemplate.ok(chatMessageService.getMessagesPage(roomId, cursor, size));
+    }
+}
