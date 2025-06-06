@@ -51,7 +51,6 @@ public class BidService {
         Member bidder = memberUtil.getCurrentMember();
         Auction auction = getAuctionOrThrow(auctionId);
 
-        validateBidderHasEnoughCoins(bidder, bidRequest.bidPrice());
         validateBiddingStatus(auction);
         validateNotOwner(bidder, auction);
 
@@ -212,12 +211,6 @@ public class BidService {
     private Auction getAuctionOrThrow(Long auctionId) {
         return auctionRepository.findById(auctionId)
                 .orElseThrow(() -> new CustomException(ErrorCode.AUCTION_NOT_FOUND));
-    }
-
-    private void validateBidderHasEnoughCoins(Member bidder, long bidPrice) {
-        if (bidder.getCoin() < bidPrice) {
-            throw new CustomException(ErrorCode.INSUFFICIENT_COINS);
-        }
     }
 
     private void validateBiddingStatus(Auction auction) {
