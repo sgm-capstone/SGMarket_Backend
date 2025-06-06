@@ -99,11 +99,7 @@ public class BidService {
         Long winningBidId = winningBid.getId();
         List<RefundAmount> refundData = bidRepository.findRefundAmountsByAuctionExceptWinning(auctionId, winningBidId);
 
-        for (RefundAmount refundAmount : refundData) {
-            Member bidderMember = memberUtil.getMemberByMemberId(refundAmount.memberId());
-            bidderMember.chargeCoin(refundAmount.totalAmount());
-        }
-
+        processRefunds(refundData);
         notifyAuctionSettled(auction, winningBid);
 
         return BidInfoResponse.of(winningBid);
@@ -152,6 +148,18 @@ public class BidService {
         priceHistoryRepository.save(priceHistory);
 
         notifyAuctionSettled(auction, highestBid);
+    }
+
+    private void processRefunds(List<RefundAmount> refundData) {
+        for (RefundAmount refundAmount : refundData) {
+            try {
+                Member bidderMember = memberUtil.getMemberByMemberId(refundAmount.memberId());
+                bidderMember.chargeCoin(refundAmount.totalAmount());
+            } catch (CustomException e) {
+                log.error("환불 실패: memberId={}, amount={}, reason={}",
+                        refundAmount.memberId(), refundAmount.totalAmount(), e.getMessage());
+            }
+        }
     }
 
     private void sendBidNotification(Auction auction, BidRegisterRequest bidRequest) {
