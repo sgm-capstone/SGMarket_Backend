@@ -110,7 +110,7 @@ public class MemberService {
         return SliceResponse.from(responseSlice);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public MemberInfoResponse chargeCoin(ChargeCoinRequest chargeCoinRequest) {
         Member member = memberUtil.getCurrentMember();
         member.chargeCoin(chargeCoinRequest.price());
