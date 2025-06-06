@@ -16,6 +16,7 @@ import shop.sgmarket.sgmarketbackend.auction.domain.Auction;
 import shop.sgmarket.sgmarketbackend.auction.domain.AuctionStatus;
 import shop.sgmarket.sgmarketbackend.auction.domain.Bid;
 import shop.sgmarket.sgmarketbackend.auction.domain.PriceHistory;
+import shop.sgmarket.sgmarketbackend.auction.dto.RefundAmount;
 import shop.sgmarket.sgmarketbackend.auction.dto.request.BidRegisterRequest;
 import shop.sgmarket.sgmarketbackend.auction.dto.response.BidInfoResponse;
 import shop.sgmarket.sgmarketbackend.auction.repository.auction.AuctionRepository;
@@ -55,18 +56,10 @@ public class BidService {
 
         auction.updateCurrentPrice(bidRequest.bidPrice());
         Bid bid = Bid.createBid(bidder, auction, bidRequest.bidPrice());
-        bidRepository.save(bid);
 
-        String message = String.format(
-                BID_NOTIFICATION_MESSAGE,
-                auction.getTitle(),
-                bidRequest.bidPrice()
-        );
-        notificationService.createAndSendNotification(
-                auction.getMember(),
-                NotificationEventType.BID,
-                message
-        );
+        bidder.deductCoin(bidRequest.bidPrice());
+        bidRepository.save(bid);
+        sendBidNotification(auction, bidRequest);
 
         return BidInfoResponse.of(bid);
     }
@@ -93,7 +86,7 @@ public class BidService {
         validateBiddingStatus(auction);
         validateAuctionOwner(owner, auction);
 
-        Bid winningBid = bidRepository.findTopByAuctionOrderByCreatedAtDesc(auction)
+        Bid winningBid = bidRepository.findTopByAuctionOrderByCreatedAtDescPriceDesc(auction)
                 .orElseThrow(() -> new CustomException(ErrorCode.BID_NOT_FOUND));
 
         auction.updateStatus(AuctionStatus.COMPLETED);
@@ -103,6 +96,10 @@ public class BidService {
         );
         priceHistoryRepository.save(priceHistory);
 
+        Long winningBidId = winningBid.getId();
+        List<RefundAmount> refundData = bidRepository.findRefundAmountsByAuctionExceptWinning(auctionId, winningBidId);
+
+        processRefunds(refundData);
         notifyAuctionSettled(auction, winningBid);
 
         return BidInfoResponse.of(winningBid);
@@ -151,6 +148,31 @@ public class BidService {
         priceHistoryRepository.save(priceHistory);
 
         notifyAuctionSettled(auction, highestBid);
+    }
+
+    private void processRefunds(List<RefundAmount> refundData) {
+        for (RefundAmount refundAmount : refundData) {
+            try {
+                Member bidderMember = memberUtil.getMemberByMemberId(refundAmount.memberId());
+                bidderMember.chargeCoin(refundAmount.totalAmount());
+            } catch (CustomException e) {
+                log.error("환불 실패: memberId={}, amount={}, reason={}",
+                        refundAmount.memberId(), refundAmount.totalAmount(), e.getMessage());
+            }
+        }
+    }
+
+    private void sendBidNotification(Auction auction, BidRegisterRequest bidRequest) {
+        String message = String.format(
+                BID_NOTIFICATION_MESSAGE,
+                auction.getTitle(),
+                bidRequest.bidPrice()
+        );
+        notificationService.createAndSendNotification(
+                auction.getMember(),
+                NotificationEventType.BID,
+                message
+        );
     }
 
     private void notifyAuctionSettled(Auction auction, Bid winningBid) {

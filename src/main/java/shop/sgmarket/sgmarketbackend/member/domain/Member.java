@@ -17,6 +17,8 @@ import lombok.NoArgsConstructor;
 import shop.sgmarket.sgmarketbackend.auth.domain.OAuthProvider;
 import shop.sgmarket.sgmarketbackend.global.domain.BaseTimeEntity;
 import shop.sgmarket.sgmarketbackend.global.domain.Status;
+import shop.sgmarket.sgmarketbackend.global.error.ErrorCode;
+import shop.sgmarket.sgmarketbackend.global.error.exception.CustomException;
 
 @Entity
 @Getter
@@ -90,5 +92,12 @@ public class Member extends BaseTimeEntity {
 
     public void chargeCoin(final Long price) {
         coin += price;
+    }
+
+    public void deductCoin(final Long price) {
+        if (coin < price) {
+            throw new CustomException(ErrorCode.INSUFFICIENT_COINS);
+        }
+        coin -= price;
     }
 }
