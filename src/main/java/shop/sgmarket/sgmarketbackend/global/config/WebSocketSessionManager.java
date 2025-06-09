@@ -49,18 +49,18 @@ public class WebSocketSessionManager {
             try {
                 WebSocketSession session = wrapper.getSession();
                 if (!session.isOpen()) {
-                    log.info("Removing closed session: {}", entry.getKey());
+                    log.info("비활성화된 세션을 제거합니다.: {}", entry.getKey());
                     return true;
                 }
                 long inactiveMinutes = Duration.between(wrapper.getLastActiveTime(), now).toMinutes();
                 if (inactiveMinutes >= INACTIVITY_LIMIT_MINUTES) {
-                    log.info("Removing inactive session ({} minutes): {}", inactiveMinutes, entry.getKey());
+                    log.info("비활성 세션 제거 중...  ({}분): {}", inactiveMinutes, entry.getKey());
                     session.close();
                     return true;
                 }
                 return false;
             } catch (Exception e) {
-                log.warn("Error checking session {}: {}", entry.getKey(), e.getMessage());
+                log.warn("세션 확인 중 오류 발생 {}: {}", entry.getKey(), e.getMessage());
                 return true;
             }
         });
