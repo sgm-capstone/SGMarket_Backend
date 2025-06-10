@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import shop.sgmarket.sgmarketbackend.chat.domain.ChatRoom;
 import shop.sgmarket.sgmarketbackend.chat.domain.MessageType;
 import shop.sgmarket.sgmarketbackend.chat.dto.response.ChatMessage;
+import shop.sgmarket.sgmarketbackend.chat.dto.response.ChatRoomActionResponse;
 import shop.sgmarket.sgmarketbackend.chat.dto.response.DirectChatListResponse;
 import shop.sgmarket.sgmarketbackend.chat.repository.ChatRoomRepository;
 import shop.sgmarket.sgmarketbackend.global.config.RedisPublisher;
@@ -135,5 +136,18 @@ public class ChatServiceImpl implements ChatService {
     public void deleteRoom(String roomId) {
         chatRoomRepository.deleteRoom(roomId);
         chatMessageService.deleteMessages(roomId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ChatRoomActionResponse getChatRoomActions(String roomId) {
+        ChatRoom room = chatRoomRepository.findRoomById(roomId);
+        if (room == null) throw new CustomException(ErrorCode.CHAT_ROOM_NOT_FOUND);
+
+        Long itemId = room.getItemId();
+        String detail = "/auction/" + itemId;          // 경매 진행 살펴보기
+        String trade  = "/auction/" + itemId + "/bid"; // 거래(낙찰) 페이지
+
+        return new ChatRoomActionResponse(itemId, detail, trade);
     }
 }

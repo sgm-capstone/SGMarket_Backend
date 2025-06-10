@@ -2,6 +2,7 @@ package shop.sgmarket.sgmarketbackend.chat.application;
 
 import shop.sgmarket.sgmarketbackend.chat.domain.ChatRoom;
 import shop.sgmarket.sgmarketbackend.chat.dto.response.ChatMessage;
+import shop.sgmarket.sgmarketbackend.chat.dto.response.ChatRoomActionResponse;
 import shop.sgmarket.sgmarketbackend.chat.dto.response.DirectChatListResponse;
 
 import java.util.List;
@@ -20,4 +21,6 @@ public interface ChatService {
     List<DirectChatListResponse> findDirectChatsWithDetails(Long userId);
 
     void deleteRoom(String roomId);
+
+    ChatRoomActionResponse getChatRoomActions(String roomId);
 }
