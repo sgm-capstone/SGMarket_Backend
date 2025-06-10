@@ -52,7 +52,7 @@ public enum ErrorCode {
     MISSING_S3_BUCKET_CONFIG(HttpStatus.INTERNAL_SERVER_ERROR, "IMAGE_5002", "S3 bucket 설정이 비어 있습니다."),
     MISSING_S3_REGION_CONFIG(HttpStatus.INTERNAL_SERVER_ERROR, "IMAGE_5003", "S3 region 설정이 비어 있습니다."),
     PAYMENT_PROCESSING_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "PAYMENT_5001", "결제 처리 중 오류가 발생했습니다."),
-    ;
+    CHAT_ROOM_NOT_FOUND(HttpStatus.INTERNAL_SERVER_ERROR,"ROOM_5001" ,"채팅방을 찾을 수 없습니다." );
 
     private final HttpStatus httpStatus;
     private final String code;
