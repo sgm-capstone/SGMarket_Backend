@@ -21,7 +21,9 @@ import shop.sgmarket.sgmarketbackend.member.domain.MemberLocation;
 import shop.sgmarket.sgmarketbackend.member.dto.request.ChargeCoinRequest;
 import shop.sgmarket.sgmarketbackend.member.dto.request.MemberUpdateRequest;
 import shop.sgmarket.sgmarketbackend.member.dto.response.MemberInfoResponse;
-import shop.sgmarket.sgmarketbackend.member.repository.MemberRepository;
+import shop.sgmarket.sgmarketbackend.order.domain.Order;
+import shop.sgmarket.sgmarketbackend.order.domain.repository.OrderRepository;
+import shop.sgmarket.sgmarketbackend.order.dto.response.OrderResponse;
 
 @Service
 @RequiredArgsConstructor
@@ -30,7 +32,7 @@ public class MemberService {
     private final AuctionRepository auctionRepository;
     private final AuctionLikeRepository auctionLikeRepository;
     private final BidRepository bidRepository;
-    private final MemberRepository memberRepository;
+    private final OrderRepository orderRepository;
 
     @Transactional(readOnly = true)
     public MemberInfoResponse getMemberInfoFromId() {
@@ -145,5 +147,17 @@ public class MemberService {
         });
 
         return SliceResponse.from(responseSlice);
+    }
+
+    @Transactional(readOnly = true)
+    public SliceResponse<OrderResponse> getOrdersByMemberId(Long memberId, Pageable pageable) {
+
+        Member targetMember = memberUtil.getMemberByMemberId(memberId);
+        Member currentMember = memberUtil.getCurrentMember();
+
+        Slice<Order> orders = orderRepository.findByMember(targetMember, pageable);
+
+        Slice<OrderResponse> orderResponses = orders.map(OrderResponse::from);
+        return SliceResponse.from(orderResponses);
     }
 }
