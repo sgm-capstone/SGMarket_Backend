@@ -2,9 +2,12 @@ package shop.sgmarket.sgmarketbackend.order.domain.repository;
 
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import shop.sgmarket.sgmarketbackend.member.domain.Member;
 import shop.sgmarket.sgmarketbackend.order.domain.Order;
 
 @Repository
@@ -25,5 +28,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
         where o.orderUid = :orderUid
     """)
     Optional<Order> findOrderAndPayment(String orderUid);
+
+    Slice<Order> findByMember(Member member, Pageable pageable);
 }
 

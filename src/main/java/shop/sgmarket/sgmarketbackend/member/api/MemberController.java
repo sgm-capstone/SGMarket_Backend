@@ -17,6 +17,7 @@ import shop.sgmarket.sgmarketbackend.member.application.MemberService;
 import shop.sgmarket.sgmarketbackend.member.dto.request.ChargeCoinRequest;
 import shop.sgmarket.sgmarketbackend.member.dto.request.MemberUpdateRequest;
 import shop.sgmarket.sgmarketbackend.member.dto.response.MemberInfoResponse;
+import shop.sgmarket.sgmarketbackend.order.dto.response.OrderResponse;
 
 @RestController
 @RequiredArgsConstructor
@@ -97,5 +98,17 @@ public class MemberController implements MemberDocs {
 
         return ApiResponseTemplate.ok(response)
                 .message("해당 멤버의 경매 목록 조회 완료");
+    }
+
+    @Override
+    @GetMapping("/{memberId}/orders")
+    public ApiResponseTemplate<SliceResponse<OrderResponse>> getOrdersByMemberId(
+            @PathVariable Long memberId,
+            @ParameterObject Pageable pageable) {
+
+        SliceResponse<OrderResponse> response = memberService.getOrdersByMemberId(memberId, pageable);
+
+        return ApiResponseTemplate.ok(response)
+                .message("해당 멤버의 주문 목록 조회 완료");
     }
 }

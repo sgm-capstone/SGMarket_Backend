@@ -19,6 +19,7 @@ import shop.sgmarket.sgmarketbackend.global.response.ApiResponseTemplate;
 import shop.sgmarket.sgmarketbackend.member.dto.request.ChargeCoinRequest;
 import shop.sgmarket.sgmarketbackend.member.dto.request.MemberUpdateRequest;
 import shop.sgmarket.sgmarketbackend.member.dto.response.MemberInfoResponse;
+import shop.sgmarket.sgmarketbackend.order.dto.response.OrderResponse;
 
 @Tag(name = "회원 API", description = "회원 관련 API입니다.")
 public interface MemberDocs {
@@ -150,6 +151,25 @@ public interface MemberDocs {
     )
     @GetMapping("/{memberId}/auctions")
     ApiResponseTemplate<SliceResponse<AuctionInfoResponse>> getAuctionsByMemberId(
+            @PathVariable Long memberId,
+            @ParameterObject Pageable pageable
+    );
+
+    @Operation(
+            summary = "특정 멤버의 구매 목록 조회",
+            description = "특정 멤버가 주문한 목록을 페이지 단위로 조회합니다.",
+            parameters = {
+                    @Parameter(name = "memberId", description = "조회할 멤버의 ID", required = true, example = "1")
+            },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "해당 멤버의 주문 목록 조회 성공",
+                            content = @Content(schema = @Schema(implementation = SliceResponse.class))),
+                    @ApiResponse(responseCode = "404", description = "존재하지 않는 회원입니다."),
+                    @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자입니다.")
+            }
+    )
+    @GetMapping("/{memberId}/orders")
+    ApiResponseTemplate<SliceResponse<OrderResponse>> getOrdersByMemberId(
             @PathVariable Long memberId,
             @ParameterObject Pageable pageable
     );
