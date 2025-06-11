@@ -9,6 +9,7 @@ public record ChatMessage(
         @Schema(description = "채팅방 ID") String roomId,
         @Schema(description = "보낸 사람 닉네임") String sender,
         @Schema(description = "보낸 사람 ID") String senderId,
+        @Schema(description = "프로필 이미지") String profileImage,
         @Schema(description = "메시지 내용") String message,
         @Schema(description = "메시지 타입 (ENTER, TALK, LEAVE)") MessageType type,
         @Schema(description = "생성 시각") LocalDateTime createdAt

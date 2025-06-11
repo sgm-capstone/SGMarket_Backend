@@ -4,12 +4,11 @@ spring:
   profiles:
     group:
       test: "test"
-      local: "local, datasource"
-      dev: "dev, datasource"
-      prod: "prod, datasource"
+      local: "local, datasource, redis"
+      dev: "dev, datasource, redis"
+      prod: "prod, datasource, redis"
     include:
       - security
-      - redis
       - cloud
       - imp
 

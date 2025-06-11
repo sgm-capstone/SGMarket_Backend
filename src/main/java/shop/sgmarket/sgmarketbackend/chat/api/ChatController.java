@@ -22,6 +22,7 @@ import shop.sgmarket.sgmarketbackend.chat.dto.response.ChatMessage;
 import shop.sgmarket.sgmarketbackend.chat.dto.request.DirectChatRequest;
 import shop.sgmarket.sgmarketbackend.chat.dto.response.ChatMessagePage;
 import shop.sgmarket.sgmarketbackend.chat.dto.response.DirectChatListResponse;
+import shop.sgmarket.sgmarketbackend.chat.dto.response.ChatRoomActionResponse;
 import shop.sgmarket.sgmarketbackend.global.util.MemberUtil;
 import shop.sgmarket.sgmarketbackend.global.response.ApiResponseTemplate;
 
@@ -187,5 +188,15 @@ public class ChatController {
             @RequestParam(defaultValue = "50") int size
     ) {
         return ApiResponseTemplate.ok(chatMessageService.getMessagesPage(roomId, cursor, size));
+    }
+
+    @Operation(
+        summary = "채팅방 메타데이터",
+        description = "• 경매 상세로 이동할 itemId\n• 거래하기(낙찰) URL을 한 번에 제공합니다.",
+        parameters = @Parameter(name = "roomId", required = true)
+    )
+    @GetMapping("/room/{roomId}/meta")
+    public ApiResponseTemplate<ChatRoomActionResponse> getRoomActions(@PathVariable String roomId) {
+        return ApiResponseTemplate.ok(chatService.getChatRoomActions(roomId));
     }
 }
