@@ -10,7 +10,10 @@ import org.springframework.web.socket.WebSocketSession;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @Component
 @Slf4j
@@ -19,7 +22,7 @@ public class WebSocketSessionManager {
     @Getter
     private static class SessionWrapper {
         private final WebSocketSession session;
-        private final Instant lastActiveTime;
+        private Instant lastActiveTime;
 
         public SessionWrapper(WebSocketSession session) {
             this.session = session;
@@ -40,6 +43,14 @@ public class WebSocketSessionManager {
     @PreDestroy
     public void destroy() {
         scheduler.shutdown();
+        try {
+            if (!scheduler.awaitTermination(5, TimeUnit.SECONDS)) {
+                scheduler.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            scheduler.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
     }
 
     private void cleanupSessions() {
