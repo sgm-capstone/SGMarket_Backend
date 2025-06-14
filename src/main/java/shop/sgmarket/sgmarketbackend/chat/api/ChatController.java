@@ -22,11 +22,11 @@ import shop.sgmarket.sgmarketbackend.chat.dto.response.ChatMessage;
 import shop.sgmarket.sgmarketbackend.chat.dto.request.DirectChatRequest;
 import shop.sgmarket.sgmarketbackend.chat.dto.response.ChatMessagePage;
 import shop.sgmarket.sgmarketbackend.chat.dto.response.DirectChatListResponse;
-import shop.sgmarket.sgmarketbackend.chat.dto.response.ChatRoomActionResponse;
 import shop.sgmarket.sgmarketbackend.global.util.MemberUtil;
 import shop.sgmarket.sgmarketbackend.global.response.ApiResponseTemplate;
+import shop.sgmarket.sgmarketbackend.chat.dto.response.ChatRoomMetaResponse;
+import shop.sgmarket.sgmarketbackend.chat.application.ChatRoomMetaService;
 
-import java.security.Principal;
 import java.util.List;
 
 @Tag(
@@ -38,9 +38,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ChatController {
 
-    private final ChatService chatService;
-    private final MemberUtil  memberUtil;
-    private final ChatMessageService chatMessageService;
+    private final ChatService          chatService;
+    private final ChatRoomMetaService  metaService;
+    private final MemberUtil           memberUtil;
+    private final ChatMessageService   chatMessageService;
 
     // --------------------------- 그룹 채팅 --------------------------- //
 
@@ -192,11 +193,11 @@ public class ChatController {
 
     @Operation(
         summary = "채팅방 메타데이터",
-        description = "• 경매 상세로 이동할 itemId\n• 거래하기(낙찰) URL을 한 번에 제공합니다.",
-        parameters = @Parameter(name = "roomId", required = true)
+        description = "상품 제목·가격 + 상대방 닉네임·프로필을 반환합니다."
     )
     @GetMapping("/room/{roomId}/meta")
-    public ApiResponseTemplate<ChatRoomActionResponse> getRoomActions(@PathVariable String roomId) {
-        return ApiResponseTemplate.ok(chatService.getChatRoomActions(roomId));
+    public ApiResponseTemplate<ChatRoomMetaResponse> getRoomMeta(@PathVariable String roomId) {
+        Long viewerId = memberUtil.getCurrentMember().getId();
+        return ApiResponseTemplate.ok(metaService.getMeta(roomId, viewerId));
     }
 }

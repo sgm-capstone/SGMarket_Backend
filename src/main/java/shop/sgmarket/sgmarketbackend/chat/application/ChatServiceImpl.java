@@ -3,10 +3,12 @@ package shop.sgmarket.sgmarketbackend.chat.application;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import shop.sgmarket.sgmarketbackend.auction.repository.auction.AuctionRepository;
 import shop.sgmarket.sgmarketbackend.chat.domain.ChatRoom;
 import shop.sgmarket.sgmarketbackend.chat.domain.MessageType;
 import shop.sgmarket.sgmarketbackend.chat.dto.response.ChatMessage;
 import shop.sgmarket.sgmarketbackend.chat.dto.response.ChatRoomActionResponse;
+import shop.sgmarket.sgmarketbackend.chat.dto.response.ChatRoomMetaResponse;
 import shop.sgmarket.sgmarketbackend.chat.dto.response.DirectChatListResponse;
 import shop.sgmarket.sgmarketbackend.chat.repository.ChatRoomRepository;
 import shop.sgmarket.sgmarketbackend.global.config.RedisPublisher;
@@ -14,6 +16,7 @@ import shop.sgmarket.sgmarketbackend.global.error.ErrorCode;
 import shop.sgmarket.sgmarketbackend.global.error.exception.CustomException;
 import shop.sgmarket.sgmarketbackend.member.domain.Member;
 import shop.sgmarket.sgmarketbackend.member.repository.MemberRepository;
+import shop.sgmarket.sgmarketbackend.auction.domain.Auction;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -28,6 +31,7 @@ public class ChatServiceImpl implements ChatService {
     private final RedisPublisher redisPublisher;
     private final ChatMessageService chatMessageService;
     private final MemberRepository memberRepository;
+    private final AuctionRepository auctionRepository;
 
     @Override
     @Transactional
@@ -43,21 +47,23 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     public void sendMessage(ChatMessage message, String userId) {
+        // 1. 보낸 사람 정보 조회
         Member sender = memberRepository.findById(Long.parseLong(userId))
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
+        // 2. 메시지 타입 기본값 보정
         MessageType type = message.type() != null ? message.type() : MessageType.TALK;
 
         ChatMessage authenticatedMessage = new ChatMessage(
                 message.roomId(),
-                sender.getNickname(),
+                sender.getNickname(),                             // 닉네임
                 userId,
-                sender.getOauthInfo().getOauthProfileImageUrl(),
+                sender.getOauthInfo().getOauthProfileImageUrl(),   // 프로필 이미지
                 message.message(),
                 type,
                 LocalDateTime.now()
         );
-        
+
         redisPublisher.publish(authenticatedMessage);
         chatMessageService.saveMessage(authenticatedMessage.roomId(), authenticatedMessage);
     }
@@ -73,25 +79,33 @@ public class ChatServiceImpl implements ChatService {
         String roomId = UUID.randomUUID().toString();
         String roomName = String.format("direct_%d_%d_item_%d", Math.min(senderId, receiverId), Math.max(senderId, receiverId), itemId);
 
-        ChatRoom room = ChatRoom.builder().id(roomId).name(roomName).creatorId(senderId).isDirectChat(true).participantId(receiverId).itemId(itemId).build();
+        ChatRoom room = ChatRoom.builder()
+                .id(roomId)
+                .name(roomName)
+                .creatorId(senderId)
+                .isDirectChat(true)
+                .participantId(receiverId)
+                .itemId(itemId)
+                .build();
 
         ChatRoom savedRoom = chatRoomRepository.createRoom(room);
 
+        // 초기 메시지가 있고 비어있지 않은 경우에만 전송
         if (initialMessage != null && !initialMessage.trim().isEmpty()) {
             Member senderMember = memberRepository.findById(senderId)
                     .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
-            
+
             ChatMessage message = new ChatMessage(
                     roomId,
-                    senderMember.getNickname(),
+                    senderMember.getNickname(),                         // 닉네임
                     senderId.toString(),
-                    senderMember.getOauthInfo().getOauthProfileImageUrl(),
+                    senderMember.getOauthInfo().getOauthProfileImageUrl(), // 프로필 이미지
                     initialMessage,
                     MessageType.TALK,
                     LocalDateTime.now()
             );
             redisPublisher.publish(message);
-            chatMessageService.saveMessage(roomId, message);
+            chatMessageService.saveMessage(roomId, message);  // 메시지 저장 추가
         }
 
         return savedRoom;
@@ -119,7 +133,8 @@ public class ChatServiceImpl implements ChatService {
             Long otherUserId = room.getCreatorId().equals(userId) ? room.getParticipantId() : room.getCreatorId();
 
             // 상대방 정보 조회
-            Member otherUser = memberRepository.findById(otherUserId).orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+            Member otherUser = memberRepository.findById(otherUserId)
+                    .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
             // 마지막 메시지 조회
             List<ChatMessage> messages = chatMessageService.getMessages(room.getId(), 1);
@@ -127,7 +142,15 @@ public class ChatServiceImpl implements ChatService {
 
             String locationName = otherUser.getLocation() != null ? otherUser.getLocation().getAddress() : null;
 
-            return new DirectChatListResponse(room.getId(), otherUserId, otherUser.getNickname(), otherUser.getOauthInfo().getOauthProfileImageUrl(),locationName, lastMessage != null ? lastMessage.message() : null, lastMessage != null ? lastMessage.createdAt() : null, room.getItemId());
+            return new DirectChatListResponse(
+                    room.getId(),
+                    otherUserId,
+                    otherUser.getNickname(),
+                    otherUser.getOauthInfo().getOauthProfileImageUrl(),
+                    locationName,
+                    lastMessage != null ? lastMessage.message() : null,
+                    lastMessage != null ? lastMessage.createdAt() : null,
+                    room.getItemId());
         }).collect(Collectors.toList());
     }
 
@@ -149,5 +172,37 @@ public class ChatServiceImpl implements ChatService {
         String trade  = "/auction/" + itemId + "/bid"; // 거래(낙찰) 페이지
 
         return new ChatRoomActionResponse(itemId, detail, trade);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ChatRoomMetaResponse getChatRoomMeta(String roomId, Long viewerId) {
+        ChatRoom room = chatRoomRepository.findRoomById(roomId);
+        if (room == null) throw new CustomException(ErrorCode.CHAT_ROOM_NOT_FOUND);
+
+        Long itemId = room.getItemId();                 // ★ 상품/경매 ID
+
+        // ─ 상품(경매) 정보 조회 ─
+        Auction auction = auctionRepository.findById(itemId)
+                .orElseThrow(() -> new CustomException(ErrorCode.AUCTION_NOT_FOUND));
+
+        String itemTitle = auction.getTitle();
+        long   itemPrice = auction.getCurrentPrice();   // 필요 시 startPrice / endPrice 로 변경
+
+        // ─ 상대방 정보 결정 ─
+        Long otherUserId = room.getCreatorId().equals(viewerId)
+                ? room.getParticipantId()
+                : room.getCreatorId();
+
+        Member otherUser = memberRepository.findById(otherUserId)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+
+        return new ChatRoomMetaResponse(
+                itemId,
+                itemTitle,
+                itemPrice,
+                otherUser.getNickname(),
+                otherUser.getOauthInfo().getOauthProfileImageUrl()
+        );
     }
 }
