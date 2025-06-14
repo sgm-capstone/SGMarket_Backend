@@ -1,8 +1,10 @@
 package shop.sgmarket.sgmarketbackend.chat.application;
 
+import org.springframework.transaction.annotation.Transactional;
 import shop.sgmarket.sgmarketbackend.chat.domain.ChatRoom;
 import shop.sgmarket.sgmarketbackend.chat.dto.response.ChatMessage;
 import shop.sgmarket.sgmarketbackend.chat.dto.response.ChatRoomActionResponse;
+import shop.sgmarket.sgmarketbackend.chat.dto.response.ChatRoomMetaResponse;
 import shop.sgmarket.sgmarketbackend.chat.dto.response.DirectChatListResponse;
 
 import java.util.List;
@@ -22,5 +24,9 @@ public interface ChatService {
 
     void deleteRoom(String roomId);
 
+    @Transactional(readOnly = true)
     ChatRoomActionResponse getChatRoomActions(String roomId);
+
+    @Transactional(readOnly = true)
+    ChatRoomMetaResponse getChatRoomMeta(String roomId, Long viewerId);
 }
